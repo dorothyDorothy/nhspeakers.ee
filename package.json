@@ -1,0 +1,34 @@
+{
+  "name": "northhertsspeakers.org",
+  "version": "1.0.0",
+  "description": "North Herts Speakers Website",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/climbingturn/wheatley.co.uk.git"
+  },
+  "keywords": [
+    "Climbing Turn, Toastmasters"
+  ],
+  "author": "Climbing Turn Ltd",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/climbingturn/northhertsspeakers.org/issues"
+  },
+  "homepage": "https://github.com/climbingturn/northhertsspeakers.org#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-clean-css": "^3.9.0",
+    "gulp-compass": "^2.1.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-copy": "^1.0.1",
+    "gulp-notify": "^3.0.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^3.1.0",
+    "gulp-sourcemaps": "^2.6.1",
+    "gulp-watch": "^4.3.11"
+  }
+}
