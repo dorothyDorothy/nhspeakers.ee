@@ -1,128 +1,99 @@
-/**
- *
- * Gulp File for North Herts Speakers
- * Created 30th October 2017
- * Climbing Turn Ltd -<www.climbingturn.co.uk>
- * Version: 1
- *
- */
+'use strict';
 
 var gulp = require('gulp');
-var compass = require('gulp-compass');
-var concat = require('gulp-concat');
-var cleanCSS = require('gulp-clean-css');
-var rename = require("gulp-rename");
-var notify = require("gulp-notify");
-var watch = require('gulp-watch');
-var sass = require('gulp-sass');
-var sourcemaps = require('gulp-sourcemaps');
 
-// var cpy = require('gulp-copy');
+var plugins = require("gulp-load-plugins")({
+    pattern: ['gulp-*', 'gulp.*', '@*/gulp{-,.}*'],
+    scope: ['dependencies', 'devDependencies', 'peerDependencies'],
+    rename: {
+      'gulp-clean-css': 'cleancss',
+      'gulp-ext-replace' : 'extreplace'
+    },    
+    replaceString: /\bgulp[\-.]/
+});
+
 
 /* --- File paths --- */
 var srcPaths = {
-    scss: './_source/scss/',
-    scss_vendor: './_source/vendor_scss/',
-    js_vendor: './_source/js/vendor/',
-    js_custom: './_source/js'
+  blogsass: './_source/sass/',
+  js: './_source/js/'
 };
 var distPaths = {
-    css_pretty: './deploy/html/css/pretty/',
-    css_min: './deploy/html/css/',
-    js_pretty: './deploy/html/js/pretty/',
-    js_min: './deploy/html/js/'
+  css: './deploy/html/css/pretty/',
+  css_min: './deploy/html/css/',
+  js: './deploy/html/js/pretty/',
+  js_min: './deploy/html/js/'
 };
 
-
-var temp_path = './_source/tmp/'
-
-/* -------------------------------------------------------------------------------------------- 
- * Minify vendor files that aren't already min,
- * then copy them all to the pretty/vendor folder
- * and concatentate them into vendor.min.css 
-   --------------------------------------------------------------------------------------------*/
+var watch_paths = [srcPaths.blogsass + '**/*.scss', srcPaths.js + '**/*.js']
 
 
-// // minify vendor css that aren't already minified and copy them to temp/pretty/vendor
-// gulp.task('minify_vendor_css', function() {
+/* --- gutils --- */
+var gutil = require('gulp-util');
+var changeEvent = function(evt) {
+    gutil.log('File', gutil.colors.cyan(evt.path.replace(new RegExp('/.*(?=/' + srcPaths.blogsass + ')/'), '')), 'was', gutil.colors.magenta(evt.type));
+};
 
-//     gulp.src([srcPaths.scss_vendor + 'owl.carousel.css', srcPaths.scss_vendor + 'owl.transitions.css'])
-//         .pipe(cleanCSS())
-//         .pipe(gulp.dest(temp_folders.vendor));
+/* --- SASS --- */
+gulp.task('sass', function () {
+  return gulp.src(srcPaths.blogsass + '**')
+    .pipe(plugins.sourcemaps.init())
+    .pipe(plugins.sass().on('error', plugins.sass.logError))
+    .pipe(plugins.sourcemaps.write('.'))
+    .pipe(gulp.dest(distPaths.css))
+    .pipe(plugins.notify({message: 'Styles Compiled', onLast:true}));
+});
 
-// });
-
-
-// // copy vendor files that are already minified to the pretty/vendor folder
-// gulp.task('copy_minified_vendor_css', ['minify_vendor_css'], function() {
-
-//     gulp.src([srcPaths.scss_vendor + 'bootstrap.min.css', srcPaths.scss_vendor + 'bootstrap-select.min.css', srcPaths.scss_vendor + 'jquery.slider.min.css'])
-//         .pipe(gulp.dest(temp_folders.vendor));
-
-// });
-
-
-// // concatenate the minified vendor css
-// gulp.task('vendor_css', ['copy_minified_vendor_css'], function() {
-
-//     gulp.src([temp_folders.vendor + 'bootstrap.min.css', temp_folders.vendor + 'bootstrap.select.css', temp_folders.vendor + 'jquery.slider.min.css', temp_folders.vendor + 'owl.carousel.css', temp_folders.vendor + 'owl.transitions.css'])
-//         .pipe(concat('vendor.min.css'))
-//         .pipe(gulp.dest(distPaths.css_min))
-//         .pipe(notify('VENDOR CSS compiled and Minified'))
-// });
+gulp.task('minify-css', ['sass'], function() {
+  return gulp.src(distPaths.css + '*.css')
+    .pipe(plugins.cleancss())
+    .pipe(gulp.dest(distPaths.css_min))
+    .pipe(plugins.notify({message: 'Styles Minified', onLast:true}));
+});
 
 
-/* ---------------------------------------------------------------------------------------------
- * Compile and Minify the custom scss
- * --------------------------------------------------------------------------------------------*/
+gulp.task('js-copy', function() {
+  return gulp.src([srcPaths.js + 'news.js', srcPaths.js + 'contact.js', srcPaths.js + 'staff.js'])
+    .pipe(gulp.dest(distPaths.js));
+});
 
-// gulp.task('compass', function() {
-// 
-//   gulp.src([srcPaths.scss + 'style.scss'])
-//     .pipe(compass({
-//       sass: srcPaths.scss,
-//       css: temp_folders.custom
-//     }))
-//     .pipe(gulp.dest(temp_folders.custom));
-// 
-// });
+// These Javascript files are used on all pages
+gulp.task('js-base-concat', ['js-copy'], function() {
+  return gulp.src([srcPaths.js + 'index.js', srcPaths.js + 'top-menu.js', srcPaths.js + 'img-club-slides.js'])
+    .pipe(plugins.sourcemaps.init())
+    .pipe(plugins.concat('base.js'))
+    .pipe(plugins.sourcemaps.write())
+    .pipe(gulp.dest(distPaths.js));
+});
 
+gulp.task('js-compress', ['js-base-concat'], function() {
+  gulp.src(distPaths.js + '*.js')
+    .pipe(plugins.minify({
+        noSource: true,
+        ext:{
+            min:'.js'
+        },
+        exclude: ['tasks'],
+        ignoreFiles: ['.combo.js', '.min.js']
+    }))
 
-gulp.task('sass2css', function() {
-
-    gulp.src(srcPaths.scss + 'wheatley.scss')
-        .pipe(sourcemaps.init())
-        .pipe(sass())
-        .pipe(sourcemaps.write())
-        .pipe(gulp.dest(distPaths.css_pretty));
-
+    .pipe(gulp.dest(distPaths.js_min))
+    .pipe(plugins.notify({message: 'Javascript Minified', onLast:true}))
 });
 
 
 
-gulp.task('minify_css', ['sass2css'], function() {
 
-    gulp.src(distPaths.css_pretty + 'wheatley.css')
-        .pipe(cleanCSS())
-        .pipe(gulp.dest(temp_path));
+gulp.task('watch', function(){
+  gulp.watch([srcPaths.blogsass + '/**/*'], [ 'minify-css'])
+    .on('change', function(evt){
+      changeEvent(evt);
+    });
 
+  gulp.watch([srcPaths.js + '/**/*'], [ 'js-compress'])
+    .on('change', function(evt){
+      changeEvent(evt);
+    });     
 });
 
-
-gulp.task('css', ['minify_css'], function() {
-
-    gulp.src(temp_path + 'wheatley.css')
-        .pipe(rename(distPaths.css_min + 'wheatley.min.css'))
-        .pipe(gulp.dest('./'))
-        .pipe(notify('Custom styles wheatley.min.css compiled'));
-
-});
-
-
-// WATCH
-
-gulp.task('watch', function () {
-    gulp.watch([srcPaths.scss + '/**/*'], ['css']);
-});
-
-gulp.task('default', ['watch']);
+gulp.task('default', ['minify-css', 'watch']);
