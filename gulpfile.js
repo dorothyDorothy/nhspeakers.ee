@@ -15,7 +15,8 @@ var plugins = require("gulp-load-plugins")({
 
 /* --- File paths --- */
 var srcPaths = {
-  blogsass: './_source/sass/',
+  sass: './_source/sass/',
+  sass_bulma: './_source/sass/bulma',
   js: './_source/js/'
 };
 var distPaths = {
@@ -25,18 +26,18 @@ var distPaths = {
   js_min: './deploy/html/js/'
 };
 
-var watch_paths = [srcPaths.blogsass + '**/*.scss', srcPaths.js + '**/*.js']
+var watch_paths = [srcPaths.sass + '**/*.scss', srcPaths.js + '**/*.js']
 
 
 /* --- gutils --- */
 var gutil = require('gulp-util');
 var changeEvent = function(evt) {
-    gutil.log('File', gutil.colors.cyan(evt.path.replace(new RegExp('/.*(?=/' + srcPaths.blogsass + ')/'), '')), 'was', gutil.colors.magenta(evt.type));
+    gutil.log('File', gutil.colors.cyan(evt.path.replace(new RegExp('/.*(?=/' + srcPaths.sass + ')/'), '')), 'was', gutil.colors.magenta(evt.type));
 };
 
 /* --- SASS --- */
 gulp.task('sass', function () {
-  return gulp.src(srcPaths.blogsass + '**')
+  return gulp.src(srcPaths.sass + '**')
     .pipe(plugins.sourcemaps.init())
     .pipe(plugins.sass().on('error', plugins.sass.logError))
     .pipe(plugins.sourcemaps.write('.'))
@@ -85,7 +86,7 @@ gulp.task('js-compress', ['js-base-concat'], function() {
 
 
 gulp.task('watch', function(){
-  gulp.watch([srcPaths.blogsass + '/**/*'], [ 'minify-css'])
+  gulp.watch([srcPaths.sass + '/**/*'], [ 'minify-css'])
     .on('change', function(evt){
       changeEvent(evt);
     });

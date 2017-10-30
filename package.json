@@ -24,8 +24,8 @@
   },
   "homepage": "https://github.com/climbingturn/northhertsspeakers.org#readme",
   "devDependencies": {
-    "gulp": "^3.9.1",
     "browser-sync": "^2.15.0",
+    "gulp": "^3.9.1",
     "gulp-clean-css": "^3.9.0",
     "gulp-concat": "^2.6.1",
     "gulp-copy": "^1.0.1",
@@ -35,7 +35,7 @@
     "gulp-sass": "^3.1.0",
     "gulp-sourcemaps": "^2.6.1",
     "gulp-uglify": "^3.0.0",
-    "gulp-util": "^2.2.14",    
+    "gulp-util": "^2.2.14",
     "gulp-watch": "^4.3.11"
   }
 }
