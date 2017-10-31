@@ -41,15 +41,15 @@ gulp.task('sass',  function () {
     .pipe(plugins.sourcemaps.init())
     .pipe(plugins.sass().on('error', plugins.sass.logError))
     .pipe(plugins.sourcemaps.write('.'))
-    .pipe(gulp.dest(distPaths.css_tmp))
+    .pipe(gulp.dest(distPaths.css))
     .pipe(plugins.notify({message: 'Styles Compiled', onLast:true}));
 });
 
 gulp.task('minify-css', ['sass'], function() {
-  return gulp.src(distPaths.css_tmp + '*.css')
+  return gulp.src(distPaths.css + '*.css')
     .pipe(plugins.cleancss())
-    .pipe(gulp.dest(distPaths.css))
-    .pipe(plugins.rename(distPaths.css + 'nhspeakers.min.css'))
+    .pipe(gulp.dest(distPaths.css_tmp))
+    .pipe(plugins.rename('nhspeakers.min.css'))
     .pipe(gulp.dest(distPaths.css_min))
     .pipe(plugins.notify({message: 'Styles Minified', onLast:true}));
 });
