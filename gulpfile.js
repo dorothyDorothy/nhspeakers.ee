@@ -15,12 +15,12 @@ var plugins = require("gulp-load-plugins")({
 
 /* --- File paths --- */
 var srcPaths = {
-  sass: './_source/sass/',
-  sass_bulma: './_source/sass/bulma',
+  sass: './_source/scss/',
   js: './_source/js/'
 };
 var distPaths = {
   css: './deploy/html/css/pretty/',
+  css_tmp: './_source/tmp/',
   css_min: './deploy/html/css/',
   js: './deploy/html/js/pretty/',
   js_min: './deploy/html/js/'
@@ -36,18 +36,20 @@ var changeEvent = function(evt) {
 };
 
 /* --- SASS --- */
-gulp.task('sass', function () {
-  return gulp.src(srcPaths.sass + '**')
+gulp.task('sass',  function () {
+  return gulp.src(srcPaths.sass + '*.scss')
     .pipe(plugins.sourcemaps.init())
     .pipe(plugins.sass().on('error', plugins.sass.logError))
     .pipe(plugins.sourcemaps.write('.'))
-    .pipe(gulp.dest(distPaths.css))
+    .pipe(gulp.dest(distPaths.css_tmp))
     .pipe(plugins.notify({message: 'Styles Compiled', onLast:true}));
 });
 
 gulp.task('minify-css', ['sass'], function() {
-  return gulp.src(distPaths.css + '*.css')
+  return gulp.src(distPaths.css_tmp + '*.css')
     .pipe(plugins.cleancss())
+    .pipe(gulp.dest(distPaths.css))
+    .pipe(plugins.rename(distPaths.css + 'nhspeakers.min.css'))
     .pipe(gulp.dest(distPaths.css_min))
     .pipe(plugins.notify({message: 'Styles Minified', onLast:true}));
 });
@@ -86,7 +88,7 @@ gulp.task('js-compress', ['js-base-concat'], function() {
 
 
 gulp.task('watch', function(){
-  gulp.watch([srcPaths.sass + '/**/*'], [ 'minify-css'])
+  gulp.watch([srcPaths.sass + '/**/*'], [ 'sass'])
     .on('change', function(evt){
       changeEvent(evt);
     });
