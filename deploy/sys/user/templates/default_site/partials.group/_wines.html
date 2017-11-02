@@ -1,0 +1,42 @@
+<section id="menu">
+  <div class="row"> 
+
+      <div class="mrgn-50-top-btm text-center">
+          <img src="/assets/divider.svg" alt="*">
+      </div>
+      
+      <div class="col-md-8 col-md-offset-2 text-center wow fadeInDown">
+
+          <h2><span class="head_itals">the</span>&nbsp;Wines</h2>    
+
+  {exp:channel:categories category_group="3" parse="inward" style="linear"}
+      <div class="col-md-4 wow fadeIn">
+        <p class="text-center mrgn-30-top"><span class="label label-menugroup text-uppercase">{category_name}</span></p>
+
+    {exp:channel:entries 
+          channel="wines" 
+          disable="member_data|pagination"
+          category="{category_id}"
+          dynamic="no"}       
+
+      {wine_serving_size}
+        {if wine_serving_size:count == 1}
+        <h3 class="mrgn-50-top">{title} <span class="accent">{wine_serving_size:price}</span></h3>
+        {/if}
+      {/wine_serving_size}
+      
+        <dl>
+          {wine_serving_size}
+          <dt>{wine_serving_size:size}</dt>
+          <dd>{wine_serving_size:price}</dd>
+          {/wine_serving_size}
+        </dl>
+        <p>{wine_description}</p>
+    {/exp:channel:entries}
+      </div>
+  {/exp:channel:categories}
+
+      </div>
+  </div>
+  
+</section>

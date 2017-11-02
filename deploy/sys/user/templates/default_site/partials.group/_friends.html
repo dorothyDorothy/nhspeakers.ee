@@ -1,0 +1,52 @@
+<section id="friends">
+  <div class="container"> 
+
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2 text-center wow fadeInDown">
+        <h2><span class="head_itals">the</span> Friends</h2>
+        <p class="lead">{tpi_friends}</p>
+      </div>
+    </div>
+
+    <div class="mrgn-50-top-btm text-center">
+      <img src="/assets/divider.svg" alt="*">
+    </div>
+
+
+  {exp:channel:categories 
+          category_group="4" 
+          parse="inward" 
+          style="linear"}
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2 text-center wow fadeInDown">
+      <h3>{category_name}</h3>
+    </div>
+  </div>
+    <div class="row"> 
+    {exp:channel:entries 
+        channel="friends"
+        category="{category_id}"
+        disable="member_data|pagination"
+        dynamic="no"}
+
+       <div class="col-md-6 wow fadeInUp mrgn-20-top-btm">
+        <div class="row">                    
+          <div class="col-xs-4 col-sm-2 col-md-3 col-lg-3">
+            <a href="http://www.{friend_link}" title="{title}"><img src="{friend_image}" alt="{title}" class="list-image"></a>
+          </div>
+
+          <div class="col-xs-8 col-sm-10 col-md-9 col-lg-9">
+            <h4>{title}</h4>
+            <p class="mrgn-10-top"><em>{friend_description}</em></p> <!-- <a href="#">(link to details)</a>-->
+            <p><a href="http://www.{friend_link}" target="_blank" class="btn btn-sm btn-main">View website</a></p>
+          </div>
+
+        </div>
+      </div>
+
+    {/exp:channel:entries}
+    </div>
+  {/exp:channel:categories}
+
+  </div>
+</section>

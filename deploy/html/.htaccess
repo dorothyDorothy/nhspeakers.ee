@@ -1,0 +1,57 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+
+  #### force www ###
+  RewriteCond %{HTTP_HOST} ^northhertsspeakers.org [NC]
+  RewriteRule ^(.*)$ https://www.northhertsspeakers.org/$1 [L,R=301]
+
+    Header set X-UA-Compatible "IE=Edge,chrome=1"
+        
+    RewriteCond $1 !\.(gif|jpe?g|png)$ [NC]
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ /index.php/$1 [L]
+</IfModule>
+
+
+<FilesMatch "\.(jpg|jpeg|png|gif|swf)$">
+    Header set Cache-Control "max-age=604800, public"
+</FilesMatch>
+
+# Compression
+<IfModule mod_deflate.c>
+    # Insert filter on all content
+    ###SetOutputFilter DEFLATE
+    # Insert filter on selected content types only
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript
+    # Netscape 4.x has some problems...
+    BrowserMatch ^Mozilla/4 gzip-only-text/html
+    # Netscape 4.06-4.08 have some more problems
+    BrowserMatch ^Mozilla/4\.0[678] no-gzip
+    # MSIE masquerades as Netscape, but it is fine
+    BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+    # Don't compress images
+    SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png)$ no-gzip dont-vary
+    # Make sure proxies don't deliver the wrong content
+    Header append Vary User-Agent env=!dont-vary
+</IfModule>
+
+# BEGIN EXPIRES
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresDefault "access plus 10 days"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType text/plain "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType application/x-javascript "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 week"
+    ExpiresByType application/x-icon "access plus 1 year"
+</IfModule>
+# END EXPIRES
+
+<IfModule mod_headers.c>
+   Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+</IfModule>

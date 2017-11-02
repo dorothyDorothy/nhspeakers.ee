@@ -5,5 +5,6 @@ node_modules/*
 *.sublime-*
 .settings/
 .sass-cache/
+cache/
 sql/
 crt/
