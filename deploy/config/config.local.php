@@ -26,7 +26,7 @@
 $config['database'] = array(
   'expressionengine' => array(
     'hostname' => 'localhost',
-    'database' => 'nh_speakers',
+    'database' => 'nhspeakers',
     'username' => 'nhspeaker',
     'password' => '$1wagonEACH4$',
     'dbprefix' => 'exp_',
