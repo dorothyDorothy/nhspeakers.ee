@@ -1,4 +1,4 @@
-a:3:{s:4:"time";i:1509817469;s:3:"ttl";i:0;s:4:"data";a:4:{s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:1:{s:4:"feed";a:1:{i:0;a:6:{s:4:"data";s:95:"
+a:3:{s:4:"time";i:1511866292;s:3:"ttl";i:0;s:4:"data";a:4:{s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:1:{s:4:"feed";a:1:{i:0;a:6:{s:4:"data";s:95:"
 
 		
 		
@@ -22,7 +22,69 @@ a:3:{s:4:"time";i:1509817469;s:3:"ttl";i:0;s:4:"data";a:4:{s:5:"child";a:1:{s:27
 					
 		
 
-	";s:7:"attribs";a:1:{s:36:"http://www.w3.org/XML/1998/namespace";a:1:{s:4:"lang";s:7:"english";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:8:{s:5:"title";a:1:{i:0;a:5:{s:4:"data";s:16:"ExpressionEngine";s:7:"attribs";a:1:{s:0:"";a:1:{s:4:"type";s:4:"text";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:8:"subtitle";a:1:{i:0;a:5:{s:4:"data";s:4:"Blog";s:7:"attribs";a:1:{s:0:"";a:1:{s:4:"type";s:4:"text";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:4:"link";a:2:{i:0;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:3:"rel";s:9:"alternate";s:4:"type";s:9:"text/html";s:4:"href";s:0:"";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}i:1;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:3:"rel";s:4:"self";s:4:"type";s:20:"application/atom+xml";s:4:"href";s:49:"https://expressionengine.com/blog/rss-feed/cpnews";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:7:"updated";a:1:{i:0;a:5:{s:4:"data";s:25:"2017-11-03T22:59:57+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:6:"rights";a:1:{i:0;a:5:{s:4:"data";s:32:"Copyright (c) 2017, Robin Sowell";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:9:"generator";a:1:{i:0;a:5:{s:4:"data";s:16:"ExpressionEngine";s:7:"attribs";a:1:{s:0:"";a:2:{s:3:"uri";s:28:"http://expressionengine.com/";s:7:"version";s:5:"3.5.8";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:2:"id";a:1:{i:0;a:5:{s:4:"data";s:29:"https://expressionengine.com/";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:5:"entry";a:10:{i:0;a:6:{s:4:"data";s:123:"
+	";s:7:"attribs";a:1:{s:36:"http://www.w3.org/XML/1998/namespace";a:1:{s:4:"lang";s:7:"english";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:8:{s:5:"title";a:1:{i:0;a:5:{s:4:"data";s:16:"ExpressionEngine";s:7:"attribs";a:1:{s:0:"";a:1:{s:4:"type";s:4:"text";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:8:"subtitle";a:1:{i:0;a:5:{s:4:"data";s:4:"Blog";s:7:"attribs";a:1:{s:0:"";a:1:{s:4:"type";s:4:"text";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:4:"link";a:2:{i:0;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:3:"rel";s:9:"alternate";s:4:"type";s:9:"text/html";s:4:"href";s:0:"";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}i:1;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:3:"rel";s:4:"self";s:4:"type";s:20:"application/atom+xml";s:4:"href";s:49:"https://expressionengine.com/blog/rss-feed/cpnews";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:7:"updated";a:1:{i:0;a:5:{s:4:"data";s:25:"2017-11-25T20:55:12+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:6:"rights";a:1:{i:0;a:5:{s:4:"data";s:31:"Copyright (c) 2017, Derek Jones";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:9:"generator";a:1:{i:0;a:5:{s:4:"data";s:16:"ExpressionEngine";s:7:"attribs";a:1:{s:0:"";a:2:{s:3:"uri";s:28:"http://expressionengine.com/";s:7:"version";s:5:"3.5.8";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:2:"id";a:1:{i:0;a:5:{s:4:"data";s:29:"https://expressionengine.com/";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:5:"entry";a:10:{i:0;a:6:{s:4:"data";s:123:"
+				
+				
+				
+				
+				
+				
+				
+					
+					
+				
+					
+					
+				
+					
+					
+				
+				
+
+				
+				
+					
+					
+				
+			";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:10:{s:5:"title";a:1:{i:0;a:5:{s:4:"data";s:41:"Cyber Monday Returns, 20% Off Today Only!";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:4:"link";a:1:{i:0;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:3:"rel";s:9:"alternate";s:4:"type";s:9:"text/html";s:4:"href";s:72:"https://expressionengine.com/blog/cyber-monday-returns-20-off-today-only";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:2:"id";a:1:{i:0;a:5:{s:4:"data";s:72:"https://expressionengine.com/blog/cyber-monday-returns-20-off-today-only";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:9:"published";a:1:{i:0;a:5:{s:4:"data";s:25:"2017-11-27T07:55:00+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:7:"updated";a:1:{i:0;a:5:{s:4:"data";s:25:"2017-11-25T20:55:12+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:6:"author";a:1:{i:0;a:6:{s:4:"data";s:23:"
+					
+					
+					
+				";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:2:{s:4:"name";a:1:{i:0;a:5:{s:4:"data";s:11:"Derek Jones";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:5:"email";a:1:{i:0;a:5:{s:4:"data";s:24:"derek.jones@ellislab.com";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}}s:8:"category";a:3:{i:0;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:4:"term";s:17:"CP Accessory Feed";s:6:"scheme";s:60:"https://expressionengine.com/blog/category/cp-accessory-feed";s:5:"label";s:17:"CP Accessory Feed";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}i:1;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:4:"term";s:16:"ExpressionEngine";s:6:"scheme";s:59:"https://expressionengine.com/blog/category/expressionengine";s:5:"label";s:16:"ExpressionEngine";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}i:2;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:4:"term";s:4:"News";s:6:"scheme";s:47:"https://expressionengine.com/blog/category/news";s:5:"label";s:4:"News";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:7:"content";a:1:{i:0;a:5:{s:4:"data";s:914:"
+				<p>For today only, you can enjoy 20% off all ExpressionEngine, CartThrob, and Freeform purchases—including upgrades!</p>
+
+<p>That&#8217;s 20% off the world&#8217;s best CMS, its most popular e-commerce solution, <em>and</em> the most powerful form builder for ExpressionEngine. 🤩🤯</p>
+
+<p><a href="https://expressionengine.com/store">Use coupon code</a> <strong>HTX7J-EQAG7</strong> at checkout.</p>
+
+<figure><img src="https://expressionengine.com/asset/img/blog/cyber-money-blog-2017.png" alt="20% off with coupon code HTX7J-EQAG7"></figure>
+
+<p>.<br />
+.<br />
+.<br />
+.<br />
+.<br />
+.</p>
+
+<p>Oh, hello there, friend. You read the whole page. Well in that case, we&#8217;ll remind you that all ExpressionEngine 3 purchases and upgrades made right now will get a <strong>free upgrade</strong> to v4. We probably shouldn&#8217;t remind you of that, but we like that you scrolled down. 🤗</p>
+
+				";s:7:"attribs";a:1:{s:0:"";a:1:{s:4:"type";s:4:"html";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:7:"pubDate";a:1:{i:0;a:5:{s:4:"data";s:31:"Mon, 27 Nov 2017 07:55:00 +0000";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:11:"description";a:1:{i:0;a:5:{s:4:"data";s:904:"<p>For today only, you can enjoy 20% off all ExpressionEngine, CartThrob, and Freeform purchases—including upgrades!</p>
+
+<p>That&#8217;s 20% off the world&#8217;s best CMS, its most popular e-commerce solution, <em>and</em> the most powerful form builder for ExpressionEngine. 🤩🤯</p>
+
+<p><a href="https://expressionengine.com/store">Use coupon code</a> <strong>HTX7J-EQAG7</strong> at checkout.</p>
+
+<figure><img src="https://expressionengine.com/asset/img/blog/cyber-money-blog-2017.png" alt="20% off with coupon code HTX7J-EQAG7"></figure>
+
+<p>.<br />
+.<br />
+.<br />
+.<br />
+.<br />
+.</p>
+
+<p>Oh, hello there, friend. You read the whole page. Well in that case, we&#8217;ll remind you that all ExpressionEngine 3 purchases and upgrades made right now will get a <strong>free upgrade</strong> to v4. We probably shouldn&#8217;t remind you of that, but we like that you scrolled down. 🤗</p>
+";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}i:1;a:6:{s:4:"data";s:123:"
 				
 				
 				
@@ -70,7 +132,7 @@ a:3:{s:4:"time";i:1509817469;s:3:"ttl";i:0;s:4:"data";a:4:{s:5:"child";a:1:{s:27
 <p>The live look button is back, and the forum permission settings are now more cooperative.  You may see a speed improvement in the publish form if you&#8217;re using lots of categories, and developers should enjoy the new <code>URL_TITLE_MAX_LENGTH</code> constant and some cleaning up in the DocBlocks.</p>
 
 <p>See the <a href="https://docs.expressionengine.com/v3/about/changelog.html#version-3-5-12">changelog</a> for the full list of improvements or just go <a href="https://expressionengine.com/store/purchases">download it now</a>.</p>
-";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}i:1;a:6:{s:4:"data";s:123:"
+";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}i:2;a:6:{s:4:"data";s:123:"
 				
 				
 				
@@ -198,7 +260,7 @@ a:3:{s:4:"time";i:1509817469;s:3:"ttl";i:0;s:4:"data";a:4:{s:5:"child";a:1:{s:27
 <p>We&#8217;ll announce those details along with pricing soon. Rest assured, there is no penalty for buying ExpressionEngine 3 today. Any purchases of ExpressionEngine 3 (including upgrades) made from here until v4 goes on sale will get a <strong>free upgrade</strong>. And in celebration, upgrades to v3 are <a href="https://expressionengine.com/store/purchases/upgradeable"><strong>on sale for 10% off</strong></a> for the remainder of the week. Enjoy!</p>
 
 <p>We are super excited about ExpressionEngine 4 and hope you are too. We&#8217;ll be taking deep dives into all of these features in the future, as we&#8217;ve barely scratched the surface here!</p>
-";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}i:2;a:6:{s:4:"data";s:106:"
+";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}i:3;a:6:{s:4:"data";s:106:"
 				
 				
 				
@@ -255,7 +317,7 @@ a:3:{s:4:"time";i:1509817469;s:3:"ttl";i:0;s:4:"data";a:4:{s:5:"child";a:1:{s:27
 <p>Every purchase of Freeform Next comes with 1 year of premium support from the Solspace team. And you can manage and download your ExpressionEngine and Freeform Next licenses all from your ExpressionEngine.com account.</p>
 
 <p>Head on over the store and <a href="https://expressionengine.com/store#freeform-next">grab Freeform Next</a> for your next project or site enhancement!</p>
-";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}i:3;a:6:{s:4:"data";s:123:"
+";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}i:4;a:6:{s:4:"data";s:123:"
 				
 				
 				
@@ -303,7 +365,7 @@ a:3:{s:4:"time";i:1509817469;s:3:"ttl";i:0;s:4:"data";a:4:{s:5:"child";a:1:{s:27
 <p>Third party developers weren&#8217;t forgotten.  There were several fixes to legacy libraries. The file model now deletes files more intelligently and password validation errors show the proper password length.</p>
 
 <p>See the <a href="https://docs.expressionengine.com/v3/about/changelog.html#version-3-5-11">changelog</a> for all the details or <a href="https://expressionengine.com/store/purchases">download it now</a> and start enjoying the improvements.</p>
-";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}i:4;a:6:{s:4:"data";s:123:"
+";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}i:5;a:6:{s:4:"data";s:123:"
 				
 				
 				
@@ -339,7 +401,7 @@ a:3:{s:4:"time";i:1509817469;s:3:"ttl";i:0;s:4:"data";a:4:{s:5:"child";a:1:{s:27
 				";s:7:"attribs";a:1:{s:0:"";a:1:{s:4:"type";s:4:"html";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:7:"pubDate";a:1:{i:0;a:5:{s:4:"data";s:31:"Tue, 27 Jun 2017 16:22:00 +0000";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:11:"description";a:1:{i:0;a:5:{s:4:"data";s:382:"<p>Because 3.5.10 is bigger than 3.5.9, we bring you two security improvements, a nice selection of bug fixes and a relationship optimization in the control panel.</p>
 
 <p>Check out the <a href="https://docs.expressionengine.com/v3/about/changelog.html#version-3-5-10">changelog</a> for the details or <a href="https://expressionengine.com/store/purchases">download it now</a>.</p>
-";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}i:5;a:6:{s:4:"data";s:123:"
+";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}i:6;a:6:{s:4:"data";s:123:"
 				
 				
 				
@@ -387,7 +449,7 @@ a:3:{s:4:"time";i:1509817469;s:3:"ttl";i:0;s:4:"data";a:4:{s:5:"child";a:1:{s:27
 <p>See the <a href="https://docs.expressionengine.com/v3/about/changelog.html#version-3-5-9">changelog</a> or <a href="https://expressionengine.com/store/purchases">download it now</a>.</p>
 
 <p>Have a great weekend, everyone!</p>
-";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}i:6;a:6:{s:4:"data";s:123:"
+";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}i:7;a:6:{s:4:"data";s:123:"
 				
 				
 				
@@ -443,7 +505,7 @@ a:3:{s:4:"time";i:1509817469;s:3:"ttl";i:0;s:4:"data";a:4:{s:5:"child";a:1:{s:27
 <p>Even the RTE module got some love this release, and should now load <a href="https://docs.expressionengine.com/latest/development/rte_tools.html">third-party RTE tools</a>.</p>
 
 <p>Check out the <a href="https://docs.expressionengine.com/v3/about/changelog.html#version-3-5-8">changelog</a> for the full scoop or head over to <a href="https://expressionengine.com/store/purchases">download it now</a>.</p>
-";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}i:7;a:6:{s:4:"data";s:123:"
+";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}i:8;a:6:{s:4:"data";s:123:"
 				
 				
 				
@@ -491,7 +553,7 @@ a:3:{s:4:"time";i:1509817469;s:3:"ttl";i:0;s:4:"data";a:4:{s:5:"child";a:1:{s:27
 <p>Channel forms also got a tweak to prevent clashing javascript when more than one form is on the page and there were fixes for comments, member notification settings, and category edits from the publish page.</p>
 
 <p>Visit the <a href="https://docs.expressionengine.com/v3/about/changelog.html#version-3-5-7">changelog</a> to view all of the changes.</p>
-";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}i:8;a:6:{s:4:"data";s:123:"
+";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}i:9;a:6:{s:4:"data";s:123:"
 				
 				
 				
@@ -609,122 +671,4 @@ a:3:{s:4:"time";i:1509817469;s:3:"ttl";i:0;s:4:"data";a:4:{s:5:"child";a:1:{s:27
 </ul>
 
 <p><strong><a href="https://expressionengine.com/store/purchases/upgradable">Get your 50% savings</a> before it&#8217;s gone!</strong></p>
-";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}i:9;a:6:{s:4:"data";s:123:"
-				
-				
-				
-				
-				
-				
-				
-					
-					
-				
-					
-					
-				
-					
-					
-				
-				
-
-				
-				
-					
-					
-				
-			";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:10:{s:5:"title";a:1:{i:0;a:5:{s:4:"data";s:50:"Colossal Upgrade Sale: 50% Off, Including Add-ons!";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:4:"link";a:1:{i:0;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:3:"rel";s:9:"alternate";s:4:"type";s:9:"text/html";s:4:"href";s:80:"https://expressionengine.com/blog/colossal-upgrade-sale-50-off-including-add-ons";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:2:"id";a:1:{i:0;a:5:{s:4:"data";s:80:"https://expressionengine.com/blog/colossal-upgrade-sale-50-off-including-add-ons";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:9:"published";a:1:{i:0;a:5:{s:4:"data";s:25:"2017-04-17T13:00:00+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:7:"updated";a:1:{i:0;a:5:{s:4:"data";s:25:"2017-04-24T18:12:10+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:6:"author";a:1:{i:0;a:6:{s:4:"data";s:23:"
-					
-					
-					
-				";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:2:{s:4:"name";a:1:{i:0;a:5:{s:4:"data";s:11:"Derek Jones";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:5:"email";a:1:{i:0;a:5:{s:4:"data";s:24:"derek.jones@ellislab.com";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}}s:8:"category";a:3:{i:0;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:4:"term";s:17:"CP Accessory Feed";s:6:"scheme";s:60:"https://expressionengine.com/blog/category/cp-accessory-feed";s:5:"label";s:17:"CP Accessory Feed";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}i:1;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:4:"term";s:16:"ExpressionEngine";s:6:"scheme";s:59:"https://expressionengine.com/blog/category/expressionengine";s:5:"label";s:16:"ExpressionEngine";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}i:2;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:4:"term";s:4:"News";s:6:"scheme";s:47:"https://expressionengine.com/blog/category/news";s:5:"label";s:4:"News";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:7:"content";a:1:{i:0;a:5:{s:4:"data";s:3577:"
-				<figure><img src="https://expressionengine.com/asset/img/blog/upgrade-sale-blog@2x.png" alt="50% off all upgrades"></figure>
-
-<p>We worked with many partners throughout the ExpressionEngine ecosystem to bring you tremendous savings! From now until ExpressionEngine 2 retires on April 30th, <a href="https://expressionengine.com/store/purchases/upgradable">upgrades in our store</a> are 50% off. But not just us. Many add-on developers around the world are participating as well. It&#8217;s never been simpler or cheaper to upgrade your site. That means that for many sites you will <b>save 50% across the board</b> for all of your software! Upgrades are 50% off from the following add-on developers:</p>
-
-<ul>
-<li><a href="http://app.25hweb.com/">25hweb</a></li>
-<li><a href="https://amphibian.info/software">Amphibian Design</a></li>
-<li><a href="http://backup-pro.com/">Backup Pro</a></li>
-<li><a href="https://eebloqs.com">Bloqs</a></li>
-<li><a href="https://boldminded.com">BoldMinded</a></li>
-<li><a href="https://buzzingpixel.com/">BuzzingPixel</a></li>
-<li><a href="https://www.cartthrob.com">CartThrob</a></li>
-<li><a href="https://www.causingeffect.com/software">Causing Effect</a> (v3 upgrades are <em>free</em>)</li>
-<li><a href="https://www.devdemon.com">DevDemon</a></li>
-<li><a href="https://eeharbor.com/upgrade">EEHarbor</a></li>
-<li><a href="https://devot-ee.com/add-ons/mustash">Mustash</a></li>
-<li><a href="https://www.putyourlightson.net/news/ee3-upgrade-offer-discounts">PutYourLightsOn</a></li>
-<li><a href="https://ee.reinos.nl">Reinos.nl</a></li>
-<li><a href="https://solspace.com/expressionengine">Solspace</a> (also offering 25% off <em>new</em> licenses)</li>
-<li><a href="https://twitter.com/wedoaddons/status/855056084171673600">wedoaddons</a> (SEO Lite is free)</li>
-</ul>
-
-<p>If you don’t have a web developer to help you upgrade, you can always find a hand in the <a href="https://expressionengine.com/pro-network">Professional Network</a>. This is a great option for sites who would benefit from a long-term relationship with an ExpressionEngine developer.</p>
-
-<p>Additionally, as part of this promotion to help folks upgrade, the following teams from our Developer Program are taking on new clients specifically for upgrade projects:</p>
-
-<ul>
-<li><a href="http://app.25hweb.com/">25hweb</a></li>
-<li><a href="http://www.bridgingunit.com/expressionengine/">Bridging Unit</a></li>
-<li><a href="https://buzzingpixel.com/upgrade-ee">BuzzingPixel</a></li>
-<li><a href="https://eeharbor.com/upgrade">EEHarbor</a></li>
-<li><a href="https://www.hopstudios.com/reliable_upgrade_expressionengine_2.x_to_3.x">Hop Studios</a></li>
-<li><a href="http://madebyhippo.com">Made By Hippo</a></li>
-<li><a href="https://notebleu.com/about/expressionengine-development">Notebleu</a></li>
-<li><a href="https://www.qdigitalstudio.com">Q Digital Studio</a></li>
-<li><a href="http://rawaysmith.com/expressionengine">RaywaySmith</a></li>
-<li><a href="http://shoeshinedesign.com/expressionengine-updates-by-expressionengine-experts">Shoe Shine Design &amp; Development</a></li>
-<li><a href="https://solspace.com/services/expressionengine-3-upgrades">Solspace</a></li>
-<li><a href="https://www.vectormediagroup.com/experience/expressionengine-development/">Vector Media Group</a></li>
-<li><a href="https://warblemedia.com.au">Warble Media</a></li>
-<li><a href="https://willowlightstudio.com/expressionengine">Willow Light Studio</a></li>
-</ul>
-
-<p>Don&#8217;t wait, <a href="https://expressionengine.com/store/purchases/upgradable">save 50% today</a>!</p>
-
-				";s:7:"attribs";a:1:{s:0:"";a:1:{s:4:"type";s:4:"html";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:7:"pubDate";a:1:{i:0;a:5:{s:4:"data";s:31:"Mon, 17 Apr 2017 13:00:00 +0000";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}s:11:"description";a:1:{i:0;a:5:{s:4:"data";s:3567:"<figure><img src="https://expressionengine.com/asset/img/blog/upgrade-sale-blog@2x.png" alt="50% off all upgrades"></figure>
-
-<p>We worked with many partners throughout the ExpressionEngine ecosystem to bring you tremendous savings! From now until ExpressionEngine 2 retires on April 30th, <a href="https://expressionengine.com/store/purchases/upgradable">upgrades in our store</a> are 50% off. But not just us. Many add-on developers around the world are participating as well. It&#8217;s never been simpler or cheaper to upgrade your site. That means that for many sites you will <b>save 50% across the board</b> for all of your software! Upgrades are 50% off from the following add-on developers:</p>
-
-<ul>
-<li><a href="http://app.25hweb.com/">25hweb</a></li>
-<li><a href="https://amphibian.info/software">Amphibian Design</a></li>
-<li><a href="http://backup-pro.com/">Backup Pro</a></li>
-<li><a href="https://eebloqs.com">Bloqs</a></li>
-<li><a href="https://boldminded.com">BoldMinded</a></li>
-<li><a href="https://buzzingpixel.com/">BuzzingPixel</a></li>
-<li><a href="https://www.cartthrob.com">CartThrob</a></li>
-<li><a href="https://www.causingeffect.com/software">Causing Effect</a> (v3 upgrades are <em>free</em>)</li>
-<li><a href="https://www.devdemon.com">DevDemon</a></li>
-<li><a href="https://eeharbor.com/upgrade">EEHarbor</a></li>
-<li><a href="https://devot-ee.com/add-ons/mustash">Mustash</a></li>
-<li><a href="https://www.putyourlightson.net/news/ee3-upgrade-offer-discounts">PutYourLightsOn</a></li>
-<li><a href="https://ee.reinos.nl">Reinos.nl</a></li>
-<li><a href="https://solspace.com/expressionengine">Solspace</a> (also offering 25% off <em>new</em> licenses)</li>
-<li><a href="https://twitter.com/wedoaddons/status/855056084171673600">wedoaddons</a> (SEO Lite is free)</li>
-</ul>
-
-<p>If you don’t have a web developer to help you upgrade, you can always find a hand in the <a href="https://expressionengine.com/pro-network">Professional Network</a>. This is a great option for sites who would benefit from a long-term relationship with an ExpressionEngine developer.</p>
-
-<p>Additionally, as part of this promotion to help folks upgrade, the following teams from our Developer Program are taking on new clients specifically for upgrade projects:</p>
-
-<ul>
-<li><a href="http://app.25hweb.com/">25hweb</a></li>
-<li><a href="http://www.bridgingunit.com/expressionengine/">Bridging Unit</a></li>
-<li><a href="https://buzzingpixel.com/upgrade-ee">BuzzingPixel</a></li>
-<li><a href="https://eeharbor.com/upgrade">EEHarbor</a></li>
-<li><a href="https://www.hopstudios.com/reliable_upgrade_expressionengine_2.x_to_3.x">Hop Studios</a></li>
-<li><a href="http://madebyhippo.com">Made By Hippo</a></li>
-<li><a href="https://notebleu.com/about/expressionengine-development">Notebleu</a></li>
-<li><a href="https://www.qdigitalstudio.com">Q Digital Studio</a></li>
-<li><a href="http://rawaysmith.com/expressionengine">RaywaySmith</a></li>
-<li><a href="http://shoeshinedesign.com/expressionengine-updates-by-expressionengine-experts">Shoe Shine Design &amp; Development</a></li>
-<li><a href="https://solspace.com/services/expressionengine-3-upgrades">Solspace</a></li>
-<li><a href="https://www.vectormediagroup.com/experience/expressionengine-development/">Vector Media Group</a></li>
-<li><a href="https://warblemedia.com.au">Warble Media</a></li>
-<li><a href="https://willowlightstudio.com/expressionengine">Willow Light Studio</a></li>
-</ul>
-
-<p>Don&#8217;t wait, <a href="https://expressionengine.com/store/purchases/upgradable">save 50% today</a>!</p>
-";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}}}}}}}}s:4:"type";i:512;s:7:"headers";a:12:{s:4:"date";s:29:"Sat, 04 Nov 2017 17:44:30 GMT";s:6:"server";s:6:"Apache";s:10:"set-cookie";s:906:"exp_last_visit=1194457470; expires=Sun, 04-Nov-2018 17:44:30 GMT; Max-Age=31536000; path=/; domain=.expressionengine.com; secure; httponly, exp_last_activity=1509817470; expires=Sun, 04-Nov-2018 17:44:30 GMT; Max-Age=31536000; path=/; domain=.expressionengine.com; secure; httponly, exp_tracker=%7B%220%22%3A%22blog%2Frss-feed%2Fcpnews%22%2C%22token%22%3A%220cf20b59bfeb139a402482b3e74bda079c7a29aef23ee0dfaa412631005a6f89a07c5499d7160a126d6fb4d69122f8a2%22%7D; path=/; domain=.expressionengine.com; secure; httponly, exp_csrf_token=deleted; expires=Thu, 01-Jan-1970 00:00:01 GMT; Max-Age=0; path=/; domain=.expressionengine.com; secure; httponly, exp_csrf_token=106d264c8d65300999d89f54449a1506004066d0; expires=Sat, 04-Nov-2017 19:44:30 GMT; Max-Age=7200; path=/; domain=.expressionengine.com; secure; httponly, PHPSESSID=c0tnfs78ege2g0mr810dqeaon6; path=/; domain=.expressionengine.com; secure; HttpOnly";s:15:"x-frame-options";s:10:"SAMEORIGIN";s:7:"expires";s:29:"Fri, 03 Nov 2017 23:59:57 GMT";s:13:"last-modified";s:29:"Fri, 03 Nov 2017 22:59:57 GMT";s:13:"cache-control";s:62:"no-store, no-cache, must-revalidate, post-check=0, pre-check=0";s:6:"pragma";s:8:"no-cache";s:16:"content-encoding";s:4:"gzip";s:4:"vary";s:15:"Accept-Encoding";s:25:"strict-transport-security";s:34:"max-age=7776000; includeSubDomains";s:12:"content-type";s:23:"text/xml; charset=utf-8";}s:5:"build";s:14:"20171027174542";}}
+";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:7:"english";}}}}}}}}}}}}s:4:"type";i:512;s:7:"headers";a:12:{s:4:"date";s:29:"Tue, 28 Nov 2017 10:51:32 GMT";s:6:"server";s:6:"Apache";s:10:"set-cookie";s:906:"exp_last_visit=1196506292; expires=Wed, 28-Nov-2018 10:51:32 GMT; Max-Age=31536000; path=/; domain=.expressionengine.com; secure; httponly, exp_last_activity=1511866292; expires=Wed, 28-Nov-2018 10:51:32 GMT; Max-Age=31536000; path=/; domain=.expressionengine.com; secure; httponly, exp_tracker=%7B%220%22%3A%22blog%2Frss-feed%2Fcpnews%22%2C%22token%22%3A%220cf20b59bfeb139a402482b3e74bda079c7a29aef23ee0dfaa412631005a6f89a07c5499d7160a126d6fb4d69122f8a2%22%7D; path=/; domain=.expressionengine.com; secure; httponly, exp_csrf_token=deleted; expires=Thu, 01-Jan-1970 00:00:01 GMT; Max-Age=0; path=/; domain=.expressionengine.com; secure; httponly, exp_csrf_token=86c566bbcf5e93e53772913b8844228e6591b606; expires=Tue, 28-Nov-2017 12:51:32 GMT; Max-Age=7200; path=/; domain=.expressionengine.com; secure; httponly, PHPSESSID=30jj6gdfaa46k8kccit6d72cu7; path=/; domain=.expressionengine.com; secure; HttpOnly";s:15:"x-frame-options";s:10:"SAMEORIGIN";s:7:"expires";s:29:"Mon, 27 Nov 2017 08:55:00 GMT";s:13:"last-modified";s:29:"Mon, 27 Nov 2017 07:55:00 GMT";s:13:"cache-control";s:62:"no-store, no-cache, must-revalidate, post-check=0, pre-check=0";s:6:"pragma";s:8:"no-cache";s:16:"content-encoding";s:4:"gzip";s:4:"vary";s:15:"Accept-Encoding";s:25:"strict-transport-security";s:34:"max-age=7776000; includeSubDomains";s:12:"content-type";s:23:"text/xml; charset=utf-8";}s:5:"build";s:14:"20171122161228";}}
