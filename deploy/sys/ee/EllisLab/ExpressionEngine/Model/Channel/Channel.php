@@ -113,6 +113,9 @@ class Channel extends StructureModel {
 		'site_id'                    => 'required|isNatural',
 		'channel_title'              => 'required|unique[site_id]|xss',
 		'channel_name'               => 'required|unique[site_id]|alphaDash',
+		'channel_url'                => 'xss',
+		'comment_url'                => 'xss',
+		'channel_description'        => 'xss',
 		'deft_comments'              => 'enum[y,n]',
 		'channel_require_membership' => 'enum[y,n]',
 		'channel_allow_img_urls'     => 'enum[y,n]',
@@ -130,9 +133,13 @@ class Channel extends StructureModel {
 		'max_entries'                => 'isNatural',
 		'max_revisions'              => 'isNatural',
 		'max_characters'             => 'isNatural',
+		'comment_max_chars'          => 'isNatural',
 		'comment_timelock'           => 'isNatural',
 		'comment_expiration'         => 'isNatural',
-		'url_title_prefix'           => 'alphaDash',
+		'search_results_url'         => 'xss',
+		'rss_url'                    => 'xss',
+		'default_entry_title'        => 'xss',
+		'url_title_prefix'           => 'alphaDash|xss',
 		'channel_notify_emails'      => 'validateEmails',
 		'comment_notify_emails'      => 'validateEmails'
 	);
@@ -216,7 +223,7 @@ class Channel extends StructureModel {
 
 		foreach ($emails as $email)
 		{
-			if ($value != filter_var($value, FILTER_SANITIZE_EMAIL) OR ! filter_var($value, FILTER_VALIDATE_EMAIL))
+			if ($email != filter_var($email, FILTER_SANITIZE_EMAIL) OR ! filter_var($email, FILTER_VALIDATE_EMAIL))
 			{
 				$rule->stop();
 				return 'valid_email';
@@ -260,7 +267,7 @@ class Channel extends StructureModel {
 	 * Display the CP entry form
 	 *
 	 * @param Content $content  An object implementing the Content interface
-	 * @return Array of HTML field elements for the entry / edit form
+	 * @return array of HTML field elements for the entry / edit form
 	 */
 	public function getPublishForm($content = NULL)
 	{
@@ -320,6 +327,7 @@ class Channel extends StructureModel {
 		$this->FieldGroups = clone $channel->FieldGroups;
 		$this->CustomFields = clone $channel->CustomFields;
 		$this->Statuses = clone $channel->Statuses;
+		$this->ChannelFormSettings = clone $channel->ChannelFormSettings;
 	}
 
 	public function onBeforeSave()

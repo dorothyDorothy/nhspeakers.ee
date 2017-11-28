@@ -63,15 +63,15 @@ class EE_Core {
 		define('PATH_THIRD',  SYSPATH . 'user/addons/');
 		define('PATH_CACHE',  SYSPATH . 'user/cache/');
 		define('PATH_TMPL',   SYSPATH . 'user/templates/');
-		define('PATH_JS',     'src');
+		define('PATH_JS',     'compressed');
 		define('PATH_DICT',   SYSPATH . 'user/config/');
 
 		// application constants
 		define('IS_CORE',		FALSE);
 		define('APP_NAME',		'ExpressionEngine'.(IS_CORE ? ' Core' : ''));
-		define('APP_BUILD',		'20171027');
-		define('APP_VER',		'4.0.0-dp.3');
-		define('APP_VER_ID',	'dp.3');
+		define('APP_BUILD',		'20171122');
+		define('APP_VER',		'4.0.0-rc.1');
+		define('APP_VER_ID',	'rc.1');
 		define('SLASH',			'&#47;');
 		define('LD',			'{');
 		define('RD',			'}');
@@ -83,6 +83,7 @@ class EE_Core {
 		define('USERNAME_MAX_LENGTH', 75);
 		define('PASSWORD_MAX_LENGTH', 72);
 		define('DOC_URL',       'https://docs.expressionengine.com/v4/');
+		define('URL_TITLE_MAX_LENGTH', 200);
 
 		ee()->load->helper('language');
 		ee()->load->helper('string');

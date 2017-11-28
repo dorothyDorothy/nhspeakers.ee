@@ -42,9 +42,9 @@ class Channels extends AbstractChannelsController {
 
 		$total_channels = $channels->count();
 
-		$filters = ee('CP/Filter');
-		$filters->add('Keyword');
-		$filters->add('Perpage', $total_channels, 'all_channels', TRUE);
+		$filters = ee('CP/Filter')
+			->add('Keyword')
+			->add('Perpage', $total_channels, 'all_channels', TRUE);
 		$filter_values = $filters->values();
 
 		$page = ee('Request')->get('page') ?: 1;
@@ -85,7 +85,7 @@ class Channels extends AbstractChannelsController {
 					],
 					'layout-set' => [
 						'href' => ee('CP/URL', 'channels/layouts/' . $channel->getId()),
-						'title' => lang('export')
+						'title' => lang('layouts')
 					]
 				],
 				'selection' => [
@@ -516,7 +516,7 @@ class Channels extends AbstractChannelsController {
 	{
 		$field_group_options = ee('Model')->get('ChannelFieldGroup')
 			->fields('group_name')
-			->filter('site_id', ee()->config->item('site_id'))
+			->filter('site_id', 'IN', [ee()->config->item('site_id'), 0])
 			->order('group_name')
 			->all()
 			->getDictionary('group_id', 'group_name');
@@ -551,7 +551,7 @@ class Channels extends AbstractChannelsController {
 	{
 		$fields = ee('Model')->get('ChannelField')
 			->fields('field_label', 'field_name')
-			->filter('site_id', ee()->config->item('site_id'))
+			->filter('site_id', 'IN', [ee()->config->item('site_id'), 0])
 			->order('field_label')
 			->all();
 
@@ -782,7 +782,11 @@ class Channels extends AbstractChannelsController {
 		}
 
 		// Default status menu
-		$deft_status_options = ['' => lang('none')];
+		$deft_status_options = [
+			'' => lang('none'),
+			'open' => lang('open'),
+			'closed' => lang('closed')
+		];
 		$deft_status_options += $channel->Statuses
 			->sortBy('status_order')
 			->getDictionary('status', 'status');
@@ -1080,11 +1084,7 @@ class Channels extends AbstractChannelsController {
 					'desc' => 'enable_versioning_desc',
 					'fields' => array(
 						'enable_versioning' => array(
-							'type' => 'inline_radio',
-							'choices' => array(
-								'y' => 'enable',
-								'n' => 'disable'
-							),
+							'type' => 'yes_no',
 							'value' => $channel->enable_versioning
 						)
 					)
@@ -1110,11 +1110,7 @@ class Channels extends AbstractChannelsController {
 					'desc' => 'enable_author_notification_desc',
 					'fields' => array(
 						'comment_notify_authors' => array(
-							'type' => 'inline_radio',
-							'choices' => array(
-								'y' => 'enable',
-								'n' => 'disable'
-							),
+							'type' => 'yes_no',
 							'value' => $channel->comment_notify_authors
 						)
 					)
@@ -1124,11 +1120,7 @@ class Channels extends AbstractChannelsController {
 					'desc' => 'enable_channel_entry_notification_desc',
 					'fields' => array(
 						'channel_notify' => array(
-							'type' => 'inline_radio',
-							'choices' => array(
-								'y' => 'enable',
-								'n' => 'disable'
-							),
+							'type' => 'yes_no',
 							'value' => $channel->channel_notify
 						),
 						'channel_notify_emails' => array(
@@ -1142,11 +1134,7 @@ class Channels extends AbstractChannelsController {
 					'desc' => 'enable_comment_notification_desc',
 					'fields' => array(
 						'comment_notify' => array(
-							'type' => 'inline_radio',
-							'choices' => array(
-								'y' => 'enable',
-								'n' => 'disable'
-							),
+							'type' => 'yes_no',
 							'value' => $channel->comment_notify
 						),
 						'comment_notify_emails' => array(

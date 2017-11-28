@@ -29,7 +29,7 @@ foreach ($setting['fields'] as $field_name => $field)
 {
 	if (isset($field['required']) && $field['required'] == TRUE)
 	{
-		$fieldset_classes .= 'fieldset-required';
+		$fieldset_classes .= ' fieldset-required';
 		break;
 	}
 }
@@ -127,7 +127,10 @@ $element = ($grid) ? 'div' : 'fieldset'; ?>
 					$vars['field']['margin_top'] = TRUE;
 				}
 
-				$count++;
+				if ($field['type'] != 'hidden')
+				{
+					$count++;
+				}
 
 				$this->embed('ee:_shared/form/field', $vars);
 			}

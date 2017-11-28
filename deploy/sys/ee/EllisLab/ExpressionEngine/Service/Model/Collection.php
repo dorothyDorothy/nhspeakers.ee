@@ -38,14 +38,14 @@ class Collection extends CoreCollection {
 	/**
 	 *
 	 */
-	public function add(Model $model)
+	public function add(Model $model, $propagate = TRUE)
 	{
 		$this->elements[] = $model;
 
-		// if (isset($this->association))
-		// {
-		// 	$this->association->add($model);
-		// }
+		if (isset($this->association) && $propagate)
+		{
+			$this->association->add($model);
+		}
 
 		return $this;
 	}
@@ -187,6 +187,11 @@ class Collection extends CoreCollection {
 			default:
 				throw new InvalidArgumentException('Not a valid operator: '.htmlentities($operator));
 		}
+	}
+
+	public function __toString()
+	{
+		return spl_object_hash($this);
 	}
 }
 

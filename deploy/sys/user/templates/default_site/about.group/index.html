@@ -1,0 +1,41 @@
+{layout="layouts/_index"}
+
+{exp:channel:entries 
+        channel="about"
+        url_title="{segment_2}"
+        dynamic="no"
+        disable="categories|member_data|pagination"}
+
+        {if no_results}
+no results
+{segment_2}
+        {/if}
+
+<section id="about">
+  <div class="container-fluid">
+
+    <div class="row wow fadeInDown">
+      <div class="col-md-6 col-md-offset-3 text-center">
+        <h2>{title}</h2>     
+        <p class="lead">{p_intro}</p>
+
+      </div>
+    </div>
+
+    <div class="mrgn-50-top-btm text-center">
+        <img src="/assets/divider.svg" alt="*">
+    </div>
+
+      <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 col-sm-10 col-sm-offset-1 wow fadeIn">
+    {about_image}
+        <img src="{about_image:source}" class="img-responsive center-block mrgn-20-btm chefitem" width="350" height="350" alt="{about_image:alt_text">
+    {/about_image}    
+        <h3>{title}</h3>
+        <p class="mrgn-20-top">{p_content}</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+{/exp:channel:entries }

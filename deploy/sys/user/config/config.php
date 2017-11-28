@@ -7,13 +7,13 @@ $config['cache_driver'] = 'file';
 // Find more configs and overrides at
 // https://docs.expressionengine.com/latest/general/system_configuration_overrides.html
 
-$config['app_version'] = '4.0.0-dp.3';
+$config['app_version'] = '4.0.0-rc.1';
 $config['encryption_key'] = '36bcf98ff5292d339b6b2c7585c3021b686ea6b3';
 $config['session_crypt_key'] = '1cda6cd12ef7f6e45286714d8c1b432f3e81e323';
 $config['database'] = array(
 	'expressionengine' => array(
 		'hostname' => 'localhost',
-		'database' => 'nhspeakers',
+		'database' => 'nh_speakers',
 		'username' => 'nhspeaker',
 		'password' => '$1wagonEACH4$',
 		'dbprefix' => 'exp_',
