@@ -1,0 +1,97 @@
+@CHARSET "ISO-8859-1";
+
+.mainTable {
+    width: 80%;
+}
+
+.mainTable td, .mainTable th {
+    width: 200px;
+}
+
+.mainTable input[type="submit"] {
+	padding: 3px 5px;
+}
+
+.mainTable div {
+	margin: 2px 5px;
+	padding: 3px;
+	vertical-align: middle;
+}
+
+/* .mainTable input[type="radio"] { */
+/* 	padding: 5px 3px 0; */
+/* } */
+
+.mainTable span {
+	padding-left: 8px;
+}
+
+.submit-container {
+	float: right;
+	padding-right: 10px;
+}
+
+input[type="checkbox"],
+label {
+	cursor: pointer;
+}
+
+label {
+	padding-right: 5px;
+}
+
+.cp-footer {
+	width: 100%;
+	clear:both;
+	margin-top: 20px;
+	padding-top: 20px;
+	border-top: 1px solid #fff;
+}
+
+/* ---- Reports --- */
+
+
+.report-controls {
+/*	margin: 10px;
+	float: left;*/
+}
+
+
+
+.report-controls select {
+  /* Safari 3-4, iOS 1-3.2, Android 1.6- */
+  -webkit-border-radius: 5px; 
+
+  /* Firefox 1-3.6 */
+  -moz-border-radius: 5px; 
+  
+  /* Opera 10.5, IE 9, Safari 5, Chrome, Firefox 4, iOS 4, Android 2.1+ */
+  border-radius: 5px; 	
+    outline:none;
+    display: inline-block;
+    border: none;
+    padding: 5px;
+    margin: 10px 10px 10px 0;
+}
+
+
+.report-data-title {
+	margin-top: 20px;
+}
+
+
+/* --------- STATS --------------- */
+
+.pagination-container {
+	margin: 10px 0;
+	font-size: 0.8rem;
+}
+
+code {
+	font-weight: bold;
+}
+
+.purge-button {
+	float: right;
+	margin-top: 10px;
+}

@@ -27,7 +27,7 @@ Contents
 5.Video Background Header
 6.Common Styles for Sections
 7.About us
-8.Chefs
+8.Lasting Impressions
 8.1.Chefs2
 9.Recommendations
 9.1.Recommendations2
@@ -180,13 +180,13 @@ section h2 {font-family: 'ITC Galliard Roman', serif; font-size:44px; text-trans
 section#about {background:#f9f9f9;max-width: 100%; overflow:hidden}
 
 /*********  
-8.Chefs
+8.Lasting Impressions
 *********/
-section#chefs {background:#f9f7f3 url(/images/backgrounds/bf-events-bg.jpg);background-attachment:fixed;}
-section#chefs h3 {text-transform:uppercase; font-weight:400}
-section#chefs h4 {text-transform:uppercase; font-weight:400}
-section#chefs .chefitem {border:1px solid rgba(206, 196, 168, 1)}
-section#chefs .chef {margin-bottom:30px;}
+section#impressions {background:#f9f7f3 url(/images/backgrounds/bf-events-bg.jpg);background-attachment:fixed;}
+section#impressions h3 {text-transform:uppercase; font-weight:400}
+section#impressions h4 {text-transform:uppercase; font-weight:400}
+section#impressions .chefitem {border:1px solid rgba(206, 196, 168, 1)}
+section#impressions .chef {margin-bottom:30px;}
 
 /*********  
 8.1.Chefs2

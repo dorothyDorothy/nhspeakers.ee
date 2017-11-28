@@ -1,4 +1,4 @@
-<section id="chefs">
+<section id="impressions">
   <div class="container"> 
          
     <div class="row">
@@ -13,20 +13,24 @@
     </div>
 
     <div class="row text-center"> 
-{exp:channel:entries 
-        channel="chefs" 
+  {exp:lasting_impressions:entries
+        channel="about"
         disable="categories|member_data|pagination"
         dynamic="no"}   
 
-    {basic_image}
-      <div class="col-sm-4 wow fadeIn chef"> <img src="{basic_image:source}" class="img-responsive center-block mrgn-20-btm chefitem" width="350" height="350" alt="{basic_image:alt}" />
-    {/basic_image}    
+    {about_image}
+    <a href="/about/{url_title}" title="{title}">
+      <div class="col-sm-4 wow fadeIn chef">
+        <img src="{about_image:source}" class="img-responsive location" alt="{about_image:alt_text}">
+      </div>
+    </a>
+    {/about_image}   
         <h3>{title}</h3>
-        <p class="text-muted">{basic_subhead}</p>
-        <p class="mrgn-20-top">{basic_body}</p>
+        <p class="text-muted">{p_intro}</p>
+        <p class="mrgn-20-top">{p_content}</p>
       </div>
 
-{/exp:channel:entries} 
+{/exp:lasting_impressions:entries} 
 
     </div>
 
