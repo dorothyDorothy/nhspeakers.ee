@@ -2147,7 +2147,10 @@ class EE_Typography {
 
 		foreach ($emoji_remap as $smiley => $short_name)
 		{
-			$str = str_replace($smiley, $short_name, $str);
+			foreach(array(' ', "\t", "\n", "\r", '.', ',', '>') as $char)
+			{
+				$str = str_replace($char.$smiley, $char.$short_name, $str);
+			}
 		}
 
 		return $str;
@@ -2517,7 +2520,14 @@ while (--j >= 0)
 		// on the domain and not the entire string.
 		if (isset($parts['host']))
 		{
-			$parts['host'] = idn_to_ascii($parts['host']);
+			if (is_php('7.2'))
+			{
+				$parts['host'] = idn_to_ascii($parts['host'], 0, INTL_IDNA_VARIANT_UTS46);
+			}
+			else
+			{
+				$parts['host'] = idn_to_ascii($parts['host']);
+			}
 		}
 
 		return $this->unparse_url($parts);

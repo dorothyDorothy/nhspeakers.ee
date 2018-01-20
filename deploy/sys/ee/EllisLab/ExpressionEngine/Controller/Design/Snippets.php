@@ -220,7 +220,7 @@ class Snippets extends AbstractDesignController {
 						'fields' => array(
 							'snippet_contents' => array(
 								'type' => 'textarea',
-								'required' => TRUE
+								'attrs' => 'class="textarea-medium"'
 							)
 						)
 					),
@@ -259,11 +259,6 @@ class Snippets extends AbstractDesignController {
 				'field' => 'snippet_name',
 				'label' => 'lang:snippet_name',
 				'rules' => 'required|callback__snippet_name_checks'
-			),
-			array(
-				'field' => 'snippet_contents',
-				'label' => 'lang:snippet_contents',
-				'rules' => 'required'
 			)
 		));
 
@@ -355,7 +350,7 @@ class Snippets extends AbstractDesignController {
 						'fields' => array(
 							'snippet_contents' => array(
 								'type' => 'textarea',
-								'required' => TRUE,
+								'attrs' => 'class="textarea-medium"',
 								'value' => $snippet->snippet_contents
 							)
 						)
@@ -389,11 +384,6 @@ class Snippets extends AbstractDesignController {
 				'field' => 'snippet_name',
 				'label' => 'lang:snippet_name',
 				'rules' => 'required|callback__snippet_name_checks'
-			),
-			array(
-				'field' => 'snippet_contents',
-				'label' => 'lang:snippet_contents',
-				'rules' => 'required'
 			)
 		));
 

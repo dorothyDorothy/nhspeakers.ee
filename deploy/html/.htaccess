@@ -3,8 +3,8 @@
 
 
   #### force www ###
-  RewriteCond %{HTTP_HOST} ^northhertsspeakers.org [NC]
-  RewriteRule ^(.*)$ https://www.northhertsspeakers.org/$1 [L,R=301]
+  # RewriteCond %{HTTP_HOST} ^northhertsspeakers.org [NC]
+  # RewriteRule ^(.*)$ https://www.northhertsspeakers.org/$1 [L,R=301]
 
     Header set X-UA-Compatible "IE=Edge,chrome=1"
         

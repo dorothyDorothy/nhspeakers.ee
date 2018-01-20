@@ -229,7 +229,7 @@ section#specials2 .label-dishitem {background:rgba(206, 196, 168, 1); text-trans
 /*********  
 11.Menu
 *********/
-section#menu {background: url(/images/backgrounds/bf-menu-bg.jpg) no-repeat;background-attachment:fixed;background-repeat:no-repeat;-webkit-background-size:cover;-moz-background-size:cover;background-size:cover;-o-background-size:cover; color:#FFF}
+section#menu {background: url(/resources/images/backgrounds/bf-menu-bg.jpg) no-repeat;background-attachment:fixed;background-repeat:no-repeat;-webkit-background-size:cover;-moz-background-size:cover;background-size:cover;-o-background-size:cover; color:#FFF}
 section#menu h3 {font-size:18px;font-weight:500; text-transform:uppercase; border-bottom:1px solid rgba(206, 196, 168, 1); padding-bottom:10px}
 section#menu .label-menugroup {background:rgba(206, 196, 168, 1); text-transform:uppercase; font-size:21px;}
 

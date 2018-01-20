@@ -1,0 +1,11 @@
+Test cert password: Cl1mb1ng%Turn
+Challenge Password: Climbing
+
+This is how to generate the certificates
+
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /home/dorothy/websites/ee4_nhspeakers.org/crt/nhspeakers.dev.key -out /home/dorothy/websites/ee4_nhspeakers.org/crt/nhspeakers.dev.crt
+
+All my problems with using another self signed certificate came from using the wrong path.  I.e. using 
+/home/dorothy/websites/ee4_nhspeakers.org/
+instead of 
+/media/dorothy/Data/websites/ee4_nhspeakers.org/

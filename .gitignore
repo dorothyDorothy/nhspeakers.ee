@@ -8,3 +8,11 @@ node_modules/*
 cache/
 sql/
 crt/
+
+deploy/html/images/smileys/
+deploy/html/images/uploads/
+deploy/html/themes/ee_4.0.0/
+deploy/html/themes/user_4.0.0/
+deploy/sys_4.0.0/
+deploy/html/index_4.0.0.php
+deploy/html/admin_4.0.0.php

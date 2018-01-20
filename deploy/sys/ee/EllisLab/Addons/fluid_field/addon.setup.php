@@ -5,7 +5,7 @@ use EllisLab\Addons\FluidField\Service\Tag;
 return array(
 	'author'         => 'EllisLab',
 	'author_url'     => 'https://ellislab.com/',
-	'name'           => 'Fluid Field',
+	'name'           => 'Fluid',
 	'description'    => 'Fluid Fields',
 	'version'        => '1.0.0',
 	'namespace'      => 'EllisLab\Addons\FluidField',
@@ -15,7 +15,7 @@ return array(
 	'services' => array(
 		'Tag' => function($ee, $tagdata)
 		{
-			return new Tag($tagdata, ee()->functions, ee()->api_channel_fields);
+			return new Tag($tagdata, ee()->functions, ee()->api_channel_fields, $ee->make('ee:Variables/Parser'));
 		}
 	),
 

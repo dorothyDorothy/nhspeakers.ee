@@ -1,0 +1,34 @@
+<section id="chefs">
+  <div class="container"> 
+         
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2 text-center wow fadeInDown">
+        <h2><span class="head_itals">the</span> Chefs</h2>
+        <p class="lead">{tpi_chefs}</p>
+      </div>
+    </div>
+
+    <div class="mrgn-50-top-btm text-center">
+      <img src="/assets/divider.svg" alt="*">
+    </div>
+
+    <div class="row text-center"> 
+{exp:channel:entries 
+        channel="chefs" 
+        disable="categories|member_data|pagination"
+        dynamic="no"}   
+
+    {basic_image}
+      <div class="col-sm-4 wow fadeIn chef"> <img src="{basic_image:source}" class="img-responsive center-block mrgn-20-btm chefitem" width="350" height="350" alt="{basic_image:alt}" />
+    {/basic_image}    
+        <h3>{title}</h3>
+        <p class="text-muted">{basic_subhead}</p>
+        <p class="mrgn-20-top">{basic_body}</p>
+      </div>
+
+{/exp:channel:entries} 
+
+    </div>
+
+  </div>
+</section>

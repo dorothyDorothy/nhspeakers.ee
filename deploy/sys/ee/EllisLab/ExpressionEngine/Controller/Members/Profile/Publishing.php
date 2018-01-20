@@ -38,8 +38,12 @@ class Publishing extends Profile {
 						)
 					)
 				)
-			),
-			'rte_settings' => array(
+			)
+		);
+
+		if (ee('Addon')->get('rte')->isInstalled())
+		{
+			$vars['sections']['rte_settings'] = array(
 				array(
 					'title' => 'rte_enabled',
 					'desc' => 'rte_enabled_desc',
@@ -56,15 +60,13 @@ class Publishing extends Profile {
 					'fields' => array(
 						'rte_toolset_id' => array(
 							'type' => 'radio',
-							'choices' => array(
-								0 => lang('default')
-							),
+							'choices' => ee('Model')->get('rte:Toolset')->all()->getDictionary('toolset_id', 'name'),
 							'value' => $this->member->rte_toolset_id
 						),
 					)
 				)
-			)
-		);
+			);
+		}
 
 		if( ! empty($_POST))
 		{

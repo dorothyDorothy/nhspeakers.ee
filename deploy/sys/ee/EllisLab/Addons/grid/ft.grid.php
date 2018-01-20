@@ -60,7 +60,7 @@ class Grid_ft extends EE_Fieldtype {
 
 		$this->_load_grid_lib();
 
-		return encode_multi_field(ee()->grid_lib->getSearchableData());
+		return encode_multi_field(ee()->grid_lib->getSearchableData()) ?: ' ';
 	}
 
 	public function post_save($data)
@@ -142,7 +142,7 @@ class Grid_ft extends EE_Fieldtype {
 		{
 			// channel form is not guaranteed to have this wrapper class,
 			// but the js requires it
-			$field = '<div class="grid-publish">'.$field.'</div>';
+			$field = '<div class="fieldset-faux">'.$field.'</div>';
 		}
 
 		return $field;
@@ -155,15 +155,15 @@ class Grid_ft extends EE_Fieldtype {
 	{
 		ee()->load->library('grid_parser');
 
+		$fluid_field_data_id = (isset($this->settings['fluid_field_data_id'])) ? $this->settings['fluid_field_data_id'] : 0;
+
 		// not in a channel scope? pre-process may not have been run.
 		if ($this->content_type() != 'channel')
 		{
 			ee()->load->library('api');
 			ee()->legacy_api->instantiate('channel_fields');
-			ee()->grid_parser->grid_field_names[$this->id()] = $this->name();
+			ee()->grid_parser->grid_field_names[$this->id()][$fluid_field_data_id] = $this->name();
 		}
-
-		$fluid_field_data_id = (isset($this->settings['fluid_field_data_id'])) ? $this->settings['fluid_field_data_id'] : 0;
 
 		return ee()->grid_parser->parse($this->row, $this->id(), $params, $tagdata, $this->content_type(), $fluid_field_data_id);
 	}

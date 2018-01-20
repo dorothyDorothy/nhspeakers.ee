@@ -90,7 +90,7 @@
 						<li><b><?=$number_of_channels?></b> <?=lang('channels')?></li>
 						<?php endif; ?>
 						<?php if ($can_access_fields): ?>
-						<li><a href="<?=ee('CP/URL', 'channels/fields/groups')?>"><b><?=$number_of_channel_field_groups?></b> <?=lang('field_groups')?></a></li>
+						<li><a href="<?=ee('CP/URL', 'fields')?>"><b><?=$number_of_channel_fields?></b> <?=lang('fields')?></a></li>
 						<?php endif; ?>
 					</ul>
 				</div>
@@ -143,13 +143,11 @@ if ($can_create_channels || count($menu['channels']['create'])): ?>
 							<li>
 								<a class="has-sub" href=""><?=lang('create_new')?></a>
 								<div class="sub-menu">
-									<div class="scroll-wrap">
-										<ul>
-											<?php foreach ($menu['channels']['create'] as $channel_name => $link): ?>
-												<li><a href="<?=$link?>"><?=$channel_name?></a></li>
-											<?php endforeach ?>
-										</ul>
-									</div>
+									<ul>
+										<?php foreach ($menu['channels']['create'] as $channel_name => $link): ?>
+											<li><a href="<?=$link?>"><?=$channel_name?></a></li>
+										<?php endforeach ?>
+									</ul>
 								</div>
 							</li>
 						</ul>

@@ -111,7 +111,7 @@ class Publish extends AbstractPublishController {
 		$autosave->entry_data = $_POST;
 
 		// This is currently unused, but might be useful for display purposes
-		$autosave->author_id = ee()->input->post('author_id');
+		$autosave->author_id = ee()->input->post('author_id', ee()->session->userdata('member_id'));
 
 		// This group of columns is unused
 		$autosave->title = (ee()->input->post('title')) ?: 'autosave_' . ee()->localize->now;
@@ -225,7 +225,6 @@ class Publish extends AbstractPublishController {
 			'form_attributes' => $form_attributes,
 			'errors' => new \EllisLab\ExpressionEngine\Service\Validation\Result,
 			'revisions' => $this->getRevisionsTable($entry),
-			'autosaves' => $this->getAutosavesTable($entry, $autosave_id),
 			'extra_publish_controls' => $channel->extra_publish_controls,
 			'buttons' => [
 				[
@@ -289,6 +288,7 @@ class Publish extends AbstractPublishController {
 		// Auto-saving needs an entry_id...
 		$entry->entry_id = 0;
 
+		$vars['autosaves'] = $this->getAutosavesTable($entry, $autosave_id);
 		$vars['entry'] = $entry;
 
 		$this->setGlobalJs($entry, TRUE);

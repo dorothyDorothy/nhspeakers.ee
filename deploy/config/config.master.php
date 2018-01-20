@@ -91,22 +91,32 @@ if (isset($config))
 	 * The array keys must match the ID from exp_upload_prefs
 	 */
 	
-	$resources_folder = "/resouces/";
+	$resources_folder = "/resources/";
 	$resources_url = $base_url . $resources_folder;
 	$resources_path = $base_path . $resources_folder; 
 
 	$about_path = "images/about";
 
 	$env_config['upload_preferences'] = array(
-	    1 => array(
+	    6 => array(
+	        'name'        => 'Blog',
+	        'server_path' => $resources_path . 'images/blog/',
+	        'url'         => $resources_url  . 'images/blog/'
+	    ),		
+	    7 => array(
+	        'name'        => 'Common',
+	        'server_path' => $resources_path . 'images/common/',
+	        'url'         => $resources_url  . 'images/common/'
+	    ),	
+	    9 => array(
 	        'name'        => 'About Us',
-	        'server_path' => $resources_path . $about_path,
-	        'url'         => $images_url  . $about_path
+	        'server_path' => $resources_path . 'images/about/',
+	        'url'         => $resources_url  . 'images/about/'
 	    ),
-	    2 => array(
-	        'name'        => 'Second Folder',
-	        'server_path' => $images_path . '/another_one/',
-	        'url'         => $images_url  . '/another_one/'
+	    10 => array(
+	        'name'        => 'Backgrounds',
+	        'server_path' => $resources_path . 'images/backgrounds/',
+	        'url'         => $resources_url  . 'images/backgrounds/'
 	    )
 	);
 
