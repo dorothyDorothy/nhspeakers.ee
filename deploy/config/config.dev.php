@@ -10,10 +10,23 @@
  * @author     Focus Lab, LLC <dev@focuslabllc.com>
  */
 
+// $config['database'] = array(
+//   'expressionengine' => array(
+//     'hostname' => 'localhost',
+//     'database' => 'nh_speakers',
+//     'username' => 'nhspeaker',
+//     'password' => '$1wagonEACH4$',
+//     'dbprefix' => 'exp_',
+//     'char_set' => 'utf8mb4',
+//     'dbcollat' => 'utf8mb4_unicode_ci',
+//     'port'     => ''
+//   ),
+// );
+
 $config['database'] = array(
   'expressionengine' => array(
     'hostname' => 'localhost',
-    'database' => 'nh_speakers',
+    'database' => 'nhspeakers',
     'username' => 'nhspeaker',
     'password' => '$1wagonEACH4$',
     'dbprefix' => 'exp_',

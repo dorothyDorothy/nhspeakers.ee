@@ -107,6 +107,11 @@ if (isset($config))
 	        'name'        => 'Common',
 	        'server_path' => $resources_path . 'images/common/',
 	        'url'         => $resources_url  . 'images/common/'
+	    ),
+	    8 => array(
+	        'name'        => 'Dividers',
+	        'server_path' => $resources_path . 'images/dividers/',
+	        'url'         => $resources_url  . 'images/dividers/'
 	    ),	
 	    9 => array(
 	        'name'        => 'About Us',
