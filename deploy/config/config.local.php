@@ -38,7 +38,7 @@ $config['database'] = array(
 
 
 // Local testing email address
-$env_config['webmaster_email'] = '';
+$env_config['webmaster_email'] = 'accounts@climbingturn.co.uk';
 
 
 /* End of file config.local.php */

@@ -10,23 +10,11 @@
  * @author     Focus Lab, LLC <dev@focuslabllc.com>
  */
 
-// $config['database'] = array(
-//   'expressionengine' => array(
-//     'hostname' => 'localhost',
-//     'database' => 'nh_speakers',
-//     'username' => 'nhspeaker',
-//     'password' => '$1wagonEACH4$',
-//     'dbprefix' => 'exp_',
-//     'char_set' => 'utf8mb4',
-//     'dbcollat' => 'utf8mb4_unicode_ci',
-//     'port'     => ''
-//   ),
-// );
 
 $config['database'] = array(
   'expressionengine' => array(
-    'hostname' => 'localhost',
-    'database' => 'nhspeakers',
+    'hostname' => 'bellhouse',
+    'database' => 'nh_speakers',
     'username' => 'nhspeaker',
     'password' => '$1wagonEACH4$',
     'dbprefix' => 'exp_',
@@ -38,7 +26,7 @@ $config['database'] = array(
 
 
 // Local testing email address
-$env_config['webmaster_email'] = 'dorothym@climbingturn.co.uk';
+$env_config['webmaster_email'] = 'accounts@climbingturn.co.uk';
 
 
 /* End of file config.local.php */

@@ -15,7 +15,7 @@
 if ( ! defined('ENV'))
 {
 	$production  = 'northhertsspeakers.org';
-	$development = 'nhspeakers.dev';
+	$development = 'dev.speakers';
 	$local       = 'localhost';
 
 	switch (strtolower($_SERVER['HTTP_HOST'])) {
