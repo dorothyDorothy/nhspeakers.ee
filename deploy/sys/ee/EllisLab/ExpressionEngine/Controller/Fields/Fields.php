@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Fields;
@@ -55,13 +56,13 @@ class Fields extends AbstractFieldsController {
 			->getDictionary('group_id', 'group_name');
 
 		$filters = ee('CP/Filter');
-		$group_filter = $filters->make('group_id', 'group', $group_ids);
+		$group_filter = $filters->make('group_id', 'group_filter', $group_ids);
 		$group_filter->setPlaceholder(lang('all'));
 		$group_filter->disableCustomValue();
 
 		$fieldtypes = ee('Model')->make('ChannelField')->getCompatibleFieldtypes();
 
-		$fieldtype_filter = $filters->make('fieldtype', 'type', $fieldtypes);
+		$fieldtype_filter = $filters->make('fieldtype', 'type_filter', $fieldtypes);
 		$fieldtype_filter->setPlaceholder(lang('all'));
 		$fieldtype_filter->disableCustomValue();
 
@@ -259,6 +260,10 @@ class Fields extends AbstractFieldsController {
 					$return = (empty($group_id)) ? '' : '/'.$group_id;
 					ee()->functions->redirect(ee('CP/URL')->make('fields/create'.$return));
 				}
+				elseif (ee()->input->post('submit') == 'save_and_close')
+				{
+					ee()->functions->redirect(ee('CP/URL')->make('fields'));
+				}
 				else
 				{
 					ee()->functions->redirect(ee('CP/URL')->make('fields/edit/'.$field->getId()));
@@ -297,12 +302,24 @@ class Fields extends AbstractFieldsController {
 					'value' => 'save_and_new',
 					'text' => 'save_and_new',
 					'working' => 'btn_saving'
+				],
+				[
+					'name' => 'submit',
+					'type' => 'submit',
+					'value' => 'save_and_close',
+					'text' => 'save_and_close',
+					'working' => 'btn_saving'
 				]
 			],
 			'form_hidden' => array(
 				'field_id' => NULL
 			),
 		);
+
+		if (AJAX_REQUEST)
+		{
+			unset($vars['buttons'][2]);
+		}
 
 		ee()->view->cp_page_title = lang('create_new_field');
 
@@ -384,6 +401,10 @@ class Fields extends AbstractFieldsController {
 				{
 					ee()->functions->redirect(ee('CP/URL')->make('fields/create'));
 				}
+				elseif (ee()->input->post('submit') == 'save_and_close')
+				{
+					ee()->functions->redirect(ee('CP/URL')->make('fields'));
+				}
 				else
 				{
 					ee()->functions->redirect(ee('CP/URL')->make('fields/edit/'.$field->getId()));
@@ -420,6 +441,13 @@ class Fields extends AbstractFieldsController {
 					'value' => 'save_and_new',
 					'text' => 'save_and_new',
 					'working' => 'btn_saving'
+				],
+				[
+					'name' => 'submit',
+					'type' => 'submit',
+					'value' => 'save_and_close',
+					'text' => 'save_and_close',
+					'working' => 'btn_saving'
 				]
 			],
 			'form_hidden' => array(
@@ -436,7 +464,7 @@ class Fields extends AbstractFieldsController {
 	{
 		$field->field_list_items = ($field->field_list_items) ?: '';
 		$field->field_order = ($field->field_order) ?: 0;
-		$field->site_id = ($field->site_id) ?: 0;
+		$field->site_id = (int) $field->site_id ?: 0;
 
 		$field->set($_POST);
 

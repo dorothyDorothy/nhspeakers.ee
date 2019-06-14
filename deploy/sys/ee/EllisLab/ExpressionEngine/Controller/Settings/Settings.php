@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Settings;
@@ -49,7 +50,6 @@ class Settings extends CP_Controller {
 		$list = $sidebar->addHeader(lang('general_settings'), ee('CP/URL')->make('settings/general'))
 			->addBasicList();
 
-		$list->addItem(lang('license_and_registration'), ee('CP/URL')->make('settings/license'));
 		$list->addItem(lang('url_path_settings'), ee('CP/URL')->make('settings/urls'));
 
 		if (ee()->cp->allowed_group('can_access_comm'))
@@ -107,6 +107,16 @@ class Settings extends CP_Controller {
 
 			$list->addItem(lang('access_throttling'), ee('CP/URL')->make('settings/throttling'));
 			$list->addItem(lang('captcha'), ee('CP/URL')->make('settings/captcha'));
+
+			if (ee()->cp->allowed_group('can_manage_consents'))
+			{
+				$list->addItem(lang('consent_requests'), ee('CP/URL')->make('settings/consents'));
+			}
+		}
+		elseif (ee()->cp->allowed_group('can_manage_consents'))
+		{
+			$list = $sidebar->addHeader(lang('security_privacy'))->addBasicList();
+			$list->addItem(lang('consent_requests'), ee('CP/URL')->make('settings/consents'));
 		}
 	}
 

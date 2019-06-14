@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -148,7 +149,7 @@ class EE_Cache_memcached extends CI_Driver {
 	{
 		$stored = $this->_memcached->get($this->_namespaced_key($key, $scope));
 
-		if (count($stored) !== 3)
+		if ($stored == FALSE OR count($stored) !== 3)
 		{
 			return FALSE;
 		}

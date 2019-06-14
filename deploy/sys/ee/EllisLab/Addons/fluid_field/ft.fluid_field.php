@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -136,16 +137,53 @@ class Fluid_field_ft extends EE_Fieldtype {
 
 		ee()->session->set_cache(__CLASS__, $this->name(), $data);
 
+		$fluid_field_data = $this->getFieldData()->indexBy('id');
+
 		$compiled_data_for_search = array();
 
-		foreach ($data['fields'] as $field_data)
+		foreach ($data['fields'] as $key => $value)
 		{
-			foreach ($field_data as $key => $value)
+			if ($key == 'new_field_0')
 			{
-				if (strpos($key, '_id_') and is_string($value))
+				continue;
+			}
+
+			$fluid_field_data_id = 0;
+
+			// Existing field
+			if (strpos($key, 'field_') === 0)
+			{
+				$id = str_replace('field_', '', $key);
+				$field = $fluid_field_data[$id]->getField();
+				$fluid_field_data_id = $fluid_field_data[$id]->getId();
+			}
+			// New field
+			elseif (strpos($key, 'new_field_') === 0)
+			{
+				foreach (array_keys($value) as $k)
 				{
-					$compiled_data_for_search[] = $value;
+					if (strpos($k, 'field_id_') === 0)
+					{
+						$field_id = str_replace('field_id_', '', $k);
+
+						$fluid_field = ee('Model')->make('fluid_field:FluidField');
+						$fluid_field->fluid_field_id = $this->field_id;
+						$fluid_field->field_id = $field_id;
+
+						$field = $fluid_field->getField();
+						$fluid_field_data_id = $key;
+						break;
+					}
 				}
+			}
+
+			$field->setItem('field_search', true);
+			$field->setItem('fluid_field_data_id', $fluid_field_data_id);
+
+			foreach ($value as $field_data)
+			{
+				$field->setData($field_data);
+				$compiled_data_for_search[] = $field->save($field_data);
 			}
 		}
 
@@ -292,10 +330,15 @@ class Fluid_field_ft extends EE_Fieldtype {
 
 		$field_templates = ee('Model')->get('ChannelField', $this->settings['field_channel_fields'])
 			->order('field_label')
-			->all()
-			->indexByIds();
+			->all();
 
-		$filters = ee('View')->make('fluid_field:filters')->render(array('fields' => $field_templates));
+		$filter_options = $field_templates->map(function($field) {
+			return $field->getField();
+		});
+
+		$filters = ee('View')->make('fluid_field:filters')->render(array('fields' => $filter_options));
+
+		$field_templates = $field_templates->indexByIds();
 
 		if ( ! is_array($field_data))
 		{
@@ -309,7 +352,14 @@ class Fluid_field_ft extends EE_Fieldtype {
 
 					$field->setName($this->name() . '[fields][field_' . $data->getId() . '][field_id_' . $field->getId() . ']');
 
-					$fields .= ee('View')->make('fluid_field:field')->render(array('field' => $data->ChannelField, 'filters' => $filters, 'errors' => $this->errors));
+					$fields .= ee('View')->make('fluid_field:field')->render([
+						'field' => $field,
+						'field_name' => $data->ChannelField->field_name,
+						'filters' => $filters,
+						'errors' => $this->errors,
+						'reorderable' => TRUE,
+						'show_field_type' => TRUE
+					]);
 				}
 			}
 
@@ -337,7 +387,14 @@ class Fluid_field_ft extends EE_Fieldtype {
 
 				$f = $this->setupFieldInstance($f, $data, $field_id);
 
-				$fields .= ee('View')->make('fluid_field:field')->render(array('field' => $field, 'filters' => $filters, 'errors' => $this->errors));
+				$fields .= ee('View')->make('fluid_field:field')->render([
+					'field' => $f,
+					'field_name' => $field->field_name,
+					'filters' => $filters,
+					'errors' => $this->errors,
+					'reorderable' => TRUE,
+					'show_field_type' => TRUE
+				]);
 			}
 		}
 
@@ -349,7 +406,14 @@ class Fluid_field_ft extends EE_Fieldtype {
 			$f->setItem('fluid_field_data_id', NULL);
 			$f->setName($this->name() . '[fields][new_field_0][field_id_' . $field->getId() . ']');
 
-			$templates .= ee('View')->make('fluid_field:field')->render(array('field' => $field, 'filters' => $filters, 'errors' => $this->errors));
+			$templates .= ee('View')->make('fluid_field:field')->render([
+				'field' => $f,
+				'field_name' => $field->field_name,
+				'filters' => $filters,
+				'errors' => $this->errors,
+				'reorderable' => TRUE,
+				'show_field_type' => TRUE
+			]);
 		}
 
 		if (REQ == 'CP')
@@ -448,6 +512,10 @@ class Fluid_field_ft extends EE_Fieldtype {
 
 		if (isset($this->settings['field_channel_fields']))
 		{
+			$this->settings['field_channel_fields'] = array_filter($this->settings['field_channel_fields'], function($value) {
+				return is_numeric($value);
+			});
+
 			$removed_fields = (array_diff($this->settings['field_channel_fields'], $all['field_channel_fields']));
 
 			if ( ! empty($removed_fields))
@@ -483,7 +551,12 @@ class Fluid_field_ft extends EE_Fieldtype {
 				->delete();
 		}
 
-		return array();
+		$columns['field_id_' . $data['field_id']] = [
+			'type' => 'mediumtext',
+			'null' => TRUE
+		];
+
+		return $columns;
 	}
 
 	/**
@@ -600,6 +673,60 @@ class Fluid_field_ft extends EE_Fieldtype {
 		return ee()->fluid_field_parser->parse($this->row, $this->id(), $params, $tagdata, $this->content_type());
 	}
 
+	/**
+	 * :length modifier
+	 */
+	public function replace_length($data, $params = '', $tagdata = '')
+	{
+		return $this->replace_total_fields($data, $params, $tagdata);
+	}
+
+	/**
+	 * :total_fields modifier
+	 */
+	public function replace_total_fields($data, $params = '', $tagdata = '')
+	{
+		ee()->load->library('fluid_field_parser');
+
+		$fluid_field_data = $this->getFieldData();
+
+		if (ee('LivePreview')->hasEntryData())
+		{
+			$data = ee('LivePreview')->getEntryData();
+
+			if ($data['entry_id'] == $this->content_id())
+			{
+				$fluid_field_data = ee()->fluid_field_parser->overrideWithPreviewData(
+					$fluid_field_data,
+					[$this->id()]
+				);
+
+				if ( ! isset($data["field_id_{$this->id()}"])
+					|| ! isset($data["field_id_{$this->id()}"]['fields']))
+				{
+					return 0;
+				}
+			}
+		}
+
+		if (isset($params['type']))
+		{
+			$fluid_field_data = $fluid_field_data->filter(function($datum) use($params)
+			{
+				return ($params['type'] == $datum->ChannelField->field_type);
+			});
+		}
+
+		if (isset($params['name']))
+		{
+			$fluid_field_data = $fluid_field_data->filter(function($datum) use($params)
+			{
+				return ($params['name'] == $datum->ChannelField->field_name);
+			});
+		}
+
+		return ($fluid_field_data) ? count($fluid_field_data) : 0;
+	}
 }
 
 // EOF

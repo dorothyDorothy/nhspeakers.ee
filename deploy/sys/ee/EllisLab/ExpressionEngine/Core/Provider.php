@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Core;
@@ -100,6 +101,7 @@ class Provider extends InjectionBindingDecorator {
 		$this->prefix = $prefix;
 
 		$this->registerServices($prefix);
+		$this->registerCookies();
 	}
 
 	/**
@@ -296,6 +298,19 @@ class Provider extends InjectionBindingDecorator {
 			}
 
 			$this->registerSingleton("{$prefix}:{$name}", $this->partial($closure, $this));
+		}
+	}
+
+	protected function registerCookies()
+	{
+		$cookie_reg = $this->make('ee:CookieRegistry');
+		foreach (['Necessary', 'Functionality', 'Performance', 'Targeting'] as $type)
+		{
+			foreach ($this->get('cookies.'.strtolower($type), []) as $cookie_name)
+			{
+				$method = 'register'.$type;
+				$cookie_reg->{$method}($cookie_name);
+			}
 		}
 	}
 

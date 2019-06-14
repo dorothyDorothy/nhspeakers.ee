@@ -11,6 +11,8 @@ $lang = array(
 
 'comment_settings' => 'Comment Settings',
 
+'consent_requests' => 'Consent Requests',
+
 'content_and_design' => 'Content & Design',
 
 'debugging_output' => 'Debugging & Output',
@@ -79,6 +81,10 @@ $lang = array(
 
 'online' => 'Online',
 
+'show_ee_news' => 'Show ExpressionEngine news?',
+
+'show_ee_news_desc' => 'When enabled, the latest news about ExpressionEngine will appear on the control panel\'s homepage.',
+
 'site_default' => 'Use site default',
 
 'site_name' => 'Name',
@@ -96,44 +102,6 @@ $lang = array(
 'version_autocheck' => 'New version auto check',
 
 'version_autocheck_desc' => 'When set to <b>auto</b>, ExpressionEngine will automatically check for newer versions of the software.',
-
-
-/* License & Registration */
-'features_limited' => 'Features Limited',
-
-'features_limited_desc' => 'The Core version of ExpressionEngine is feature limited. <a href="%s" rel="external">Upgrade today.</a>',
-
-'license_and_registration' => 'License &amp; Registration',
-
-'license_and_registration_settings' => 'License &amp; Registration Settings',
-
-'license_file' => 'License file',
-
-'license_file_corrupt_license_file' => 'The license file provided is missing data.',
-
-'license_file_desc' => 'Found on your <a href="%s" rel="external">purchase management</a> page.',
-
-'license_file_error' => 'License Invalid',
-
-'license_file_fail' => 'License not saved',
-
-'license_file_invalid_license_number' => 'The license file provided is invalid.',
-
-'license_file_invalid_signature' => 'The license file provided has an invalid signature.',
-
-'license_file_missing_pubkey' => 'The ExpressionEngine product is missing data. Pleas visit <a href="%s" rel="external">EllisLab.com</a> and download a fresh copy.',
-
-'license_file_permissions' => 'The license file could not be saved. Check the permissions on <b>%s</b>.',
-
-'license_file_upload_error' => 'Cannot Update License &amp; Registration',
-
-'license_file_upload_error_desc' => 'We were unable to update the license &amp; registration, please review and fix errors below.',
-
-'license_updated' => 'License &amp; Registration Updated',
-
-'license_updated_desc' => 'Your license and registration information has been saved successfully.',
-
-'site_limit' => 'Site limit',
 
 
 /* URLs and Path Settings */
@@ -723,7 +691,7 @@ $lang = array(
 
 'cookie_path' => 'Path',
 
-'cookie_path_desc' => 'Path to apply cookies to the above domain. (<a href="%s">more info</a>)',
+'cookie_path_desc' => 'Path to apply cookies to the above domain. (<a href="%s" rel="external">more info</a>)',
 
 'cookie_prefix' => 'Prefix',
 
@@ -747,6 +715,10 @@ $lang = array(
 
 'enable_rank_denial_desc' => 'When enabled, all outgoing links are sent to a redirect page. This prevents spammers from <a href="%s" rel="external">gaining page rank</a>.',
 
+'force_interstitial' => 'Force redirect confirmation on submitted links?',
+
+'force_interstitial_desc' => 'Shows a confirmation screen when a linked is clicked and Enable Rank Denial is turned on.',
+
 'form_security_settings' => 'Content Submission Settings',
 
 'member_security_settings' => 'Member Security Settings',
@@ -767,6 +739,10 @@ $lang = array(
 
 'pw_min_len_desc' => 'Minimum number of characters required for new members\' passwords.',
 
+'require_cookie_consent' => 'Require user consent to set cookies?',
+
+'require_cookie_consent_desc' => 'When enabled, cookies will not be set for the visitor (except those <b>strictly necessary</b> for the web site to function) until they have consented to your site\'s cookie policy. See the <a href="'.DOC_URL.'add-ons/consent/">Consent Module documentation</a> for more details.',
+
 'require_ip_for_login' => 'Require user agent and <abbr title="Internet Protocol">IP</abbr> for login?',
 
 'require_ip_for_login_desc' => 'When enabled, members will be unable to login without a valid user agent and <abbr title="Internet Protocol">IP</abbr> address.',
@@ -783,7 +759,11 @@ $lang = array(
 
 'security_tip' => '<b>Tip</b>: Site security is important.',
 
-'security_tip_desc' => 'Any setting marked with <span title="security enhancement"></span> will further enhance and improve site security.',
+'security_tip_desc' => 'Any setting marked with <span class="icon--caution" title="security enhancement"></span> will further enhance and improve site security.',
+
+'share_analytics' => 'Share analytics with the ExpressionEngine Development Team?',
+
+'share_analytics_desc' => 'EllisLab asks users to help improve ExpressionEngine by occasionally <a href="%s">providing analytics, diagnostic, and usage information</a>.',
 
 'un_min_len' => 'Minimum username length',
 
@@ -850,6 +830,21 @@ $lang = array(
 'edit_html_buttons_success' => '<abbr title="Hyper-Text Markup Language">HTML</abbr> Button Updated',
 
 'edit_html_buttons_success_desc' => 'The <abbr title="Hyper-Text Markup Language">HTML</abbr> button <b>%s</b> has been updated.',
+
+/* Consent Requests */
+'consent_request_versions' => 'Versions of %s',
+
+'new_version' => 'New version',
+
+'app_consent_requests' => 'Application Consent Requests',
+
+'user_consent_requests' => 'User Consent Requests',
+
+'author' => 'Author',
+
+'cookie_consent_disabled' => 'Cookie Consent Disabled',
+
+'cookie_consent_disabled_desc' => 'Cookie-related consent requests have no affect on the setting of cookies unless the <a href="%s">cookie consent setting</a> is enabled.'
 
 );
 

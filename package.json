@@ -4,8 +4,7 @@
   "description": "North Herts Speakers Website",
   "main": "gulpfile.js",
   "dependencies": {
-    "gulp-concat-multi": "^1.0.1",
-    "gulp-load-plugins": "^1.5.0"
+    "gulp-concat-multi": "^1.0.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -24,19 +23,13 @@
   },
   "homepage": "https://github.com/climbingturn/northhertsspeakers.org#readme",
   "devDependencies": {
-    "browser-sync": "^2.15.0",
-    "gulp": "^3.9.1",
-    "gulp-clean-css": "^3.9.0",
-    "gulp-concat": "^2.6.1",
-    "gulp-copy": "^1.0.1",
-    "gulp-load-plugins": "^1.5.0",
-    "gulp-minify": "^1.0.0",
-    "gulp-notify": "^3.0.0",
+    "browser-sync": "^2.26.7",
+    "gulp": "^4.0.2",
+    "gulp-clean": "^0.4.0",
+    "gulp-clean-css": "^4.2.0",
+    "gulp-livereload": "^4.0.1",
     "gulp-rename": "^1.2.2",
-    "gulp-sass": "^3.1.0",
-    "gulp-sourcemaps": "^2.6.5",
-    "gulp-uglify": "^3.0.0",
-    "gulp-util": "^2.2.14",
-    "gulp-watch": "^4.3.11"
+    "gulp-sass": "^4.0.2",
+    "gulp-sourcemaps": "^2.6.5"
   }
 }

@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Files;
@@ -368,7 +369,7 @@ class File extends AbstractFilesController {
 					],
 					'crop_y' => [
 						'type' => 'short-text',
-						'label' => 'y-axis',
+						'label' => 'y_axis',
 						'value' => ee('Request')->post('crop_y', 0)
 					]
 				]
@@ -378,7 +379,7 @@ class File extends AbstractFilesController {
 				'fields' => [
 					'img_preview' => [
 						'type' => 'html',
-						'content' => '<figure class="img-preview"><img src="' . $file->getAbsoluteURL() . '"></figure>'
+						'content' => '<figure class="img-preview"><img src="' . $file->getAbsoluteURL() . '?v=' . time() . '"></figure>'
 					]
 				]
 			]
@@ -412,7 +413,7 @@ class File extends AbstractFilesController {
 				'fields' => [
 					'img_preview' => [
 						'type' => 'html',
-						'content' => '<figure class="img-preview"><img src="' . $file->getAbsoluteURL() . '"></figure>'
+						'content' => '<figure class="img-preview"><img src="' . $file->getAbsoluteURL() . '?v=' . time() . '"></figure>'
 					]
 				]
 			]
@@ -446,7 +447,7 @@ class File extends AbstractFilesController {
 				'fields' => [
 					'img_preview' => [
 						'type' => 'html',
-						'content' => '<figure class="img-preview"><img src="' . $file->getAbsoluteURL() . '"></figure>'
+						'content' => '<figure class="img-preview"><img src="' . $file->getAbsoluteURL() . '?v=' . time() . '"></figure>'
 					]
 				]
 			]

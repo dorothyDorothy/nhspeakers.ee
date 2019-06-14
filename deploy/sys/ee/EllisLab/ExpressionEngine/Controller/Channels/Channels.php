@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Channels;
@@ -162,11 +163,6 @@ class Channels extends AbstractChannelsController {
 			show_error(lang('unauthorized_access'), 403);
 		}
 
-		if ($this->hasMaximumChannels())
-		{
-			show_error(lang('maximum_channels_reached'));
-		}
-
 		return $this->form();
 	}
 
@@ -192,11 +188,6 @@ class Channels extends AbstractChannelsController {
 	{
 		if (is_null($channel_id))
 		{
-			if ($this->hasMaximumChannels())
-			{
-				show_error(lang('maximum_channels_reached'));
-			}
-
 			// Only auto-complete channel short name for new channels
 			ee()->cp->add_js_script('plugin', 'ee_url_title');
 
@@ -269,6 +260,10 @@ class Channels extends AbstractChannelsController {
 				{
 					ee()->functions->redirect(ee('CP/URL')->make('channels/create'));
 				}
+				elseif (ee()->input->post('submit') == 'save_and_close')
+				{
+					ee()->functions->redirect(ee('CP/URL')->make('channels'));
+				}
 				else
 				{
 					ee()->functions->redirect(ee('CP/URL')->make('channels/edit/'.$channel->getId()));
@@ -334,7 +329,6 @@ class Channels extends AbstractChannelsController {
 
 		ee()->view->header = array(
 			'title' => lang('channel_manager'),
-			'form_url' => ee('CP/URL')->make('channels/search'),
 			'toolbar_items' => array(
 				'settings' => array(
 					'href' => ee('CP/URL')->make('settings/content-design'),
@@ -362,6 +356,13 @@ class Channels extends AbstractChannelsController {
 				'type' => 'submit',
 				'value' => 'save_and_new',
 				'text' => 'save_and_new',
+				'working' => 'btn_saving'
+			],
+			[
+				'name' => 'submit',
+				'type' => 'submit',
+				'value' => 'save_and_close',
+				'text' => 'save_and_close',
 				'working' => 'btn_saving'
 			]
 		];
@@ -733,15 +734,11 @@ class Channels extends AbstractChannelsController {
 	{
 		$statuses = ee('Model')->get('Status')
 			->order('status_order')
-			->all()
-			->getDictionary('status_id', 'status');
+			->all();
 
-		foreach ($statuses as $status_id => $status)
+		foreach ($statuses as $status)
 		{
-			if (in_array($status, ['open', 'closed']))
-			{
-				$statuses[$status_id] = lang($status);
-			}
+			$status_options[] = $status->getOptionComponent(['use_ids' => TRUE]);
 		}
 
 		$selected = ee('Request')->post('statuses') ?: [];
@@ -761,7 +758,7 @@ class Channels extends AbstractChannelsController {
 
 		return ee('View')->make('ee:_shared/form/fields/select')->render([
 			'field_name'       => 'statuses',
-			'choices'          => $statuses,
+			'choices'          => $status_options,
 			'disabled_choices' => $default,
 			'unremovable_choices' => $default,
 			'value'            => $selected,
@@ -785,23 +782,6 @@ class Channels extends AbstractChannelsController {
 	 */
 	private function renderSettingsTab($channel, $errors)
 	{
-		$templates = ee('Model')->get('Template')
-			->with('TemplateGroup')
-			->filter('site_id', ee()->config->item('site_id'))
-			->order('TemplateGroup.group_name', 'ASC')
-			->order('template_name', 'ASC')
-			->all();
-
-		$live_look_template_options[0] = lang('no_live_look_template');
-
-		if ( count($templates) > 0)
-		{
-			foreach ($templates as $template)
-			{
-				$live_look_template_options[$template->template_id] = $template->getTemplateGroup()->group_name.'/'.$template->template_name;
-			}
-		}
-
 		// Default status menu
 		$deft_status_options = [
 			'open' => lang('open'),
@@ -870,6 +850,9 @@ class Channels extends AbstractChannelsController {
 		// Add "Use Channel Default" option for channel form default status
 		$channel_form_statuses = array('' => lang('channel_form_default_status_empty'));
 		$channel_form_statuses = array_merge($channel_form_statuses, $deft_status_options);
+		ee()->load->model('admin_model');
+
+		$author_list = $this->authorList();
 
 		$sections = array(
 			array(
@@ -889,8 +872,8 @@ class Channels extends AbstractChannelsController {
 					'fields' => array(
 						'channel_lang' => array(
 							'type' => 'radio',
-							'choices' => ee()->lang->language_pack_names(),
-							'value' => $channel->channel_lang ?: 'english'
+							'choices' => ee()->admin_model->get_xml_encodings(),
+							'value' => $channel->channel_lang ?: 'en'
 						)
 					)
 				),
@@ -937,16 +920,12 @@ class Channels extends AbstractChannelsController {
 					)
 				),
 				array(
-					'title' => 'live_look_template',
-					'desc' => 'live_look_template_desc',
+					'title' => 'preview_url',
+					'desc' => 'preview_url_desc',
 					'fields' => array(
-						'live_look_template' => array(
-							'type' => 'radio',
-							'choices' => $live_look_template_options,
-							'value' => $channel->live_look_template,
-							'no_results' => [
-								'text' => sprintf(lang('no_found'), lang('templates'))
-							]
+						'preview_url' => array(
+							'type' => 'text',
+							'value' => $channel->getRawProperty('preview_url')
 						)
 					)
 				)
@@ -1080,7 +1059,9 @@ class Channels extends AbstractChannelsController {
 							'type' => 'radio',
 							'choices' => $this->authorList(),
 							'filter_url' => ee('CP/URL')->make('channels/author-list')->compile(),
-							'value' => $channel_form->default_author,
+							'value' => isset($author_list[$channel_form->default_author])
+								? $channel_form->default_author
+								: NULL,
 							'no_results' => [
 								'text' => sprintf(lang('no_found'), lang('authors'))
 							]
@@ -1368,7 +1349,7 @@ class Channels extends AbstractChannelsController {
 
 		$channel->ChannelFormSettings->default_status = ee('Request')->post('default_status');
 		$channel->ChannelFormSettings->allow_guest_posts = ee('Request')->post('allow_guest_posts');
-		$channel->ChannelFormSettings->default_author = ee('Request')->post('default_author');
+		$channel->ChannelFormSettings->default_author = ee('Request')->post('default_author') ?: 0;
 
 		return $channel;
 	}
@@ -1420,7 +1401,7 @@ class Channels extends AbstractChannelsController {
 			unset($_POST['duplicate_channel_prefs']);
 
 			// duplicating preferences?
-			if ($dupe_id !== FALSE AND is_numeric($dupe_id))
+			if ( ! empty($dupe_id) && is_numeric($dupe_id))
 			{
 				$dupe_channel = ee('Model')->get('Channel')
 					->filter('channel_id', $dupe_id)
@@ -1453,16 +1434,6 @@ class Channels extends AbstractChannelsController {
 		}
 
 		return $channel;
-	}
-
-	/**
-	 * Maximum number of channels reached?
-	 *
-	 * @return bool
-	 **/
-	private function hasMaximumChannels()
-	{
-		return (IS_CORE && ee('Model')->get('Channel')->count() >= 3);
 	}
 }
 

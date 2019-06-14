@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Service\Encrypt;
@@ -228,7 +229,7 @@ class Encrypt {
 
 		if ( ! in_array($algo, hash_algos()))
 		{
-			throw new InvalidArgumentException('{$algo} is not a valid hashing algorithm.');
+			throw new InvalidArgumentException("{$algo} is not a valid hashing algorithm.");
 		}
 
 		$key = ($key) ?: $this->default_key;

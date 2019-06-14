@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\Addons\Forum\Model;
@@ -50,7 +51,6 @@ class Moderator extends Model {
 			'model'    => 'ee:Member',
 			'from_key' => 'mod_member_id',
 			'to_key'   => 'member_id',
-			'weak'     => TRUE,
 			'inverse' => array(
 				'name' => 'Moderator',
 				'type' => 'hasMany'
@@ -61,7 +61,6 @@ class Moderator extends Model {
 			'model'    => 'ee:MemberGroup',
 			'from_key' => 'mod_group_id',
 			'to_key'   => 'group_id',
-			'weak'     => TRUE,
 			'inverse' => array(
 				'name' => 'Moderator',
 				'type' => 'hasMany'

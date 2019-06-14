@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -148,7 +149,7 @@ class EE_Channel_custom_field_pair_parser implements EE_Channel_parser_component
 					// API is referencing changed to another fieldtype
 					// (Grid may cause this), get it back on track to
 					// parse the next chunk
-					if ($ft_name != $ft_api->field_type)
+					if ($ft_name != $ft_api->field_type || $ft->id() != $field_id)
 					{
 						$ft_api->setup_handler($field_id);
 					}

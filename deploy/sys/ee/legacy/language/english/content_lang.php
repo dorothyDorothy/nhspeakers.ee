@@ -32,7 +32,7 @@ $lang = array(
 
 'btn_create_new_entry_in_channel' => 'New in %s',
 
-'btn_edit_comment' => 'Edit Comment',
+'btn_edit_comment' => 'Save',
 
 'btn_publish' => 'Publish',
 
@@ -142,6 +142,8 @@ $lang = array(
 
 'filter_autosaves' => 'filter auto saves',
 
+'filter_by_author' => 'author',
+
 'filter_by_category' => 'category',
 
 'filter_by_channel' => 'channel',
@@ -202,7 +204,7 @@ $lang = array(
 
 'autosave_data_available' => 'auto saved data available',
 
-'autosave_success' => '<b>Auto saved</b> at ',
+'autosave_success' => 'Auto Saved',
 
 'autosave_title' => 'Saved data available',
 
@@ -229,6 +231,8 @@ $lang = array(
 'button_mode' => 'Button Mode:',
 
 'calendar' => 'Calendar',
+
+'cancel_preview' => 'Cancel Preview',
 
 'category' => 'Category',
 
@@ -482,8 +486,6 @@ $lang = array(
 
 'link' => 'Link',
 
-'live_look' => 'Live Look',
-
 'live_view' => 'Click to View',
 
 'load_revision' => 'Load Revision',
@@ -606,6 +608,8 @@ $lang = array(
 
 'pre' => 'Pre-formatted',
 
+'preview' => 'Preview',
+
 'preview_entry' => 'Preview Entry',
 
 'preview_layout' => 'Preview Layout',
@@ -698,13 +702,11 @@ $lang = array(
 
 'title' => 'Title',
 
-'title_and_body' => 'Search titles and entries',
+'titles' => 'Titles',
 
-'title_body_comments' => 'Search titles, entries, and comments',
+'titles_and_content' => 'Titles & Content',
 
 'title_not_unique' => 'An entry already exists with this title. Titles must be unique.',
-
-'title_only' => 'Search titles only',
 
 'today' => 'Today',
 
@@ -721,6 +723,8 @@ $lang = array(
 'unauthorized_to_edit' => 'You are not allowed to edit the entries you selected.',
 
 'unordered_list' => 'Unordered List',
+
+'unpublished' => 'unpublished',
 
 'upload' => 'Upload',
 
@@ -755,6 +759,8 @@ $lang = array(
 'view_entry' => 'View Entry',
 
 'view_filtered' => 'Return to Filtered Entries',
+
+'view_wider' => 'View Wider',
 
 'warning' => 'Warning',
 
@@ -793,6 +799,8 @@ $lang = array(
 'add_new_row' => 'Add new row',
 
 'collapse' => 'Collapse',
+
+'creating_new_in_rel' => 'Creating new entry in <b>#to_channel#</b> for a relationship with <b>#from_channel#</b>',
 
 'hide' => 'Hide',
 
@@ -917,6 +925,50 @@ $lang = array(
 'menu_publish' => 'Publish',
 
 'rel_ft_no_entries' => 'No Entries',
+
+/* Bulk Edit */
+
+'add_categories' => 'Add Categories',
+
+'add_categories_entries' => 'Add categories to %d entries',
+
+'add_editable_fields' => 'Add editable fields',
+
+'add_editable_fields_desc' => 'Chosen fields will be added below, and will be editable for <b>all</b> selected entries.',
+
+'btn_save_all_and_close' => 'Save All & Close',
+
+'editing_entries' => 'Editing %d entries',
+
+'entries_updated' => '%d entries have been updated.',
+
+'filter_selected_entries' => 'Filter selected entries',
+
+'no_cat_groups_in_common' => 'No <b>Category Groups</b> in common.',
+
+'bulk_edit' => 'Bulk Edit',
+
+'bulk_edit_add_categories_notice' => 'Any categories selected will be assigned to the selected entries <b>in addition</b> to the current category selection for those entries.',
+
+'bulk_edit_destructive' => 'This is a destructive and irreversible action.',
+
+'bulk_edit_notice' => 'Any fields submitted will overwrite that field\'s stored content for all selected entries.',
+
+'bulk_edit_remove_categories_notice' => 'Any categories selected will be <b>removed</b> from the selected entries, leaving the entries\' other category assignments intact.',
+
+'remove_categories' => 'Remove Categories',
+
+'remove_categories_entries' => 'Remove categories from %d entries',
+
+'remove_from_selection' => 'Remove from selection',
+
+'save_and_next' => 'Save & Next',
+
+'selected_entries' => 'Selected Entries',
+
+'showing' => 'Showing',
+
+'unauthorized_entry_desc' => 'You do not have permission to edit one of the selected entries.'
 
 );
 

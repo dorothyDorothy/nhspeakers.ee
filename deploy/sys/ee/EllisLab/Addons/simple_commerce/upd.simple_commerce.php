@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -228,6 +229,18 @@ class Simple_commerce_upd {
 			ee()->db->where('class', 'Simple_commerce');
 			ee()->db->where('method', 'incoming_ipn');
 			ee()->db->update('actions', $data);
+		}
+
+		if (version_compare($current, '2.2.1', '<'))
+		{
+			ee('Model')->make('Extension', [
+				'class'    => 'Simple_commerce_ext',
+				'method'   => 'anonymizeMember',
+				'hook'     => 'member_anonymize',
+				'settings' => [],
+				'version'  => $current,
+				'enabled'  => 'y'
+			])->save();
 		}
 
 		return TRUE;

@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -80,6 +81,10 @@ class Member_register extends Member {
 			$member_fields = ee('Model')->get('MemberField', $member_field_ids)
 				->all()
 				->indexBy('m_field_id');
+
+			ee()->router->set_class('cp');
+			ee()->load->library('cp');
+			ee()->load->library('javascript');
 
 			foreach ($query->result_array() as $row)
 			{
@@ -458,10 +463,7 @@ class Member_register extends Member {
 			return ee()->output->show_user_error('submission', $errors);
 		}
 
-		ee()->load->library('auth');
-		$hashed_password = ee()->auth->hash_password($member->password);
-		$member->password = $hashed_password['password'];
-		$member->salt = $hashed_password['salt'];
+		$member->hashAndUpdatePassword($member->password);
 
 		// Do we require captcha?
 		if (ee('Captcha')->shouldRequireCaptcha())

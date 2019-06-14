@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
  require_once APPPATH.'libraries/datastructures/Tree.php';
@@ -214,7 +215,12 @@ class EE_relationship_tree_builder {
 			return NULL;
 		}
 
-		$all_fields = array_merge($this->relationship_field_names, array('parents', 'siblings'));
+		$all_fields = array_merge($this->relationship_field_names, ['parents', 'siblings']);
+
+		usort($all_fields, function ($a, $b){
+			return strlen($b) - strlen($a);
+		});
+
 		$all_fields = implode('|', $all_fields);
 
 		// Regex to separate out the relationship prefix part from the rest
@@ -222,7 +228,7 @@ class EE_relationship_tree_builder {
 		// 0 => full_match
 		// 1 => rel:pre:fix:
 		// 2 => tag:modified param="value"
-		$is_grid = ( ! empty($this->grid_relationship_names));
+		$is_grid = ($this->grid_field_id);
 
 		if ( ! $is_grid)
 		{
@@ -244,7 +250,6 @@ class EE_relationship_tree_builder {
 			return NULL;
 		}
 
-
 		$root = new QueryNode('__root__');
 
 		$open_nodes = array(
@@ -265,7 +270,7 @@ class EE_relationship_tree_builder {
 			$in_grid = array_key_exists($relationship_prefix, $this->grid_relationship_ids);
 			$in_fluid_field = (bool) ($this->fluid_field_data_id && $this->fluid_field_data_id > 0);
 
-			if ($in_grid && $match[2])
+			if (($in_grid || $in_fluid_field) && $match[2])
 			{
 				$is_only_relationship = ($match[2][0] != ':');
 			}
@@ -344,7 +349,7 @@ class EE_relationship_tree_builder {
 				'in_cond' => $type == 'conditional' ? TRUE : FALSE
 			));
 
-			if ($is_only_relationship && ! $node->in_cond)
+			if ($is_only_relationship && ! $node->in_cond && empty($match[2]))
 			{
 				$open_nodes[$tag_name] = $node;
 			}

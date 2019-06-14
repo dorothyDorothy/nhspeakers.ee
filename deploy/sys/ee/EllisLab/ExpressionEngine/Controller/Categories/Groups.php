@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Categories;
@@ -153,6 +154,10 @@ class Groups extends AbstractCategoriesController {
 				{
 					ee()->functions->redirect(ee('CP/URL')->make('categories/groups/create'));
 				}
+				elseif (ee()->input->post('submit') == 'save_and_close')
+				{
+					ee()->functions->redirect(ee('CP/URL')->make('categories/group/'.$cat_group->getId()));
+				}
 				else
 				{
 					if (is_null($group_id))
@@ -197,9 +202,21 @@ class Groups extends AbstractCategoriesController {
 					'value' => 'save_and_new',
 					'text' => 'save_and_new',
 					'working' => 'btn_saving'
+				],
+				[
+					'name' => 'submit',
+					'type' => 'submit',
+					'value' => 'save_and_close',
+					'text' => 'save_and_close',
+					'working' => 'btn_saving'
 				]
 			]
 		];
+
+		if (AJAX_REQUEST)
+		{
+			unset($vars['buttons'][2]);
+		}
 
 		if ( ! $cat_group->isNew())
 		{
@@ -328,7 +345,7 @@ class Groups extends AbstractCategoriesController {
 				->asWarning()
 				->addToBody(lang('category_permissions_warning'))
 				->addToBody(
-					sprintf(lang('category_permissions_warning2'), '<span title="excercise caution"></span>'),
+					sprintf(lang('category_permissions_warning2'), '<span class="icon--caution" title="exercise caution"></span>'),
 					'caution'
 				)
 				->cannotClose()

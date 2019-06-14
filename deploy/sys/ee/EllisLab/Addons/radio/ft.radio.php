@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 require_once SYSPATH.'ee/legacy/fieldtypes/OptionFieldtype.php';
@@ -45,7 +46,12 @@ class Radio_ft extends OptionFieldtype {
 		{
 			if (is_array($val))
 			{
-				if (array_key_exists($data, $val))
+				if (isset($val['value']) && $data == $val['value'])
+				{
+					$valid = TRUE;
+					break;
+				}
+				elseif (array_key_exists($data, $val))
 				{
 					$valid = TRUE;
 					break;
@@ -91,6 +97,7 @@ class Radio_ft extends OptionFieldtype {
 			? $this->settings['field_text_direction'] : 'ltr';
 
 		$field_options = $this->_get_field_options($data);
+		$extra = ($this->get_setting('field_disabled')) ? 'disabled' : '';
 
 		// Is this new entry?  Set a default
 		if ( ! $this->content_id AND is_null($data))
@@ -117,7 +124,7 @@ class Radio_ft extends OptionFieldtype {
 				'multi'      => FALSE,
 				'disabled'   => $this->get_setting('field_disabled'),
 				'filter_url' => $this->get_setting('filter_url', NULL),
-				'no_results' => $this->get_setting('no_results', NULL)
+				'no_results' => $this->get_setting('no_results', NULL),
 			]);
 		}
 

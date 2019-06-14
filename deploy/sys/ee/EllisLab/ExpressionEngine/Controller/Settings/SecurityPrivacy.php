@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Settings;
@@ -13,12 +14,6 @@ use CP_Controller;
 
 /**
  * Security & Privacy Settings Controller
- *
- * @package		ExpressionEngine
- * @subpackage	Control Panel
- * @category	Control Panel
- * @author		EllisLab Dev Team
- * @link		https://ellislab.com
  */
 class SecurityPrivacy extends Settings {
 
@@ -63,6 +58,16 @@ class SecurityPrivacy extends Settings {
 							)
 						)
 					)
+				),
+				array(
+					'title' => 'share_analytics',
+					'desc' => 'share_analytics_desc',
+					'desc' => sprintf(lang('share_analytics_desc'), ee()->cp->masked_url(DOC_URL.'cp/settings/security-privacy.html#share-analytics-with-the-expressionengine-development-team')),
+					'fields' => array(
+						'share_analytics' => array(
+							'type' => 'yes_no'
+						)
+					)
 				)
 			),
 			'cookie_settings' => array(
@@ -101,6 +106,14 @@ class SecurityPrivacy extends Settings {
 					'security' => TRUE,
 					'fields' => array(
 						'cookie_secure' => array('type' => 'yes_no')
+					)
+				),
+				array(
+					'title' => 'require_cookie_consent',
+					'desc' => 'require_cookie_consent_desc',
+					'security' => TRUE,
+					'fields' => array(
+						'require_cookie_consent' => array('type' => 'yes_no')
 					)
 				)
 			),
@@ -202,9 +215,22 @@ class SecurityPrivacy extends Settings {
 					'title' => 'enable_rank_denial',
 					'desc' => sprintf(lang('enable_rank_denial_desc'), 'https://support.google.com/webmasters/answer/96569?hl=en'),
 					'fields' => array(
-						'redirect_submitted_links' => array('type' => 'yes_no')
+						'redirect_submitted_links' => [
+							'type' => 'yes_no',
+							'group_toggle' => array(
+								'y' => 'force_interstitial'
+							)
+						]
 					)
-				)
+				),
+				[
+					'title' => 'force_interstitial',
+					'desc' => 'force_interstitial_desc',
+					'group' => 'force_interstitial',
+					'fields' => [
+						'force_redirect' => ['type' => 'yes_no']
+					]
+				]
 			)
 		);
 
@@ -234,7 +260,7 @@ class SecurityPrivacy extends Settings {
 			->asWarning()
 			->cannotClose()
 			->addToBody(lang('security_tip'))
-			->addToBody(lang('security_tip_desc'), 'enhance')
+			->addToBody(lang('security_tip_desc'), 'txt-enhance')
 			->now();
 		ee()->view->extra_alerts = array('security-tip');
 

@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -141,8 +142,29 @@ class Rte_lib {
 		);
 
 		$vars['ajax_validate'] = TRUE;
-		$vars['save_btn_text'] = sprintf(lang('btn_save'), lang('tool_set'));
-		$vars['save_btn_text_working'] = 'btn_saving';
+		$vars['buttons'] = [
+			[
+				'name' => 'submit',
+				'type' => 'submit',
+				'value' => 'save',
+				'text' => 'save',
+				'working' => 'btn_saving'
+			],
+			[
+				'name' => 'submit',
+				'type' => 'submit',
+				'value' => 'save_and_new',
+				'text' => 'save_and_new',
+				'working' => 'btn_saving'
+			],
+			[
+				'name' => 'submit',
+				'type' => 'submit',
+				'value' => 'save_and_close',
+				'text' => 'save_and_close',
+				'working' => 'btn_saving'
+			]
+		];
 
 		return ee('View')->make('ee:_shared/form')->render($vars);
 	}
@@ -165,13 +187,25 @@ class Rte_lib {
 		if ($toolset_id)
 		{
 			$error_url = ee('CP/URL')->make('addons/settings/rte/edit_toolset', array('toolset_id' => $toolset_id));
-			$success_url = $error_url;
 		}
 		else
 		{
 			$error_url = ee('CP/URL')->make('addons/settings/rte/new_toolset');
+		}
+
+		if (ee('Request')->post('submit') == 'save_and_new')
+		{
+			$success_url = ee('CP/URL')->make('addons/settings/rte/new_toolset');
+		}
+		elseif (ee()->input->post('submit') == 'save_and_close')
+		{
 			$success_url = ee('CP/URL')->make('addons/settings/rte');
 		}
+		else
+		{
+			$success_url = ee('CP/URL')->make('addons/settings/rte/edit_toolset', array('toolset_id' => $toolset_id));
+		}
+
 
 		$toolset = array(
 			'name'      => ee()->input->post('toolset_name'),
@@ -503,8 +537,14 @@ class Rte_lib {
 	{
 		if ( ! ee()->session->cache('rte', 'loaded'))
 		{
+			$rte_toolset_id = 0;
+			if (isset(ee()->TMPL))
+			{
+				$rte_toolset_id = (int) ee()->TMPL->fetch_param('rte_toolset_id', 0);
+			}
+
 			ee()->javascript->output(
-				ee()->rte_lib->build_js(0, '.WysiHat-field', NULL, (REQ == 'CP'))
+				ee()->rte_lib->build_js($rte_toolset_id, '.WysiHat-field', NULL, (REQ == 'CP'))
 			);
 
 			ee()->session->set_cache('rte', 'loaded', TRUE);
@@ -524,7 +564,7 @@ class Rte_lib {
 		$data = htmlspecialchars_decode($data, ENT_QUOTES);
 
 		// Check the RTE module and user's preferences
-		if (ee()->session->userdata('rte_enabled') == 'y'
+		if ((ee()->session->userdata('rte_enabled') == 'y' OR (ee()->session->userdata('rte_enabled') != 'y'AND ee()->session->userdata('group_id') == 3))
 			AND ee()->config->item('rte_enabled') == 'y')
 		{
 			$field['class']	.= ' WysiHat-field';

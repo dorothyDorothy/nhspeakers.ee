@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -69,6 +70,16 @@ class Rte_ft extends EE_Fieldtype {
 		if (isset($params['raw_output']) && $params['raw_output'] == 'yes')
 		{
 			return ee()->functions->encode_ee_tags($data);
+		}
+
+		if (ee('LivePreview')->hasEntryData())
+		{
+			$entry_data = ee('LivePreview')->getEntryData();
+
+			if ($entry_data['entry_id'] == $this->content_id)
+			{
+				$data = $this->save($data);
+			}
 		}
 
 		ee()->load->library('typography');

@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 use EllisLab\ExpressionEngine\Library\CP\Table;
@@ -808,7 +809,7 @@ MAGIC;
 
 		foreach ($sizes_q->result_array() as $row)
 		{
-			$sizes_array[$row['upload_location_id']][$row['id']] = $row['title'];
+			$sizes_array[$row['upload_location_id']][$row['id']] = $row['short_name'];
 		}
 
 		$upload_q = ee()->file_upload_preferences_model->get_file_upload_preferences(ee()->session->userdata['group_id']);

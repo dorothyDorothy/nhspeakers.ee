@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Publish;
@@ -82,6 +83,11 @@ class Comments extends AbstractPublishController {
 			$comments->filter('comment', 'LIKE', '%' . $search_value . '%');
 		}
 
+		if (ee('Request')->get('comment_id'))
+		{
+			$comments->filter('comment_id', ee('Request')->get('comment_id'));
+		}
+
 		$filters = ee('CP/Filter')
 			->add($channel_filter)
 			->add($status_filter)
@@ -150,7 +156,7 @@ class Comments extends AbstractPublishController {
 		}
 
 		// if there are Spam comments, and the user can access them, give them a link
-		if (ee()->cp->allowed_group('can_moderate_spam') && ee('Addon')->get('spam')->isInstalled())
+		if (ee()->cp->allowed_group('can_moderate_spam') && ee('Addon')->get('spam') && ee('Addon')->get('spam')->isInstalled())
 		{
 			$spam_total = ee('Model')->get('Comment')
 				->filter('site_id', ee()->config->item('site_id'))
@@ -304,9 +310,9 @@ class Comments extends AbstractPublishController {
 
 	public function edit($comment_id)
 	{
-		// Cannot remove if you cannot edit
 		if ( ! ee()->cp->allowed_group('can_edit_all_comments')
-		  && ! ee()->cp->allowed_group('can_edit_own_comments'))
+		  && ! ee()->cp->allowed_group('can_edit_own_comments')
+		  && ! ee()->cp->allowed_group('can_moderate_comments'))
 		{
 			show_error(lang('unauthorized_access'), 403);
 		}
@@ -320,12 +326,16 @@ class Comments extends AbstractPublishController {
 			show_error(lang('no_comments'));
 		}
 
-		// You get an edit button if you can edit all comments or you can
-		// edit your own comments and this comment is one of yours
-		if ( ! ee()->cp->allowed_group('can_edit_all_comments')
-			&& $comment->author_id = ee()->session->userdata('member_id'))
+		// this form lets you edit, moderate, or both. Set permissions
+		$can_edit = FALSE;
+		$can_moderate = ee()->cp->allowed_group('can_moderate_comments');
+
+		if (ee()->cp->allowed_group('can_edit_all_comments') OR
+			($comment->author_id == ee()->session->userdata('member_id')
+				&& ee()->cp->allowed_group('can_edit_own_comments')
+			))
 		{
-			show_error(lang('unauthorized_access'), 403);
+			$can_edit = TRUE;
 		}
 
 		$author_information = ee('View')->make('publish/comments/partials/author_information')
@@ -333,11 +343,10 @@ class Comments extends AbstractPublishController {
 
 		$title = $comment->getEntry()->title;
 
-		$live_look_template = $comment->getChannel()->getLiveLookTemplate();
-
-		if ($live_look_template)
+		if ($comment->Channel->preview_url)
 		{
-			$view_url = ee()->functions->create_url($live_look_template->getPath() . '/' . $comment->getEntry()->entry_id);
+			$uri = str_replace(['{url_title}', '{entry_id}'], [$comment->Entry->url_title, $comment->Entry->entry_id], $comment->Channel->preview_url);
+			$view_url = ee()->functions->create_url($uri);
 			$title = '<a href="' . ee()->cp->masked_url($view_url) . '" rel="external">' . $title . '</a>';
 		}
 
@@ -346,82 +355,102 @@ class Comments extends AbstractPublishController {
 			$comment->getChannel()->channel_title
 		);
 
-		$vars = array(
+		// we whitelist these sections based on the permissions, so everything starts out disabled
+		$vars = [
 			'ajax_validate' => TRUE,
 			'base_url' => ee('CP/URL')->make('publish/comments/edit/' . $comment_id),
 			'save_btn_text' => 'btn_edit_comment',
 			'save_btn_text_working' => 'btn_saving',
-			'sections' => array(
-				array(
-					array(
+			'sections' => [
+				[
+					'author' => [
 						'title' => 'author_information',
 						'desc' => 'author_information_desc',
-						'fields' => array(
-							'author' => array(
+						'fields' => [
+							'author' => [
 								'type' => 'html',
 								'content' => $author_information,
-
-							)
-						)
-					),
-					array(
+							]
+						]
+					],
+					'status' => [
 						'title' => 'status',
 						'desc' => 'comment_status_desc',
-						'fields' => array(
-							'status' => array(
+						'fields' => [
+							'status' => [
 								'type' => 'radio',
-								'choices' => array(
+								'choices' => [
 									'o' => lang('open'),
 									'c' => lang('closed'),
 									'p' => lang('pending'),
 									's' => lang('spam')
-								),
-								'value' => $comment->status
-							)
-						)
-					),
-					array(
+								],
+								'value' => $comment->status,
+								'disabled' => TRUE,
+							]
+						]
+					],
+					'comment' => [
 						'title' => 'comment_content',
 						'desc' => 'comment_content_desc',
-						'fields' => array(
-							'comment' => array(
+						'fields' => [
+							'comment' => [
 								'type' => 'textarea',
 								'value' => $comment->comment,
-								'required' => TRUE
-							)
-						)
-					),
-					array(
+								'attrs' => 'class="textarea--large"',
+								'required' => FALSE,
+								'disabled' => TRUE,
+							]
+						]
+					],
+					'move' => [
 						'title' => 'move_comment',
 						'desc' => $move_desc,
-						'fields' => array(
-							'move' => array(
-								'type' => 'text'
-							)
-						)
-					),
-				)
-			)
-		);
+						'fields' => [
+							'move' => [
+								'type' => 'text',
+								'disabled' => TRUE,
+							],
+						]
+					],
+				]
+			]
+		];
 
-		ee()->load->library('form_validation');
-		ee()->form_validation->set_rules(array(
-			array(
+		$rules = [];
+
+		if ($can_edit)
+		{
+			$vars['sections'][0]['comment']['fields']['comment']['required'] = TRUE;
+			$vars['sections'][0]['comment']['fields']['comment']['disabled'] = FALSE;
+
+			$rules[] = [
 				'field' => 'comment',
 				'label' => 'lang:comment',
 				'rules' => 'required'
-			),
-			array(
+			];
+		}
+
+		if ($can_moderate)
+		{
+			$vars['sections'][0]['status']['fields']['status']['disabled'] = FALSE;
+			$vars['sections'][0]['move']['fields']['move']['disabled'] = FALSE;
+
+			$rules[] = [
 				'field' => 'status',
 				'label' => 'lang:status',
 				'rules' => 'enum[o,c,p,s]'
-			),
-			array(
+			];
+
+			$rules[] = [
 				'field' => 'move',
 				'label' => 'lang:move',
 				'rules' => 'is_natural'
-			),
-		));
+			];
+		}
+
+		ee()->load->library('form_validation');
+		ee()->form_validation->set_rules($rules);
 
 		if (AJAX_REQUEST)
 		{
@@ -430,12 +459,19 @@ class Comments extends AbstractPublishController {
 		}
 		elseif (ee()->form_validation->run() !== FALSE)
 		{
-			$comment->comment = ee()->input->post('comment');
-			$comment->status = ee()->input->post('status');
-
-			if (ee()->input->post('move'))
+			if ($can_edit)
 			{
-				$comment->entry_id = ee()->input->post('move');
+				$comment->comment = ee()->input->post('comment');
+			}
+
+			if ($can_moderate)
+			{
+				$comment->status = ee()->input->post('status');
+
+				if (ee()->input->post('move'))
+				{
+					$comment->entry_id = ee()->input->post('move');
+				}
 			}
 
 			$comment->save();
@@ -529,7 +565,7 @@ class Comments extends AbstractPublishController {
 			// edit your own comments and this comment is one of yours
 			if (ee()->cp->allowed_group('can_edit_all_comments')
 				|| (ee()->cp->allowed_group('can_edit_own_comments')
-					&& $comment->author_id = ee()->session->userdata('member_id')))
+					&& $comment->author_id == ee()->session->userdata('member_id')))
 			{
 				$toolbar = array(
 					'edit' => array(

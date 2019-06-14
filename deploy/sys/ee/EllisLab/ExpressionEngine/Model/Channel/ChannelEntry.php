@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Model\Channel;
@@ -103,7 +104,10 @@ class ChannelEntry extends ContentModel {
 		'CommentSubscriptions' => array(
 			'type' => 'hasMany',
 			'model' => 'CommentSubscription'
-		)
+		),
+		'Site' => array(
+			'type' => 'belongsTo'
+		),
 	);
 
 	protected static $_field_data = array(
@@ -168,27 +172,44 @@ class ChannelEntry extends ContentModel {
 
     public function set__entry_date($entry_date)
     {
-        if ( ! is_numeric($entry_date))
-        {
-            // @TODO: DRY this out; this was copied from ft.date.php
-            // First we try with the configured date format
-            $entry_date = ee()->localize->string_to_timestamp($entry_date, TRUE, ee()->localize->get_date_format());
-
-            // If the date format didn't work, try something more fuzzy
-            if ($entry_date === FALSE)
-            {
-                $entry_date = ee()->localize->string_to_timestamp($entry_date);
-            }
-        }
-
-        $this->setRawProperty('entry_date', $entry_date);
+		$entry_timestamp = $this->stringToTimestamp($entry_date);
+		$this->setRawProperty('entry_date', $entry_timestamp);
 
         // Day, Month, and Year Fields
         // @TODO un-break these windows: inject this dependency
-        $this->setProperty('year', ee()->localize->format_date('%Y', $entry_date));
-        $this->setProperty('month', ee()->localize->format_date('%m', $entry_date));
-        $this->setProperty('day', ee()->localize->format_date('%d', $entry_date));
+		$this->setProperty('year', ee()->localize->format_date('%Y', $entry_timestamp));
+		$this->setProperty('month', ee()->localize->format_date('%m', $entry_timestamp));
+		$this->setProperty('day', ee()->localize->format_date('%d', $entry_timestamp));
     }
+
+	public function set__expiration_date($expiration_date)
+	{
+        $this->setRawProperty('expiration_date', $this->stringToTimestamp($expiration_date));
+	}
+
+	public function set__comment_expiration_date($comment_expiration_date)
+	{
+        $this->setRawProperty('comment_expiration_date', $this->stringToTimestamp($comment_expiration_date));
+	}
+
+	private function stringToTimestamp($date)
+	{
+        if ( ! is_numeric($date))
+        {
+            // @TODO: DRY this out; this was copied from ft.date.php (still need to put this logic
+			// somewhere both this Model and ft.date.php can use)
+            // First we try with the configured date format
+            $date = ee()->localize->string_to_timestamp($date, TRUE, ee()->localize->get_date_format());
+
+            // If the date format didn't work, try something more fuzzy
+            if ($date === FALSE)
+            {
+                $date = ee()->localize->string_to_timestamp($date);
+            }
+        }
+
+		return $date;
+	}
 
 	public function validate()
 	{
@@ -267,8 +288,13 @@ class ChannelEntry extends ContentModel {
 	 */
 	public function validateAuthorId($key, $value, $params, $rule)
 	{
+		$channel_permission = FALSE;
+
 		if (ee()->session->userdata('member_id'))
 		{
+			// A super admin always has channel permission to post as themself
+			$channel_permission = (ee()->session->userdata('group_id') == 1 && ($this->author_id == ee()->session->userdata('member_id'))) ? TRUE : FALSE;
+
 			if ($this->author_id != ee()->session->userdata('member_id') && ee()->session->userdata('can_edit_other_entries') != 'y')
 			{
 				return 'not_authorized';
@@ -289,8 +315,41 @@ class ChannelEntry extends ContentModel {
 			}
 		}
 
+		// If it's new or an edit AND they changed the author_id,
+		// the author_id should either have permission to post to the channel or be in include_in_authorlist
+		if ($this->getBackup('author_id') != $this->author_id && ! $channel_permission)
+		{
+			$assigned_channels = $this->Author->MemberGroup->AssignedChannels->pluck('channel_id');
+			$channel_permission = (in_array($this->channel_id, $assigned_channels)) ? TRUE : FALSE;
+
+			$authors = ee('Member')->getAuthors(NULL, FALSE);
+
+			if ( ! $channel_permission && ! isset($authors[$this->author_id]))
+			{
+				return 'not_authorized';
+			}
+		}
+		else
+		{
+			// Catch the rare database corruption
+
+			if ( ! $this->author_id)
+			{
+				return 'not_authorized';
+			}
+
+			$member = ee('Model')->get('Member', $this->author_id)->first();
+
+			if (is_null($member))
+			{
+				return 'not_authorized';
+			}
+		}
+
+
 		return TRUE;
 	}
+
 
 	/**
 	 * Validate the URL title for any disallowed characters; it's basically an alhpa-dash rule plus periods
@@ -450,7 +509,8 @@ class ChannelEntry extends ContentModel {
 		// store the author and dissociate. otherwise saving the author will
 		// attempt to save this entry to ensure relationship integrity.
 		// TODO make sure everything is already dissociated when we hit this
-		$last_author = $this->Author;
+
+		$last_author = $this->getModelFacade()->get('Member', $this->Author->member_id)->first();
 		$this->Author = NULL;
 
 		$last_author->updateAuthorStats();
@@ -742,6 +802,11 @@ class ChannelEntry extends ContentModel {
 			return array_key_exists('cat_group_id_'.$cat_group_id, $categories);
 		});
 
+		if (empty($cat_groups))
+		{
+			return;
+		}
+
 		$category_ids = array();
 
 		// Set the data on the fields in case we come back from a validation error
@@ -922,8 +987,8 @@ class ChannelEntry extends ContentModel {
 					'field_show_fmt'		=> 'n',
 					'field_instructions'	=> sprintf(lang('versioning_enabled_desc'), $this->Channel->max_revisions),
 					'field_text_direction'	=> 'ltr',
-					'field_type'			=> 'radio',
-					'field_list_items'      => array('y' => lang('yes'), 'n' => lang('no')),
+					'field_type'			=> 'toggle',
+					'yes_no'				=> TRUE,
 					'field_maxl'			=> 100
 				);
 				$default_fields['revisions'] = array(
@@ -1016,8 +1081,10 @@ class ChannelEntry extends ContentModel {
 		$channel_filter_options = array();
 
 		$channels = $this->getModelFacade()->get('Channel', $allowed_channel_ids)
+			->with('Statuses', 'CustomFields', ['FieldGroups' => 'ChannelFields'])
 			->filter('site_id', ee()->config->item('site_id'))
-			->fields('channel_id', 'channel_title')
+			// Include custom field information because it may be cached for later calls
+			->fields('channel_id', 'channel_title', 'ChannelFields.*', 'CustomFields.*')
 			->all();
 
 		foreach ($channels as $channel)
@@ -1040,7 +1107,7 @@ class ChannelEntry extends ContentModel {
 	 * @return	void    Sets author field metaddata
 	 *
 	 * The following are included in the author list regardless of
-	 * their channel posting permissions:
+	 * their channel posting permissions (assuming the user has permission to assign entries to others):
 	 *	  The current user
 	 *	  The current author (if editing)
 	 *	  Anyone in a group set to 'include_in_authorlist'
@@ -1054,21 +1121,21 @@ class ChannelEntry extends ContentModel {
 		// Default author
 		$author = $this->Author;
 
-		if ( ! $author)
+		if ($author)
 		{
-			$field->setItem('field_list_items', $author_options);
-			return;
+			$author_options[$author->getId()] = $author->getMemberName();
 		}
 
-		$author_options[$author->getId()] = $author->getMemberName();
-
-		if ($author->getId() != ee()->session->userdata('member_id'))
+		if (ee('Permission')->has('can_assign_post_authors'))
 		{
-			$author_options[ee()->session->userdata('member_id')] =
-			ee()->session->userdata('screen_name') ?: ee()->session->userdata('username');
-		}
+			if ( ! $author OR ($author->getId() != ee()->session->userdata('member_id')))
+			{
+				$author_options[ee()->session->userdata('member_id')] =
+				ee()->session->userdata('screen_name') ?: ee()->session->userdata('username');
+			}
 
-		$author_options += ee('Member')->getAuthors();
+			$author_options += ee('Member')->getAuthors();
+		}
 
 		$field->setItem('field_list_items', $author_options);
 	}
@@ -1106,10 +1173,7 @@ class ChannelEntry extends ContentModel {
 				continue;
 			}
 
-			$status_name = ($status->status == 'closed' OR $status->status == 'open')
-				? lang($status->status)
-				: $status->status;
-			$status_options[$status->status] = $status_name;
+			$status_options[] = $status->getOptionComponent();
 		}
 
 		$field->setItem('field_list_items', $status_options);
@@ -1143,8 +1207,78 @@ class ChannelEntry extends ContentModel {
 			}
 		}
 
+		foreach (['versioning_enabled', 'allow_comments', 'sticky'] as $key)
+		{
+			$data[$key] = ($data[$key]) ? 'y' : 'n';
+		}
+
+		$cat_ids = [];
+		foreach ($this->Categories as $cat)
+		{
+			$cat_ids[] = $cat->getId();
+		}
+		$data['cat_id'] = $cat_ids;
+
 		return $data;
 	}
+
+	public function hasPageURI()
+	{
+		$pages = $this->Site->site_pages;
+		return isset($pages[$this->site_id]['uris'][$this->getId()]);
+	}
+
+	public function getPageURI()
+	{
+		if ( ! $this->hasPageURI())
+		{
+			return NULL;
+		}
+
+		return $this->Site->site_pages[$this->site_id]['uris'][$this->getId()];
+	}
+
+	public function getPageTemplateID()
+	{
+		if ( ! $this->hasPageURI())
+		{
+			return NULL;
+		}
+
+		return $this->Site->site_pages[$this->site_id]['templates'][$this->getId()];
+	}
+
+	public function isLivePreviewable()
+	{
+		if ($this->Channel->preview_url)
+		{
+			return TRUE;
+		}
+
+		$pages_module = ee('Addon')->get('pages');
+		if ($pages_module && $pages_module->isInstalled())
+		{
+			return TRUE;
+		}
+
+		if ($this->hasPageURI())
+		{
+		    return TRUE;
+		}
+
+		return FALSE;
+	}
+
+	public function hasLivePreview()
+	{
+		if ($this->Channel->preview_url || $this->hasPageURI())
+		{
+			return TRUE;
+		}
+
+		return FALSE;
+	}
+
 }
 
 // EOF

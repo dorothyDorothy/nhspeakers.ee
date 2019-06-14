@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Service\Validation;
@@ -49,10 +50,10 @@ class Factory {
 	 */
 	public function ajax(ValidationResult $result)
 	{
-		if (ee()->input->is_ajax_request())
-		{
-			$field = ee()->input->post('ee_fv_field');
+		$field = ee()->input->post('ee_fv_field');
 
+		if ($field && ee()->input->is_ajax_request())
+		{
 			if ($result->hasErrors($field))
 			{
 				return ['error' => $result->renderError($field)];

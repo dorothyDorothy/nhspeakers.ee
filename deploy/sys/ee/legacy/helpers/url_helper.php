@@ -1,11 +1,12 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed.');
 
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -445,19 +446,10 @@ if ( ! function_exists('prep_url'))
 {
 	function prep_url($str = '')
 	{
-		if ($str == 'http://' OR $str == '')
-		{
-			return '';
-		}
+		ee()->load->library('logger');
+		ee()->logger->deprecated('4.2.0', "ee('Format')->make('Text', \$str)->url()");
 
-		$url = parse_url($str);
-
-		if ( ! $url OR ! isset($url['scheme']))
-		{
-			$str = 'http://'.$str;
-		}
-
-		return $str;
+		return (string) ee('Format')->make('Text', $str)->url();
 	}
 }
 

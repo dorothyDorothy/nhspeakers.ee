@@ -18,7 +18,7 @@ $lang = array(
 
 'category_groups' => 'Category groups',
 
-'category_groups_desc' => 'Assign one of more category groups to this channel.',
+'category_groups_desc' => 'Assign one or more category groups to this channel.',
 
 'channel' => 'Channel',
 
@@ -106,9 +106,9 @@ $lang = array(
 
 'field_groups' => 'Field groups',
 
-'field_groups_desc' => 'Assign one of more field groups to this channel.',
+'field_groups_desc' => 'Assign one or more field groups to this channel.',
 
-'fields_desc' => 'Assign one of more fields to this channel.',
+'fields_desc' => 'Assign one or more fields to this channel.',
 
 'form_layouts' => 'Publish Layouts',
 
@@ -183,6 +183,8 @@ $lang = array(
 'channel_not_updated' => 'Cannot Update Channel',
 
 'channel_not_updated_desc' => 'We were unable to update this channel, please review and fix errors below.',
+
+'channel_preview_url_invalid' => 'The Preview URL must be just a template path or route, it cannot be a full URL (including {base_url})',
 
 'channel_publishing_options' => 'Publishing Options',
 
@@ -326,9 +328,9 @@ $lang = array(
 
 'invalid_url_title_prefix' => 'This field cannot contain spaces.',
 
-'live_look_template' => 'Live Look template',
+'preview_url' => 'Preview <abbr title="Unified Resource Locator">URL</abbr>',
 
-'live_look_template_desc' => 'Template to use for the <mark>Live Look</mark> feature.',
+'preview_url_desc' => 'Template path or route to use for previewing. Use <code>{url_title}</code> or <code>{entry_id}</code> for single-entry templates. i.e. <b><code>blog/entry/{url_title}</code></b>',
 
 'max_characters' => 'Maximum characters allowed?',
 
@@ -341,8 +343,6 @@ $lang = array(
 'moderate_comments' => 'Moderate comments?',
 
 'moderate_comments_desc' => 'When enabled, submitted comments will be put into a moderation queue, and must be approved by a Super Admin or other member group with moderation permissions.',
-
-'no_live_look_template' => 'No template chosen',
 
 'notifications' => 'Notifications',
 
@@ -594,7 +594,7 @@ $lang = array(
 
 'statuses' => 'Statuses',
 
-'statuses_desc' => 'Assign one of more statuses to this channel.',
+'statuses_desc' => 'Assign one or more statuses to this channel.',
 
 'statuses_removed' => 'Statuses removed',
 

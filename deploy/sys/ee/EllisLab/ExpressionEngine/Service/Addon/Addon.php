@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Service\Addon;
@@ -481,6 +482,122 @@ class Addon {
 		}
 
 		return $names;
+	}
+
+	public function getInstalledConsentRequests()
+	{
+		$return = [];
+
+		$prefix = $this->getConsentPrefix();
+		$requests = $this->get('consent.requests', []);
+
+		foreach ($requests as $name => $values)
+		{
+			$consent_name = $prefix . ':' . $name;
+			if ($this->hasConsentRequestInstalled($consent_name))
+			{
+				$return[] = $consent_name;
+			}
+		}
+
+		return $return;
+	}
+
+	public function installConsentRequests()
+	{
+		// Preflight: if we have any consents that match there's been a problem.
+		$requests = $this->getInstalledConsentRequests();
+		if ( ! empty($requests))
+		{
+		    throw new \Exception;
+		}
+
+		$prefix = $this->getConsentPrefix();
+		$requests = $this->get('consent.requests', []);
+
+		foreach ($requests as $name => $values)
+		{
+			$consent_name = $prefix . ':' . $name;
+			$this->makeConsentRequest($consent_name, $values);
+		}
+	}
+
+	private function hasConsentRequestInstalled($name)
+	{
+		return (bool) ee('Model')->get('ConsentRequest')
+			->filter('consent_name', $name)
+			->count();
+	}
+
+	private function makeConsentRequest($name, $values)
+	{
+		$request = ee('Model')->make('ConsentRequest');
+		$request->user_created = FALSE; // App-generated request
+		$request->consent_name = $name;
+		$request->title = (isset($values['title'])) ? $values['title'] : $name;
+		$request->save();
+
+		if (isset($values['request']))
+		{
+			$version = ee('Model')->make('ConsentRequestVersion');
+			$version->request = $values['request'];
+			$version->request_format = (isset($values['request_format'])) ? $values['request_format'] : 'none';
+			$version->author_id = ee()->session->userdata('member_id');
+			$version->create_date = ee()->localize->now;
+			$request->Versions->add($version);
+
+			$version->save();
+
+			$request->CurrentVersion = $version;
+			$request->save();
+		}
+	}
+
+	public function updateConsentRequests()
+	{
+		$prefix = $this->getConsentPrefix();
+		$requests = $this->get('consent.requests', []);
+
+		foreach ($requests as $name => $values)
+		{
+			$consent_name = $prefix . ':' . $name;
+			if ( ! $this->hasConsentRequestInstalled($consent_name))
+			{
+				$this->makeConsentRequest($consent_name, $values);
+			}
+		}
+	}
+
+	public function removeConsentRequests()
+	{
+		$prefix = $this->getConsentPrefix();
+		$requests = $this->get('consent.requests', []);
+
+		$consent_names = [];
+
+		foreach ($requests as $name => $values)
+		{
+			$consent_names[] = $prefix . ':' . $name;
+		}
+
+		if ( ! empty($consent_names))
+		{
+			ee('Model')->get('ConsentRequest')
+				->filter('consent_name', 'IN', $consent_names)
+				->delete();
+		}
+	}
+
+	private function getConsentPrefix()
+	{
+		if (strpos($this->getPath(), PATH_ADDONS) === 0)
+		{
+			return 'ee';
+		}
+		else
+		{
+			return $this->getPrefix();
+		}
 	}
 
 	/**

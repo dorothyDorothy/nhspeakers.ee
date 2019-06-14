@@ -43,9 +43,7 @@
 							<?php endforeach ?>
 							<?php if (ee()->cp->allowed_group('can_admin_sites')): ?>
 								<li><a class="nav-manage" href="<?=ee('CP/URL', 'msm')?>"><i class="icon-settings"></i>Manage Sites</a></li>
-								<?php if (ee('License')->getEELicense()->canAddSites(ee('Model')->get('Site')->count())): ?>
-									<li><a class="nav-add" href="<?=ee('CP/URL', 'msm/create')?>"><i class="icon-add"></i><?=lang('new_site')?></a></li>
-								<?php endif ?>
+								<li><a class="nav-add" href="<?=ee('CP/URL', 'msm/create')?>"><i class="icon-add"></i><?=lang('new_site')?></a></li>
 							<?php endif ?>
 						</ul>
 					</div>
@@ -56,7 +54,6 @@
 					<?php endif ?>
 				</div>
 				<div class="nav-global-user">
-					<a class="nav-logout" href="<?=ee('CP/URL', 'login/logout')?>"><i class="icon-logout"></i><span class="nav-txt-collapse"><?=lang('log_out')?></span></a>
 					<div class="nav-user">
 						<a class="nav-has-sub" href=""><i class="icon-user"></i><span class="nav-txt-collapse"><?=$cp_screen_name?></span></a>
 						<ul class="nav-sub-menu">
@@ -67,6 +64,7 @@
 							<li><a class="nav-add" href="<?=ee('CP/URL')->make('members/profile/quicklinks/create', array('id' => ee()->session->userdata('member_id'), 'url' => ee('CP/URL')->getCurrentUrl()->encode(), 'name' => $cp_page_title))?>"><i class="icon-add"></i><?=lang('new_link')?></a></li>
 						</ul>
 					</div>
+					<a class="nav-logout" href="<?=ee('CP/URL', 'login/logout')?>"><i class="icon-logout"></i><span class="nav-txt-collapse"><?=lang('log_out')?></span></a>
 				</div>
 			</nav>
 		</div>

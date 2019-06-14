@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -70,6 +71,8 @@ class EE_Session {
 	public $sess_crypt_key		= '';
 
 	public $cookie_ttl			= '';
+	protected $activity_cookie_ttl = 31536000; // Activity cookie expiration:  One year
+
 	public $session_length		= '';
 	public $validation_type  	= '';
 
@@ -187,9 +190,6 @@ class EE_Session {
 			}
 		}
 
-		$this->_prep_flashdata();
-		ee()->remember->refresh();
-
 		// Fetch "tracker" cookie
 		if (REQ != 'CP')
 		{
@@ -219,6 +219,26 @@ class EE_Session {
 		unset($session_id);
 		unset($rememebered);
 		unset($member_exists);
+	}
+
+	public function setSessionCookies()
+	{
+		ee()->input->set_cookie('last_visit', $this->userdata['last_visit'], $this->activity_cookie_ttl);
+		ee()->input->set_cookie('last_activity', ee()->localize->now, $this->activity_cookie_ttl);
+
+		// Update session ID cookie
+		if ($this->session_exists === TRUE && $this->validation != 's')
+		{
+			ee()->input->set_cookie($this->c_session , $this->userdata['session_id'],  $this->cookie_ttl);
+		}
+
+		if (REQ == 'PAGE')
+		{
+			$this->set_tracker_cookie($this->tracker);
+		}
+
+		$this->_prep_flashdata();
+		ee()->remember->refresh();
 	}
 
 	/**
@@ -376,11 +396,15 @@ class EE_Session {
 		$this->userdata['fingerprint']	= $this->sdata['fingerprint'];
 		$this->userdata['site_id']		= ee()->config->item('site_id');
 
-		ee()->input->set_cookie($this->c_session, $this->sdata['session_id'], $this->cookie_ttl);
-		ee()->input->set_cookie($this->c_expire, time()+$this->session_length, $this->cookie_ttl);
+		// Set the session cookie, ONLY if this method is not called from the context of the constructor, i.e. a login action
+		if (isset(ee()->session))
+		{
+			ee()->input->set_cookie($this->c_session , $this->userdata['session_id'],  $this->cookie_ttl);
+		}
 
 		ee()->db->query(ee()->db->insert_string('exp_sessions', $this->sdata));
 
+		$this->session_exists = TRUE;
 		return $this->sdata['session_id'];
 	}
 
@@ -467,7 +491,6 @@ class EE_Session {
 
 		ee()->remember->delete();
 		ee()->input->delete_cookie($this->c_session);
-		ee()->input->delete_cookie($this->c_expire);
 		ee()->input->delete_cookie($this->c_anon);
 		ee()->input->delete_cookie('tracker');
 	}
@@ -502,11 +525,8 @@ class EE_Session {
 		// It enables us to track "read topics" with users who are not
 		// logged in.
 
-		// Cookie expiration:  One year
-		$expire = (60*60*24*365);
-
 		// Has the user been active before? If not we set the "last_activity" to the current time.
-		$this->sdata['last_activity'] = ( ! ee()->input->cookie('last_activity')) ? ee()->localize->now : ee()->input->cookie('last_activity');
+		$this->sdata['last_activity'] = (int) ( ! ee()->input->cookie('last_activity')) ? ee()->localize->now : ee()->input->cookie('last_activity');
 
 		// Is the "last_visit" cookie set?  If not, we set the last visit
 		// date to ten years ago. This is a kind of funky thing to do but
@@ -515,12 +535,11 @@ class EE_Session {
 		// doesn't hurt anything to set it this way for guests.
 		if ( ! ee()->input->cookie('last_visit'))
 		{
-			$this->userdata['last_visit'] = ee()->localize->now-($expire*10);
-			ee()->input->set_cookie('last_visit', $this->userdata['last_visit'], $expire);
+			$this->userdata['last_visit'] = ee()->localize->now-($this->activity_cookie_ttl*10);
 		}
 		else
 		{
-			$this->userdata['last_visit'] = ee()->input->cookie('last_visit');
+			$this->userdata['last_visit'] = (int) ee()->input->cookie('last_visit');
 		}
 
 		// If the user has been inactive longer than the session length we'll
@@ -529,11 +548,7 @@ class EE_Session {
 		if (($this->sdata['last_activity'] + $this->session_length) < ee()->localize->now)
 		{
 			$this->userdata['last_visit'] = $this->sdata['last_activity'];
-			ee()->input->set_cookie('last_visit', $this->userdata['last_visit'], $expire);
 		}
-
-		// Update the last activity with each page load
-		ee()->input->set_cookie('last_activity', ee()->localize->now, $expire);
 	}
 
 	/**
@@ -552,6 +567,11 @@ class EE_Session {
 		// Turn the query rows into array values
 		foreach ($member_query->row_array() as $key => $val)
 		{
+			if (in_array($key, ['timezone', 'date_format', 'time_format', 'include_seconds']) && $val === '')
+			{
+				$val = NULL;
+			}
+
 			if ($key != 'crypt_key')
 			{
 				$this->userdata[$key] = $val;
@@ -918,11 +938,6 @@ class EE_Session {
 			}
 		}
 
-		if (REQ == 'PAGE')
-		{
-			$this->set_tracker_cookie($tracker);
-		}
-
 		return $tracker;
 	}
 
@@ -997,12 +1012,6 @@ class EE_Session {
 		}
 
 		ee()->db->query(ee()->db->update_string('exp_sessions', $this->sdata, "session_id = '".$cur_session_id."'"));
-
-		// Update session ID cookie
-		if ($this->validation != 's')
-		{
-			ee()->input->set_cookie($this->c_session , $this->sdata['session_id'],  $this->cookie_ttl);
-		}
 
 		// We'll unset the "last activity" item from the session data array.
 		// We do this to avoid a conflict with the "last_activity" item in the
@@ -1208,12 +1217,13 @@ class EE_Session {
 	 */
 	protected function _initialize_userdata()
 	{
+		// my_* cookies used by guests in the comment form
 		$this->userdata = array(
-			'username'			=> ee()->input->cookie('my_name'),
+			'username'			=> ee('Cookie')->getSignedCookie('my_name', TRUE),
 			'screen_name'		=> '',
-			'email'				=> ee()->input->cookie('my_email'),
-			'url'				=> ee()->input->cookie('my_url'),
-			'location'			=> ee()->input->cookie('my_location'),
+			'email'				=> ee('Cookie')->getSignedCookie('my_email', TRUE),
+			'url'				=> ee('Cookie')->getSignedCookie('my_url', TRUE),
+			'location'			=> ee('Cookie')->getSignedCookie('my_location', TRUE),
 			'language'			=> '',
 			'timezone'			=> ee()->config->item('default_site_timezone'),
 			'date_format'		=> ee()->config->item('date_format') ? ee()->config->item('date_format') : '%n/%j/%Y',
@@ -1236,13 +1246,10 @@ class EE_Session {
 	 */
 	protected function _prep_flashdata()
 	{
-		if ($cookie = ee()->input->cookie('flash'))
+		if ($this->flashdata = ee('Cookie')->getSignedCookie('flash'))
 		{
-			if ($this->flashdata = ee('Encrypt/Cookie')->getVerifiedCookieData($cookie))
-			{
-				$this->_age_flashdata();
-				return;
-			}
+			$this->_age_flashdata();
+			return;
 		}
 
 		$this->flashdata = array();
@@ -1267,8 +1274,7 @@ class EE_Session {
 	{
 		if (count($this->flashdata) > 0)
 		{
-			$payload = ee('Encrypt/Cookie')->signCookieData($this->flashdata);
-			ee()->input->set_cookie('flash' , $payload, 86500);
+			ee('Cookie')->setSignedCookie('flash', $this->flashdata, 86500);
 		}
 	}
 

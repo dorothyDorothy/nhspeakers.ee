@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Model\Template;
@@ -62,12 +63,6 @@ class Template extends FileSyncedModel {
 		'DeveloperLogItems' => array(
 			'type' => 'hasMany',
 			'model' => 'DeveloperLog'
-		),
-		'Channel' => array(
-			'type' => 'belongsTo',
-			'to_key' => 'live_look_template',
-			'from_key' => 'template_id',
-			'weak' => TRUE,
 		),
 		'Versions' => array(
 			'type' => 'hasMany',
@@ -258,6 +253,24 @@ class Template extends FileSyncedModel {
 		parent::onAfterSave();
 		ee()->functions->clear_caching('all');
 	}
+
+    /**
+     * Manually clean out no_auth_bounce template field after delete.
+     */
+    public function onAfterDelete()
+    {
+        parent::onAfterDelete();
+
+        $updatable = $this->getModelFacade()->get('Template')
+            ->filter('no_auth_bounce', $this->template_id)
+            ->all();
+
+        if ($updatable)
+        {
+            $updatable->no_auth_bounce = '';
+            $updatable->save();
+        }
+    }
 }
 
 // EOF

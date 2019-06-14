@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -41,8 +42,14 @@ class Grid_parser {
 	public function pre_process($tagdata, $pre_parser, $grid_fields, $content_type = 'channel')
 	{
 		// Bail out if there are no grid fields present to parse
+
+		$sorted_grid_fields = array_keys($grid_fields);
+
+		// Sort so any names with a dash come before their roots
+		rsort($sorted_grid_fields);
+
 		if ( ! preg_match_all(
-				"/".LD.'\/?('.preg_quote($pre_parser->prefix()).'(?:(?:'.implode('|', array_flip($grid_fields)).'):?))\b([^}{]*)?'.RD."/",
+				"/".LD.'\/?('.preg_quote($pre_parser->prefix()).'(?:(?:'.implode('|', $sorted_grid_fields).'):?))\b([^}{]*)?'.RD."/",
 				$tagdata,
 				$matches,
 				PREG_SET_ORDER)
@@ -334,6 +341,12 @@ class Grid_parser {
 			{
 				$value = (isset($row['col_id_'.$col_id])) ? $row['col_id_'.$col_id] : '';
 
+				if ($col['col_type'] == 'date')
+				{
+					// don't want to cast non-existent values to 0, which is a valid date
+					$value = ($value === '') ? FALSE : (int) $value;
+				}
+
 				$cond[$prefix.$col['col_name']] = $value;
 			}
 
@@ -468,8 +481,9 @@ class Grid_parser {
 					$entry_id,
 					$row['row_id'],
 					array(
-						'modifier'	=> $modifier,
-						'params'	=> $params
+						'modifier'      => $modifier,
+						'full_modifier' => $modifier,
+						'params'        => $params,
 					),
 					$channel_row,
 					$content,
@@ -594,9 +608,12 @@ class Grid_parser {
 	 * @param	string	Unique row identifier
 	 * @param	int		Field ID of Grid field
 	 * @param	int		Entry ID being processed or parsed
+	 * @param	string	Parent content type
+	 * @param	int		Parent Fluid field ID
+	 * @param	boolean	Whether or not this field is being shown in a modal
 	 * @return	object	Fieldtype object
 	 */
-	public function instantiate_fieldtype($column, $row_name = NULL, $field_id = 0, $entry_id = 0, $content_type = 'channel', $fluid_field_data_id = 0)
+	public function instantiate_fieldtype($column, $row_name = NULL, $field_id = 0, $entry_id = 0, $content_type = 'channel', $fluid_field_data_id = 0, $in_modal_context = FALSE)
 	{
 		if ( ! isset(ee()->api_channel_fields->field_types[$column['col_type']]))
 		{
@@ -638,7 +655,8 @@ class Grid_parser {
 				'grid_field_id'		=> $field_id,
 				'grid_row_name'		=> $row_name,
 				'grid_content_type'	=> $content_type,
-				'fluid_field_data_id'     => $fluid_field_data_id
+				'fluid_field_data_id'     => $fluid_field_data_id,
+				'in_modal_context'  => $in_modal_context
 			)
 		);
 
@@ -725,14 +743,15 @@ class Grid_parser {
 		$params = array($data, $field['params'], $content);
 
 		// Sent to catchall if modifier function doesn't exist
-		if ($modifier && ! method_exists($fieldtype, $parse_fnc))
+		if ($field['full_modifier'] && ! method_exists($fieldtype, $parse_fnc))
 		{
 			$parse_fnc = 'replace_tag_catchall';
-			$params[] = $modifier;
+			$params[] = $field['full_modifier'];
 		}
 
 		return $this->call($parse_fnc, $params, TRUE);
 	}
+
 }
 
 // EOF

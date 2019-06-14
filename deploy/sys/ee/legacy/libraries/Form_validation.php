@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -170,7 +171,19 @@ class EE_Form_validation {
 			{
 				foreach ($setting['fields'] as $field_name => $field)
 				{
+					// For ajaxified fields with options not currently showing, we skip
+					if (isset($field['filter_url']) && isset($field['choices']) && count($field['choices']) == 100)
+					{
+						continue;
+					}
+
 					$enum = NULL;
+
+					// Account for empty state in React checkbox fields
+					if ($field['type'] == 'checkbox')
+					{
+						$field['choices'][''] = '';
+					}
 
 					// If this field has 'choices', make sure only those
 					// choices are let through the submission
@@ -1921,17 +1934,7 @@ class EE_Form_validation {
 	 */
 	function prep_url($str = '')
 	{
-		if ($str == 'http://' OR $str == '')
-		{
-			return '';
-		}
-
-		if (substr($str, 0, 7) != 'http://' && substr($str, 0, 8) != 'https://')
-		{
-			$str = 'http://'.$str;
-		}
-
-		return $str;
+		return (string) ee('Format')->make('Text', $str)->url();
 	}
 
 	/**

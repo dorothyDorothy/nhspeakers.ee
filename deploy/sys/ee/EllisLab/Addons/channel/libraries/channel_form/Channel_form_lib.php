@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 require_once PATH_ADDONS.'channel/libraries/channel_form/Channel_form_exception.php';
@@ -322,7 +323,9 @@ class Channel_form_lib
 
 				if (strpos($temp, LD.'display_field'.RD) !== FALSE)
 				{
-					$custom_field_variables_row['display_field'] = $this->display_field($field_name);
+					$custom_field_variables_row['display_field'] = $this->encode_ee_tags(
+						$this->display_field($field_name)
+					);
 				}
 
 				foreach ($custom_field_variables_row as $key => $value)
@@ -351,7 +354,11 @@ class Channel_form_lib
 				$custom_field_output .= $temp;
 			}
 
-			ee()->TMPL->tagdata = str_replace($match[0], $custom_field_output, ee()->TMPL->tagdata);
+			ee()->TMPL->tagdata = str_replace(
+				$match[0],
+				$this->encode_ee_tags($custom_field_output),
+				ee()->TMPL->tagdata
+			);
 		}
 
 		if ( ! empty($this->markitup))
@@ -398,7 +405,13 @@ class Channel_form_lib
 
 					foreach ($matches[1] as $match_index => $var_pair_tagdata)
 					{
-						ee()->TMPL->tagdata = str_replace($matches[0][$match_index], $this->replace_tag($tag_name, $this->entry($name), $tagparams, $var_pair_tagdata), ee()->TMPL->tagdata);
+						ee()->TMPL->tagdata = str_replace(
+							$matches[0][$match_index],
+							$this->encode_ee_tags(
+								$this->replace_tag($tag_name, $this->entry($name), $tagparams, $var_pair_tagdata)
+							),
+							ee()->TMPL->tagdata
+						);
 					}
 				}
 			}
@@ -415,24 +428,20 @@ class Channel_form_lib
 			//parse category menu
 			elseif ($tag_name == 'category_menu')
 			{
-				ee()->load->library('channel_form/channel_form_category_tree');
+				$cats = $this->categories($tagparams);
+				$tree = array();
+				$checkbox_fields[] = 'category';
 
-				if ($this->edit OR ! empty($this->channel->deft_category))
+				foreach($cats as $cat_value)
 				{
-					$tree = ee()->channel_form_category_tree->create(
-						$this->channel('cat_group'), 'edit', '', $this->entry->Categories->pluck('cat_id')
-					);
-				}
-				else
-				{
-					$tree = ee()->channel_form_category_tree->create(
-						$this->channel('cat_group'), '', '', ''
-					);
+					$cat_selected = (in_array($cat_value['category_id'], $this->get_selected_cats())) ? ' selected="selected"' : '';
+					$tree[] = '<option value="'.$cat_value['category_id'].'"'.$cat_selected.'>'.$cat_value['category_name'].'</option>';
 				}
 
 				$this->parse_variables['category_menu'] = array(
-					array('select_options' => implode("\n", $tree->categories()))
+					array('select_options' => implode("\n", $tree))
 				);
+
 			}
 
 			//parse status menu
@@ -457,8 +466,14 @@ class Channel_form_lib
 			}
 		}
 
-		//edit form or post-error submission
-		if ($this->edit OR ! empty($_POST))
+		// edit form or post-error submission
+		// check to make sure the POST request is meant for this form
+		if ( ! empty($_POST) && ! is_numeric($this->_hidden_fields['ACT']))
+		{
+			$this->_hidden_fields['ACT'] = ee()->functions->insert_action_ids($this->_hidden_fields['ACT']);
+		}
+
+		if ($this->edit OR ee()->input->post('ACT') == $this->_hidden_fields['ACT'])
 		{
 			//not necessary for edit forms
 			ee()->TMPL->tagparams['use_live_url'] = 'no';
@@ -481,12 +496,16 @@ class Channel_form_lib
 				// use fieldtype display_field method
 				elseif (preg_match('/^field:(.*)$/', $key, $match))
 				{
-					if ($this->get_field_type($match[1]) == 'checkboxes' OR $this->get_field_type($match[1]) == 'grid')
+					if ($this->get_field_type($match[1]) == 'checkboxes' ||
+						$this->get_field_type($match[1]) == 'grid' ||
+						$this->get_field_type($match[1]) == 'file_grid')
 					{
 						$checkbox_fields[] = $match[1];
 					}
 
-					$this->parse_variables[$match[0]] = (array_key_exists($match[1], $this->custom_fields)) ? $this->display_field($match[1]) : '';
+					$this->parse_variables[$match[0]] = (array_key_exists($match[1], $this->custom_fields))
+						? $this->encode_ee_tags($this->display_field($match[1]))
+						: '';
 				}
 
 				elseif (preg_match('/^label:(.*)$/', $key, $match))
@@ -552,6 +571,13 @@ class Channel_form_lib
 							}
 
 							$this->parse_variables[$key] = ee()->localize->human_time($date);
+
+							// Default dates need a timestamp variable for the datepicker
+							if (in_array($name, array('entry_date', 'expiration_date', 'comment_expiration_date')))
+							{
+								$timestamp_name = str_replace('date', 'timestamp', $name);
+								$this->parse_variables[$timestamp_name] = $date;
+							}
 						}
 						else
 						{
@@ -565,7 +591,9 @@ class Channel_form_lib
 					}
 					elseif (property_exists($this->entry, $name) OR $this->entry->hasCustomField($name))
 					{
-						$this->parse_variables[$key] = form_prep($this->entry($name), $name);
+						$this->parse_variables[$key] = $this->encode_ee_tags(
+							form_prep($this->entry($name), $name)
+						);
 					}
 				}
 			}
@@ -581,7 +609,7 @@ class Channel_form_lib
 		{
 			$this->parse_variables['title']		= $this->channel('default_entry_title');
 			$this->parse_variables['url_title'] = $this->channel('url_title_prefix');
-			$this->parse_variables['allow_comments'] = ($this->channel('deft_comments') != 'n' OR $this->channel('comment_system_enabled') != 'y') ? '' : "checked='checked'";
+			$this->parse_variables['allow_comments'] = ($this->channel('deft_comments') == FALSE OR $this->channel('comment_system_enabled') == FALSE) ? '' : "checked='checked'";
 
 			$this->form_hidden('unique_url_title', $this->bool_string(ee()->TMPL->fetch_param('unique_url_title')) ? '1' : '');
 
@@ -590,25 +618,30 @@ class Channel_form_lib
 				if (strpos(ee()->TMPL->tagdata, 'entry_date') !== FALSE)
 				{
 					$this->parse_variables['entry_date'] = ee()->localize->human_time();
+					$this->parse_variables['entry_timestamp'] = ee()->localize->now;
 				}
 
 				if (strpos(ee()->TMPL->tagdata, 'expiration_date') !== FALSE)
 				{
 					$this->parse_variables['expiration_date'] = '';
+					$this->parse_variables['expiration_timestamp'] = '';
 				}
 
 				if (strpos(ee()->TMPL->tagdata, 'comment_expiration_date') !== FALSE)
 				{
 					$comment_expiration_date = '';
+					$comment_expiration_timestamp = '';
 
 					if ($this->channel('comment_expiration') > 0)
 					{
 						$comment_expiration_date = $this->channel('comment_expiration') * (60 * 60 * 24); // days -> seconds
 						$comment_expiration_date = $comment_expiration_date + ee()->localize->now;
+						$comment_expiration_timestamp = $comment_expiration_date;
 						$comment_expiration_date = ee()->localize->human_time($comment_expiration_date);
 					}
 
 					$this->parse_variables['comment_expiration_date'] = $comment_expiration_date;
+					$this->parse_variables['comment_expiration_timestamp'] = $comment_expiration_timestamp;
 				}
 			}
 			else
@@ -616,6 +649,9 @@ class Channel_form_lib
 				$this->parse_variables['entry_date'] = ee()->localize->human_time();
 				$this->parse_variables['expiration_date'] = '';
 				$this->parse_variables['comment_expiration_date'] = '';
+				$this->parse_variables['entry_timestamp'] = ee()->localize->now;
+				$this->parse_variables['expiration_timestamp'] = '';
+				$this->parse_variables['comment_expiration_timestamp'] = '';
 			}
 
 			foreach ($this->custom_fields as $field)
@@ -680,7 +716,18 @@ class Channel_form_lib
 						$checkbox_fields[] = $field->field_name;
 					}
 
-					$this->parse_variables['field:'.$field->field_name] = (array_key_exists($field->field_name, $this->custom_fields)) ? $this->display_field($field->field_name) : '';
+					$this->parse_variables['field:'.$field->field_name] = (array_key_exists($field->field_name, $this->custom_fields))
+						? $this->encode_ee_tags($this->display_field($field->field_name))
+						: '';
+				}
+			}
+
+			// We need to know if allow_comments field is present in order to figure out defaults
+			foreach ($this->checkboxes as $value)
+			{
+				if (isset(ee()->TMPL->var_single[$value]))
+				{
+					$checkbox_fields[] = $value;
 				}
 			}
 		}
@@ -956,7 +1003,8 @@ class Channel_form_lib
 
 		$this->output_js['json'] = array(
 			'EE'					=> $addt_js,
-			'mySettings'			=> $markItUp,
+			'EE.markitup'			=> new StdClass(),
+			'EE.markitup.settings'			=> $markItUp,
 		);
 
 		$include_jquery = ee()->TMPL->fetch_param('include_jquery');
@@ -1102,7 +1150,7 @@ GRID_FALLBACK;
 		$include_jquery = ($this->bool_string($include_jquery, TRUE)) ? '&include_jquery=y' : '';
 
 		// RTE Selector parameter?
-		$rte_selector = ee()->TMPL->fetch_param('rte_selector', '.WysiHat-field');
+		$rte_selector = ee()->TMPL->fetch_param('rte_selector');
 
 		if ($rte_selector)
 		{
@@ -1504,6 +1552,12 @@ GRID_FALLBACK;
 			}
 		}
 
+		// If allow_comments is NOT included in the form and it's not set by parameter, use the default
+		if ($this->edit != TRUE && ! isset($_POST['allow_comments']) && $this->_meta['allow_comments'] == FALSE)
+		{
+			$_POST['allow_comments'] = ($this->channel('deft_comments') == TRUE && $this->channel('comment_system_enabled') == TRUE) ? 'y' : 'n';
+		}
+
 		$spam_content = "";
 
 		// Reset categories if they weren't set above
@@ -1745,7 +1799,7 @@ GRID_FALLBACK;
 		$cat_groups = explode('|', $this->entry->Channel->cat_group);
 		if ( ! empty($cat_groups) && isset($_POST['category']))
 		{
-			$_POST['categories'] = array('cat_group_id_'.$cat_groups[0] => $_POST['category']);
+			$_POST['categories'] = array('cat_group_id_'.$cat_groups[0] => (is_array($_POST['category'])) ? $_POST['category'] : [$_POST['category']]);
 		}
 
 		if (in_array($this->channel('channel_id'), $this->member->MemberGroup->AssignedChannels->pluck('channel_id')) OR (int) $this->member->MemberGroup->getId() == 1)
@@ -2097,8 +2151,41 @@ GRID_FALLBACK;
 		{
 			return $this->entry->getProperty($key);
 		}
-
 	}
+
+	/**
+	 * Encode EE tags in field contents. Channel Form may output module tags or
+	 * other when they're in the data of an entry, and since they will be output
+	 * during module parsing, the template engine will parse any module code
+	 * that is output. So we'll encode EE tags with a special marker that we can
+	 * reverse after template parsing has completed so the original field
+	 * contents aren't altered on edit.
+	 *
+	 * @param string $string Field data
+	 * @return string Encoded string
+	 */
+	private function encode_ee_tags($string)
+	{
+		return str_replace([LD, RD], ['CFORM-ENCODE-LEFT-BRACKET', 'CFORM-ENCODE-RIGHT-BRACKET'], $string);
+	}
+
+	/**
+	 * Get selected categories
+	 *
+	 * @return	array
+	 */
+	public function get_selected_cats()
+	{
+		$selected = array();
+
+		if ($this->entry->entry_id OR ! empty($this->channel->deft_category))
+		{
+			$selected = $this->entry->Categories->pluck('cat_id');
+		}
+
+		return $selected;
+	}
+
 
 	/**
 	 * Load categories
@@ -2113,12 +2200,7 @@ GRID_FALLBACK;
 			return;
 		}
 
-		$selected = '';
-
-		if ($this->entry->entry_id OR ! empty($this->channel->deft_category))
-		{
-			$selected = $this->entry->Categories->pluck('cat_id');
-		}
+		$selected = $this->get_selected_cats();
 
 		// Load up the library and figure out what belongs and what's selected
 		ee()->load->library(array('api', 'file_field'));
@@ -2290,6 +2372,7 @@ GRID_FALLBACK;
 			$query->filter('url_title', $url_title);
 		}
 
+		$query->filter('ChannelEntry.channel_id', $this->channel->channel_id);
 		$query->filter('ChannelEntry.site_id', $this->site_id);
 
 		$entry = $query->first();
@@ -2750,6 +2833,27 @@ GRID_FALLBACK;
 					);
 				}
 			}
+			elseif ($field->field_list_items)
+			{
+				foreach (preg_split('/[\r\n]+/', $field->field_list_items) as $row)
+				{
+					$row = trim($row);
+
+					if ($row == '')
+					{
+						continue;
+					}
+
+					$options[] = array(
+						'option_value' => $row,
+						'option_name' => $row,
+						'selected' => (in_array($row, $field_data)) ? ' selected="selected"' : '',
+						'checked' => (in_array($row, $field_data)) ? ' checked="checked"' : '',
+					);
+				}
+			}
+
+
 			if ($field->field_pre_populate == 'y')
 			{
 				$pop_entries = ee('Model')->get('ChannelEntry')
@@ -2773,27 +2877,6 @@ GRID_FALLBACK;
 					}
 				}
 			}
-
-			elseif ($field->field_list_items)
-			{
-				foreach (preg_split('/[\r\n]+/', $field->field_list_items) as $row)
-				{
-					$row = trim($row);
-
-					if ($row == '')
-					{
-						continue;
-					}
-
-					$options[] = array(
-						'option_value' => $row,
-						'option_name' => $row,
-						'selected' => (in_array($row, $field_data)) ? ' selected="selected"' : '',
-						'checked' => (in_array($row, $field_data)) ? ' checked="checked"' : '',
-					);
-				}
-			}
-
 			elseif ( ! in_array($field->field_type, $this->native_option_fields))
 			{
 				$field_settings = $field->field_settings;
@@ -3220,6 +3303,13 @@ GRID_FALLBACK;
 		ee()->legacy_api->instantiate('channel_fields');
 
 		ee()->api_channel_fields->field_type = $this->get_field_type($field_name);
+
+		if ( ! is_object(ee()->api_channel_fields->field_types[ee()->api_channel_fields->field_type]))
+		{
+			ee()->api_channel_fields->include_handler(ee()->api_channel_fields->field_type);
+			$fieldtype = ee()->api_channel_fields->setup_handler(ee()->api_channel_fields->field_type, TRUE);
+			ee()->api_channel_fields->field_types[ee()->api_channel_fields->field_type] = $fieldtype;
+		}
 
 		ee()->api_channel_fields->field_types[ee()->api_channel_fields->field_type]->settings = array_merge($this->get_field_settings($field_name), $this->get_field_data($field_name), ee()->api_channel_fields->get_global_settings(ee()->api_channel_fields->field_type));
 

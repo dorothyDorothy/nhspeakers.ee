@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Service\Alert;
@@ -51,11 +52,11 @@ class AlertCollection {
 	 */
 	public function __construct(EE_Session $session, View $view, EE_Lang $lang)
 	{
-		$this->alerts = array(
-			'inline' => array(),
-			'banner' => array(),
-			'standard' => array()
-		);
+		$this->alerts = [
+			'inline'   => [],
+			'banner'   => [],
+			'alert'   => []
+		];
 		$this->session = $session;
 		$this->view = $view;
 		$this->lang = $lang;
@@ -81,7 +82,7 @@ class AlertCollection {
 
 				switch ($value['severity'])
 				{
-					case 'issue':
+					case 'error':
 						$alert->asIssue();
 						break;
 
@@ -89,7 +90,11 @@ class AlertCollection {
 						$alert->asSuccess();
 						break;
 
-					case 'warn':
+					case 'tip':
+						$alert->asTip();
+						break;
+
+					case 'important':
 						$alert->asWarning();
 						break;
 				}
@@ -110,7 +115,7 @@ class AlertCollection {
 					$sub_alert->body = $value['sub_alert']['body'];
 					switch ($value['sub_alert']['severity'])
 					{
-						case 'issue':
+						case 'error':
 							$sub_alert->asIssue();
 							break;
 
@@ -118,7 +123,11 @@ class AlertCollection {
 							$sub_alert->asSuccess();
 							break;
 
-						case 'warn':
+						case 'tip':
+							$sub_alert->asTip();
+							break;
+
+						case 'important':
 							$sub_alert->asWarning();
 							break;
 					}
@@ -174,7 +183,7 @@ class AlertCollection {
 	 * Gets the rendered value of a named alert of a certain type.
 	 *
 	 * @param string $name The name of the alert
-	 * @param string $type The type of the alert (inline, banner, or standard)
+	 * @param string $type The type of the alert (inline, banner, or alert)
 	 * @return string The rendered HTML of the alert
 	 */
 	public function get($name, $type = 'inline')
@@ -228,7 +237,7 @@ class AlertCollection {
 	public function getStandard()
 	{
 		$return = '';
-		foreach ($this->alerts['standard'] as $alert)
+		foreach ($this->alerts['alert'] as $alert)
 		{
 			$return .= $alert->render();
 		}
@@ -236,13 +245,25 @@ class AlertCollection {
 	}
 
 	/**
+	 * Gets the rendered value of the floating alert.
+	 * @deprecated use getStandard() instead.
+	 *
+	 * @return string The rendered HTML of the alert
+	 */
+	public function getAllAlerts()
+	{
+		ee()->logger->deprecated('4.2.1', 'getStandard()');
+		return $this->getStandard();
+	}
+
+	/**
 	 * Makes a new named alert of the specified type.
 	 *
 	 * @param string $name The name of the alert
-	 * @param string $type The type of the alert (inline, banner, or standard)
+	 * @param string $type The type of the alert (inline, banner, or alert)
 	 * @return EllisLab\ExpressionEngine\Service\Alert\Alert An Alert
 	 */
-	public function make($name = '', $type = 'standard')
+	public function make($name = '', $type = 'alert')
 	{
 		return new Alert($type, $name, $this, $this->view, $this->lang);
 	}
@@ -277,7 +298,20 @@ class AlertCollection {
 	 */
 	public function makeStandard($name = '')
 	{
-		return $this->make($name, 'standard');
+		return $this->make($name, 'alert');
+	}
+
+	/**
+	 * Makes a new named floating alert.
+	 * @deprecated use makeStandard() instead.
+	 *
+	 * @param string $name The name of the alert
+	 * @return EllisLab\ExpressionEngine\Service\Alert\Alert An Alert
+	 */
+	public function makeAlert($name = '')
+	{
+		ee()->logger->deprecated('4.2.1', 'makeStandard()');
+		return $this->makeStandard($name);
 	}
 
 	public function makeDeprecationNotice()

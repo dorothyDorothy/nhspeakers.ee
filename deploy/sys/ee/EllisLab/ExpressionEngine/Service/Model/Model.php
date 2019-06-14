@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Service\Model;
@@ -825,6 +826,54 @@ class Model extends SerializableEntity implements Subscriber, ValidationAware {
 		}
 
 		call_user_func_array('parent::emit', $args);
+	}
+
+	/**
+	 * Emit an event to a static method, typically an event that isn't tied to
+	 * any one entity, but just one that an entity type needs to know about,
+	 * such as a bulk deletion of its type. Also calls an extension hook if the
+	 * model has a hook ID.
+	 */
+	public static function emitStatic(/* $event, ...$args */)
+	{
+		$args = func_get_args();
+		$event = array_shift($args);
+
+		$events = self::getMetaData('events') ?: [];
+		$events = array_flip($events);
+
+		if (isset($events[$event]))
+		{
+			$method = 'on'.ucfirst($event);
+			forward_static_call_array('static::'.$method, $args);
+		}
+
+		// Extension hook
+		if ($hook_basename = self::getMetaData('hook_id'))
+		{
+			if (strpos($event, 'before') === 0)
+			{
+				$when = 'before_';
+			}
+			if (strpos($event, 'after') === 0)
+			{
+				$when = 'after_';
+			}
+
+			// Turn an event string like beforeBulkDelete into before_member_bulk_delete
+			$action = str_replace(['before', 'after'], '', $event);
+			$action = preg_replace_callback('/([a-z])([A-Z])/', function($matches) {
+				return strtolower($matches[1]).'_'.strtolower($matches[2]);
+			}, lcfirst($action));
+
+			$hook_name = $when.$hook_basename.'_'.$action;
+
+			if (isset(ee()->extensions) && ee()->extensions->active_hook($hook_name) === TRUE)
+			{
+				$args = array_merge([$hook_name], $args);
+				call_user_func_array(array(ee()->extensions, 'call'), $args);
+			}
+		}
 	}
 
 	/**

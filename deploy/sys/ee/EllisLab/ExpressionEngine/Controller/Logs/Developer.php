@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Logs;
@@ -185,7 +186,7 @@ class Developer extends Logs {
 					$description .= sprintf(
 						lang('deprecated_template'),
 						'<code>exp:'.strtolower($log->addon_module).':'.$log->addon_method.'</code>',
-						'<a href="'.ee('CP/URL')->make('design/edit_template/'.$log->template_id).'">'.$log->template_group.'/'.$log->template_name.'</a>'
+						'<a href="'.ee('CP/URL')->make('design/template/edit/'.$log->template_id).'">'.$log->template_group.'/'.$log->template_name.'</a>'
 					);
 
 					if ($log->snippets)

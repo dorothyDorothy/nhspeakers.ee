@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -15,6 +16,7 @@ class El_pings {
 
 	protected $ping_result;
 	protected $cache;
+	private $error;
 
 	public function __construct()
 	{
@@ -34,62 +36,63 @@ class El_pings {
 	 *
 	 * @return bool
 	 **/
-	public function is_registered($license = NULL)
+	public function shareAnalytics()
 	{
-		$license = ($license) ?: ee('License')->getEELicense();
-		if ( ! IS_CORE && ! $license->isValid())
-		{
-			return FALSE;
-		}
+		$cached = $this->cache->get('analytics_sent', Cache::GLOBAL_SCOPE);
 
-		$cached = $this->cache->get('software_registration', Cache::GLOBAL_SCOPE);
-		$exp_response = md5($license->getData('license_number').$license->getData('license_contact'));
+		$server_name = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '';
+		$exp_response = md5($server_name.PHP_VERSION);
 
 		if ( ! $cached OR $cached != $exp_response)
 		{
-			// restrict the call to certain pages for performance and user experience
-			$class = ee()->router->fetch_class();
-			$method = ee()->router->fetch_method();
+			$payload = array(
+				'domain'           => ee()->config->item('site_url'),
+				'server_name'      => (isset($_SERVER['SERVER_NAME'])) ? $_SERVER['SERVER_NAME'] : '',
+				'ee_version'       => APP_VER,
+				'php_version'      => PHP_VERSION,
+				'mysql_version'    => ee('Database')->getConnection()->getNative()->getAttribute(PDO::ATTR_SERVER_VERSION),
+				'installed_addons' => json_encode($this->getInstalledAddons())
+			);
 
-			if ($class == 'homepage' OR ($class == 'license' && $method == 'index'))
+			if ( ! $response = $this->_do_ping('https://ping.expressionengine.com/analytics/'.APP_VER, $payload))
 			{
-				$payload = array(
-					'contact'			=> $license->getData('license_contact'),
-					'license_number'	=> (IS_CORE) ? 'CORE LICENSE' : $license->getData('license_number'),
-					'domain'			=> ee()->config->item('site_url'),
-					'server_name'		=> (isset($_SERVER['SERVER_NAME'])) ? $_SERVER['SERVER_NAME'] : '',
-					'ee_version'		=> ee()->config->item('app_version'),
-					'php_version'		=> PHP_VERSION
-				);
-
-				if ( ! $registration = $this->_do_ping('https://ping.ellislab.com/register.php', $payload))
+				// save the failed request for a day only
+				$this->cache->save('analytics_sent', $response, 60*60*24, Cache::GLOBAL_SCOPE);
+			}
+			else
+			{
+				if ($response != $exp_response)
 				{
-					// save the failed request for a day only
-					$this->cache->save('software_registration', $exp_response, 60*60*24, Cache::GLOBAL_SCOPE);
+					// may have been a server error, save the failed request for a day
+					$this->cache->save('analytics_sent', $response, 60*60*24, Cache::GLOBAL_SCOPE);
 				}
 				else
 				{
-					if ($registration != $exp_response)
-					{
-						// may have been a server error, save the failed request for a day
-						$this->cache->save('software_registration', $exp_response, 60*60*24, Cache::GLOBAL_SCOPE);
-					}
-					else
-					{
-						// keep for two weeks
-						$this->cache->save('software_registration', $registration, 60*60*24*7*2, Cache::GLOBAL_SCOPE);
-					}
+					// keep for two weeks
+					$this->cache->save('analytics_sent', $response, 60*60*24*7*2, Cache::GLOBAL_SCOPE);
 				}
 			}
 		}
 
-		// hard fail only when no valid license is entered or it doesn't even match a valid pattern
-		if ( ! $license->isValid())
-		{
-			return FALSE;
-		}
-
 		return TRUE;
+	}
+
+	/**
+	 * Returns an array of installed add-on names
+	 *
+	 * @return array[string] Names of installed add-ons
+	 */
+	private function getInstalledAddons()
+	{
+		$installed_addons = ee('Addon')->installed();
+
+		$third_party = array_filter($installed_addons, function($addon) {
+			return $addon->getAuthor() != 'EllisLab';
+		});
+
+		return array_map(function($addon) {
+			return $addon->getName();
+		}, array_values($third_party));
 	}
 
 	/**
@@ -97,15 +100,15 @@ class El_pings {
 	 *
 	 * Checks the current version of ExpressionEngine available from EllisLab
 	 *
-	 * @access	private
-	 * @return	string
+	 * @param boolean $force_update Use the force, update regardless of cache
+	 * @return array
 	 */
-	public function get_version_info()
+	public function get_version_info($force_update = FALSE)
 	{
 		// Attempt to grab the local cached file
 		$cached = $this->cache->get('current_version', Cache::GLOBAL_SCOPE);
 
-		if ( ! $cached)
+		if ( ! $cached || $force_update)
 		{
 			try
 			{
@@ -139,18 +142,52 @@ class El_pings {
 			$version_file = $cached;
 		}
 
+		if (isset($version_file['error']) && $version_file['error'] == TRUE)
+		{
+			if (isset($version_file['error_msg']))
+			{
+				$this->error = $version_file['error_msg'];
+			}
+
+			return FALSE;
+		}
+
 		// one final check for good measure
 		if ( ! $this->_is_valid_version_file($version_file))
 		{
 			return FALSE;
 		}
 
-		if (isset($version_file['error']) && $version_file['error'] == TRUE)
+		return $version_file;
+	}
+
+	/**
+	 * Get information about the available upgrade, or FALSE if no upgrade path available
+	 *
+	 * @param boolean $force_update Use the force, update regardless of cache
+	 * @return array or FALSE if no upgrade path available
+	 */
+	public function getUpgradeInfo($force_update = FALSE)
+	{
+		$version_file = $this->get_version_info($force_update);
+
+		$version_info = array(
+			'version' => $version_file['latest_version'],
+			'build' => $version_file['build_date'],
+			'security' => $version_file['severity'] == 'high'
+		);
+
+		if (version_compare($version_info['version'], ee()->config->item('app_version')) < 1)
 		{
 			return FALSE;
 		}
 
-		return $version_file;
+		return $version_info;
+	}
+
+	public function getError()
+	{
+		return $this->error;
 	}
 
 	/**
@@ -223,6 +260,7 @@ class El_pings {
 		}
 
 		$headers = TRUE;
+		$chunked = FALSE;
 		$response = '';
 		while ( ! feof($fp))
 		{
@@ -232,6 +270,10 @@ class El_pings {
 			{
 				$response .= $line;
 			}
+			elseif (strstr($line, 'Transfer-Encoding: chunked') !== FALSE)
+			{
+				$chunked = TRUE;
+			}
 			elseif (trim($line) == '')
 			{
 				$headers = FALSE;
@@ -240,7 +282,28 @@ class El_pings {
 
 		fclose($fp);
 
+		if ($chunked)
+		{
+			return $this->decodeChunked($response);
+		}
+
 		return $response;
+	}
+
+	/**
+	 * Decode chunk-encoded response, thanks https://stackoverflow.com/questions/10793017
+	 *
+	 * @param string $response Chunk-encoded response
+	 * @return string De-chunked response
+	 **/
+	private function decodeChunked($str) {
+		for ($res = ''; !empty($str); $str = trim($str)) {
+			$pos = strpos($str, "\r\n");
+			$len = hexdec(substr($str, 0, $pos));
+			$res.= substr($str, $pos + 2, $len);
+			$str = substr($str, $pos + 2 + $len);
+		}
+		return $res;
 	}
 }
 // END CLASS

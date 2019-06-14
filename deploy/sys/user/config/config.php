@@ -1,5 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+$config['show_ee_news'] = 'y';
+$config['share_analytics'] = 'y';
 $config['debug'] = '1';
 $config['enable_devlog_alerts'] = 'n';
 $config['cache_driver'] = 'file';
@@ -7,7 +9,7 @@ $config['cache_driver'] = 'file';
 // Find more configs and overrides at
 // https://docs.expressionengine.com/latest/general/system_configuration_overrides.html
 
-$config['app_version'] = '4.0.6';
+$config['app_version'] = '5.2.3';
 $config['encryption_key'] = '36bcf98ff5292d339b6b2c7585c3021b686ea6b3';
 $config['session_crypt_key'] = '1cda6cd12ef7f6e45286714d8c1b432f3e81e323';
 $config['database'] = array(

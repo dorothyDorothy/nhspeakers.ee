@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -548,8 +549,24 @@ class Member_memberlist extends Member {
 
 		if ($query->num_rows() > 0)
 		{
+			$member_ids = [];
 			foreach ($query->result_array() as $row)
 			{
+				$member_ids[] = $row['member_id'];
+			}
+
+			$members = ee('Model')->get('Member', $member_ids)
+				->all()
+				->indexBy('member_id');
+
+			foreach ($query->result_array() as $row)
+			{
+				$member = $members[$row['member_id']];
+				foreach ($member->getCustomFieldNames() as $name)
+				{
+					$row[$name] = $member->$name;
+				}
+
 				$temp = $memberlist_rows;
 
 				$style = ($i++ % 2) ? 'memberlistRowOne' : 'memberlistRowTwo';
@@ -610,7 +627,7 @@ class Member_memberlist extends Member {
 					/** ------------------------------------------*/
 					elseif (isset($fields[$val['3']]))
 					{
-						if (isset($row['m_field_id_'.$fields[$val['3']]]))
+						if (array_key_exists('m_field_id_'.$fields[$val['3']], $row))
 						{
 							$v = $row['m_field_id_'.$fields[$val['3']]];
 
@@ -651,17 +668,9 @@ class Member_memberlist extends Member {
 					/** ----------------------------------------*/
 					if (preg_match("/^if\s+avatar.*/i", $val['0']))
 					{
-						if (ee()->config->item('enable_avatars') == 'y' AND $row['avatar_filename'] != '' AND ee()->session->userdata('display_avatars') == 'y' )
+						if (ee()->config->item('enable_avatars') == 'y' AND ee()->session->userdata('display_avatars') == 'y' )
 						{
-							$avatar_url = ee()->config->slash_item('avatar_url');
-							$avatar_fs_path = ee()->config->slash_item('avatar_path');
-
-							if (file_exists($avatar_fs_path.'default/'.$row['avatar_filename']))
-							{
-								$avatar_url .= 'default/';
-							}
-
-							$avatar_path	= $avatar_url.$row['avatar_filename'];
+							$avatar_path	= $member->getAvatarUrl();
 							$avatar_width	= $row['avatar_width'];
 							$avatar_height	= $row['avatar_height'];
 

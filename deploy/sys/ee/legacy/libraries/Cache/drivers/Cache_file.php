@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -259,14 +260,12 @@ class EE_Cache_file extends CI_Driver {
 		// file name and so we can prefix a directory reliably
 		$key = trim($key, Cache::NAMESPACE_SEPARATOR.DIRECTORY_SEPARATOR);
 
+		// Sometime class names are used as keys, replace class namespace
+		// slashes with underscore to prevent filesystem issues
+		$key = str_replace('\\', '_', $key);
+
 		// Replace all namespace separators with the system's directory separator
 		$key = str_replace(Cache::NAMESPACE_SEPARATOR, DIRECTORY_SEPARATOR, $key);
-
-		// Replace \ with _ if on Windows
-		if (DIRECTORY_SEPARATOR == '\\')
-		{
-			$key = str_replace('\\', '_', $key);
-		}
 
 		// For locally-cached items, separate by site name
 		if ($scope == Cache::LOCAL_SCOPE)

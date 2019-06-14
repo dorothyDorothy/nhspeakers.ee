@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -164,8 +165,14 @@ class Cp {
 			'router_class'     => ee()->router->class, // advanced css
 			'lang'             => $js_lang_keys,
 			'THEME_URL'        => $this->cp_theme_url,
-			'hasRememberMe'    => (bool) ee()->remember->exists()
+			'hasRememberMe'    => (bool) ee()->remember->exists(),
+			'cp.updateCheckURL' => ee('CP/URL', 'settings/general/version-check')->compile(),
 		));
+
+		if (ee()->session->flashdata('update:completed'))
+		{
+			ee()->javascript->set_global('cp.updateCompleted', TRUE);
+		}
 
 		// Combo-load the javascript files we need for every request
 
@@ -214,12 +221,11 @@ class Cp {
 		$date_format = ee()->session->userdata('date_format', ee()->config->item('date_format'));
 
 		ee()->load->helper('text');
+		ee()->load->library('el_pings');
 
 		if (ee()->config->item('new_version_check') == 'y' &&
-			$new_version = $this->_version_check())
+			$new_version = ee()->el_pings->getUpgradeInfo())
 		{
-			$new_version['version'] = formatted_version($new_version['version']);
-			$new_version['build'] = ee()->localize->format_date($date_format, $this->_parse_build_date($new_version['build']), TRUE);
 			ee()->view->new_version = $new_version;
 		}
 
@@ -236,12 +242,11 @@ class Cp {
 		$this->_seal_combo_loader();
 		$this->add_js_script('file', 'cp/global_end');
 
-		ee()->view->ee_build_date = ee()->localize->format_date($date_format, $this->_parse_build_date(), TRUE);
+		ee()->view->ee_build_date = ee()->localize->format_date($date_format, ee()->localize->parse_build_date(), TRUE);
 		ee()->view->version_identifier = APP_VER_ID;
 		ee()->view->show_news_button = $this->shouldShowNewsButton();
 
-		$license = $this->validateLicense();
-		ee()->view->ee_license = $license;
+		ee()->view->ee_license = ee('License')->getEELicense();
 		$sidebar = ee('CP/Sidebar')->render();
 
 		if ( ! empty($sidebar))
@@ -265,62 +270,6 @@ class Cp {
 			->first();
 
 		return ( ! $news_view OR version_compare(APP_VER, $news_view->version, '>'));
-	}
-
-	protected function validateLicense()
-	{
-		$license = ee('License')->getEELicense();
-
-		require_once(APPPATH.'libraries/El_pings.php');
-		$pings = new El_pings();
-		$registered = $pings->is_registered($license);
-
-		if ( ! $license->isValid())
-		{
-			$alert = ee('CP/Alert')->makeBanner('invalid-license')
-				->asWarning()
-				->cannotClose()
-				->withTitle(lang('software_unregistered'));
-
-			foreach ($license->getErrors() as $key => $value)
-			{
-				if ($key == 'missing_pubkey')
-				{
-					$alert->addToBody(sprintf(lang($key), 'https://expressionengine.com/store/purchases'));
-				}
-				else
-				{
-					$alert->addToBody(sprintf(lang($key), ee('CP/URL')->make('settings/license')));
-				}
-			}
-
-			$alert->now();
-		}
-
-		return $license;
-	}
-
-	/**
-	 * Converts our build date constant into a timestamp so we can format it
-	 * for display
-	 *
-	 * @param  string Build date in the format of yyyymmdd, uses APP_BUILD by default
-	 * @return int Timestamp representing the build date
-	 */
-	protected function _parse_build_date($build = NULL)
-	{
-		if (empty($build))
-		{
-			$build = APP_BUILD;
-		}
-
-		$year = substr($build, 0, 4);
-		$month = substr($build, 4, 2);
-		$day = substr($build, 6, 2);
-
-		$string = $year . '-' . $month . '-' . $day;
-
-		return ee()->localize->string_to_timestamp($string, TRUE, '%Y-%m-%d');
 	}
 
 	/**
@@ -384,7 +333,7 @@ class Cp {
 			$notices[] = sprintf(
 				lang('missing_encryption_key'),
 				'session_crypt_key',
-				'https://expressionengine.com/support'
+				DOC_URL.'troubleshooting/error_messages/missing_encryption_keys.html'
 			);
 		}
 
@@ -393,7 +342,7 @@ class Cp {
 			$notices[] = sprintf(
 				lang('missing_encryption_key'),
 				'encryption_key',
-				'https://expressionengine.com/support'
+				DOC_URL.'troubleshooting/error_messages/missing_encryption_keys.html'
 			);
 		}
 
@@ -496,30 +445,10 @@ class Cp {
 				->withTitle(lang('cp_message_warn'))
 				->addToBody(sprintf(
 					lang('new_version_error'),
-					ee()->cp->masked_url('https://expressionengine.com/store/purchases')
+					ee()->cp->masked_url(DOC_URL.'troubleshooting/error_messages/unexpected_error_occurred_attempting_to_download_the_current_expressionengine_version_number.html')
 				))
 				->now();
-			return FALSE;
 		}
-
-		$version_info = array(
-			'version' => $version_file['latest_version'],
-			'build' => $version_file['build_date'],
-			'security' => $version_file['severity'] == 'high'
-		);
-
-		// Upgrading form Core to Pro?
-		if (IS_CORE && $version_file['license_type'] == 'pro')
-		{
-			return $version_info;
-		}
-
-		if (version_compare($version_info['version'], ee()->config->item('app_version')) < 1)
-		{
-			return FALSE;
-		}
-
-		return $version_info;
 	}
 
 	/**
@@ -1087,16 +1016,16 @@ class Cp {
 			'screen_name', 'signature', 'signature_image_height',
 			'signature_image_url', 'signature_image_width', 'status',
 			'switch', 'title', 'title_permalink', 'total_results',
-			'trimmed_url', 'url', 'url_as_email_as_link', 'url_or_email',
+			'trimmed_url', 'url_as_email_as_link', 'url_or_email',
 			'url_or_email_as_author', 'url_title', 'url_title_path',
-			'username', 'channel', 'channel_id', 'year'
+			'username', 'channel', 'channel_id', 'year', 'content'
 		);
 
 		$global_vars = array(
 			'app_version', 'captcha', 'charset', 'current_time',
 			'debug_mode', 'elapsed_time', 'email', 'embed', 'encode',
 			'group_description', 'group_id', 'gzip_mode', 'hits',
-			'homepage', 'ip_address', 'ip_hostname', 'lang', 'location',
+			'homepage', 'ip_address', 'ip_hostname', 'lang',
 			'member_group', 'member_id', 'member_profile_link', 'path',
 			'private_messages', 'screen_name', 'site_index', 'site_name',
 			'site_url', 'stylesheet', 'total_comments', 'total_entries',

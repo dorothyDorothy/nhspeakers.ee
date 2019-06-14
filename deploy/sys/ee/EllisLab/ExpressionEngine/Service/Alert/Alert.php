@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Service\Alert;
@@ -41,7 +42,7 @@ class Alert {
 	protected $name;
 
 	/**
-	 * @var string $severity The severity of the alert (issue, warn, success)
+	 * @var string $severity The severity of the alert (issue, warn, success, tip)
 	 */
 	protected $severity;
 
@@ -51,7 +52,7 @@ class Alert {
 	protected $sub_alert;
 
 	/**
-	 * @var string $type The type of alert (standard, inline, banner)
+	 * @var string $type The type of alert (alert, inline, banner)
 	 */
 	protected $type;
 
@@ -75,7 +76,7 @@ class Alert {
 	 * Constructor: sets the type and name of the alert, and injects the
 	 * AllertCollection and View dependencies.
 	 *
-	 * @param string $type The type of alert (standard, inline, banner)
+	 * @param string $type The type of alert (alert, inline, banner)
 	 * @param string $name The name of the alert
 	 * @param AlertCollection $collection A collection of alerts for use with
 	 *  deferring or immediately displaying alerts
@@ -83,7 +84,7 @@ class Alert {
 	 * @param EE_Lang $lang A EE_Lang object for loading language
 	 * @return self This returns a reference to itself
 	 */
-	public function __construct($type = 'standard', $name = '', AlertCollection $collection, View $view, EE_Lang $lang)
+	public function __construct($type = 'alert', $name = '', AlertCollection $collection, View $view, EE_Lang $lang)
 	{
 		$this->type = $type;
 		$this->name = $name;
@@ -178,7 +179,7 @@ class Alert {
 	 */
 	public function asIssue()
 	{
-		$this->severity = 'issue';
+		$this->severity = 'error';
 		$this->cannotClose();
 		return $this;
 	}
@@ -196,14 +197,62 @@ class Alert {
 	}
 
 	/**
+	 * Marks the alert as a tip alert.
+	 *
+	 * @return self This returns a reference to itself
+	 */
+	public function asTip()
+	{
+		$this->severity = 'tip';
+		$this->cannotClose();
+		return $this;
+	}
+
+	/**
 	 * Marks the alert as a warning alert.
 	 *
 	 * @return self This returns a reference to itself
 	 */
 	public function asWarning()
 	{
-		$this->severity = 'warn';
+		$this->severity = 'important';
 		$this->canClose();
+		return $this;
+	}
+
+	/**
+	 * Marks the alert as an important alert that cannot be closed.
+	 *
+	 * @return self This returns a reference to itself
+	 */
+	public function asImportant()
+	{
+		$this->severity = 'important';
+		$this->cannotClose();
+		return $this;
+	}
+
+	/**
+	 * Marks the alert as an attention alert that cannot be closed.
+	 *
+	 * @return self This returns a reference to itself
+	 */
+	public function asAttention()
+	{
+		$this->severity = 'attention';
+		$this->cannotClose();
+		return $this;
+	}
+
+	/**
+	 * Marks the alert as a loading alert that cannot be closed.
+	 *
+	 * @return self This returns a reference to itself
+	 */
+	public function asLoading()
+	{
+		$this->severity = 'loading';
+		$this->cannotClose();
 		return $this;
 	}
 

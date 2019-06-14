@@ -1,4 +1,4 @@
-<?php if (REQ == 'PAGE'): ?>
+<?php if (REQ == 'PAGE' OR ee('LivePreview')->hasEntryData()): ?>
 	<link rel="stylesheet" href="<?=URL_THEMES.'debug/css/eecms-debug.min.css'?>" type="text/css" media="screen" />
 <?php endif; ?>
 
@@ -26,7 +26,7 @@
 </section>
 
 
-<?php if (REQ == 'PAGE'): ?>
+<?php if (REQ == 'PAGE' OR ee('LivePreview')->hasEntryData()): ?>
 	<script>
 	!function() {
 		"use strict";
@@ -79,6 +79,6 @@
 	</script>
 <?php endif; ?>
 
-<link rel="stylesheet" href="<?=URL_THEMES_GLOBAL_ASSET?>css/highlight.css">
-<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.2.0/highlight.min.js"></script>
+<link rel="stylesheet" href="<?=URL_THEMES?>debug/css/highlight.css">
+<script src="<?=URL_THEMES?>debug/javascript/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>

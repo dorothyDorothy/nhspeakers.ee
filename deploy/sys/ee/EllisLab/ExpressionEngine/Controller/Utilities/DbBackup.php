@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Utilities;
@@ -65,7 +66,8 @@ class DbBackup extends Utilities {
 				'table_counts'            => $table_counts,
 				'total_rows'              => array_sum($table_counts),
 				'backup_ajax_fail_banner' => $backup_ajax_fail_banner->render(),
-				'base_url'                => ee('CP/URL')->make('utilities/db-backup')->compile()
+				'base_url'                => ee('CP/URL')->make('utilities/db-backup')->compile(),
+				'out_of_memory_lang'      => sprintf(lang('backup_out_of_memory'), ee()->cp->masked_url(DOC_URL.'general/system-configuration-overrides.html#db_backup_row_limit'))
 			]
 		]);
 

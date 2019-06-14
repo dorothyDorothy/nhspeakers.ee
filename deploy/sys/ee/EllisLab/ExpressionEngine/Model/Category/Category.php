@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Model\Category;
@@ -12,6 +13,7 @@ namespace EllisLab\ExpressionEngine\Model\Category;
 use EllisLab\ExpressionEngine\Model\Content\ContentModel;
 use EllisLab\ExpressionEngine\Model\Content\Display\LayoutInterface;
 use EllisLab\ExpressionEngine\Model\Category\Display\CategoryFieldLayout;
+use EllisLab\ExpressionEngine\Service\Model\Collection;
 
 /**
  * Category Model
@@ -144,6 +146,28 @@ class Category extends ContentModel {
 		}
 
 		return parent::addFacade($id, $info, $name_prefix);
+	}
+
+	/**
+	 * Get all nested children for the category, not just top level
+	 *
+	 * @return Collection All category children
+	 */
+	public function getAllChildren()
+	{
+		$children = [];
+
+		if ($this->Children)
+		{
+			$children = $this->Children->asArray();
+
+			foreach ($this->Children as $child)
+			{
+				$children = array_merge($children, $child->getAllChildren()->asArray());
+			}
+		}
+
+		return new Collection($children);
 	}
 }
 

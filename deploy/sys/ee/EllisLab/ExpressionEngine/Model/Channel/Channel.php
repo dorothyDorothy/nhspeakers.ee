@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Model\Channel;
@@ -75,13 +76,6 @@ class Channel extends StructureModel {
 		'ChannelFormSettings' => array(
 			'type' => 'hasOne'
 		),
-		'LiveLookTemplate' => array(
-			'type' => 'hasOne',
-			'model' => 'Template',
-			'from_key' => 'live_look_template',
-			'to_key' => 'template_id',
-			'weak' => TRUE,
-		),
 		'AssignedMemberGroups' => array(
 			'type' => 'hasAndBelongsToMany',
 			'model' => 'MemberGroup',
@@ -96,6 +90,12 @@ class Channel extends StructureModel {
 		'Site' => array(
 			'type' => 'belongsTo'
 		),
+		'SearchExcerpt' => array(
+			'type' => 'belongsTo',
+			'model' => 'ChannelField',
+			'from_key' => 'search_excerpt',
+			'weak' => TRUE
+		),
 		'ChannelEntryAutosaves' => array(
 			'type' => 'hasMany',
 			'model' => 'ChannelEntryAutosave',
@@ -109,6 +109,7 @@ class Channel extends StructureModel {
 		'channel_title'              => 'required|unique[site_id]|xss',
 		'channel_name'               => 'required|unique[site_id]|alphaDash',
 		'channel_url'                => 'xss',
+		'preview_url'                => 'xss|validatePreviewURL',
 		'comment_url'                => 'xss',
 		'channel_description'        => 'xss',
 		'deft_comments'              => 'enum[y,n]',
@@ -200,8 +201,8 @@ class Channel extends StructureModel {
 	protected $default_entry_title;
 	protected $title_field_label;
 	protected $url_title_prefix;
-	protected $live_look_template = 0;
 	protected $max_entries;
+	protected $preview_url;
 
 	/**
 	 * Custom validation callback to validate a comma-separated list of email
@@ -227,6 +228,27 @@ class Channel extends StructureModel {
 
 		return TRUE;
 	}
+
+	/**
+	 * Custom validation callback to validate preview URL- needs to be relative URL
+	 */
+	public function validatePreviewURL($key, $value, $params, $rule)
+	{
+		if (empty($value))
+		{
+			return TRUE;
+		}
+
+		$parsed_url = parse_url($value);
+
+		if (strpos($value, '{base_url}') !== FALSE OR isset($parsed_url['scheme']))
+		{
+			return lang('channel_preview_url_invalid');
+		}
+
+		return TRUE;
+	}
+
 
 	/**
 	 * Parses URL properties for any config variables
@@ -325,10 +347,13 @@ class Channel extends StructureModel {
 			}
 		}
 
-		$this->FieldGroups = clone $channel->FieldGroups;
-		$this->CustomFields = clone $channel->CustomFields;
-		$this->Statuses = clone $channel->Statuses;
-		$this->ChannelFormSettings = clone $channel->ChannelFormSettings;
+        foreach (['FieldGroups', 'CustomFields', 'Statuses', 'ChannelFormSettings'] as $rel)
+        {
+            if ($channel->$rel)
+            {
+                $this->$rel = clone $channel->$rel;
+            }
+        }
 	}
 
 	public function onBeforeSave()
@@ -403,9 +428,15 @@ class Channel extends StructureModel {
 		foreach ($this->ChannelLayouts as $channel_layout)
 		{
 			$field_layout = $channel_layout->field_layout;
+			$new_cat_tab = 0;
 
 			foreach ($field_layout as $i => $section)
 			{
+				if ($section['id'] == 'categories' && $section['visible'])
+				{
+					$new_cat_tab = $i;
+				}
+
 				foreach ($section['fields'] as $j => $field_info)
 				{
 					// All category fields begin with "categories"
@@ -439,7 +470,7 @@ class Channel extends StructureModel {
 					'visible' => TRUE,
 					'collapsed' => FALSE
 				);
-				$field_layout[2]['fields'][] = $field_info;
+				$field_layout[$new_cat_tab]['fields'][] = $field_info;
 			}
 
 			$channel_layout->field_layout = $field_layout;
@@ -567,35 +598,28 @@ class Channel extends StructureModel {
 	{
 		$fields = $this->CustomFields->indexBy('field_name');
 
-		foreach ($this->FieldGroups->pluck('group_id') as $group_id)
+		$cache_key = "ChannelFieldGroups/{$this->getId()}/";
+		if (($field_groups = ee()->session->cache(__CLASS__, $cache_key, FALSE)) == FALSE)
 		{
-			$field_group = $this->getFieldGroup($group_id);
+			$field_groups = $this->FieldGroups;
+		}
 
+		foreach ($field_groups as $field_group)
+		{
 			foreach($field_group->ChannelFields as $field)
 			{
 				$fields[$field->field_name] = $field;
 			}
 		}
 
+		ee()->session->set_cache(__CLASS__, $cache_key, $field_groups);
+
 		return new Collection($fields);
 	}
 
-	private function getFieldGroup($id)
+	public function maxEntriesLimitReached()
 	{
-		$cache_key = "ChannelFieldGroup/{$id}/";
-
-		if (($group = ee()->session->cache(__CLASS__, $cache_key, FALSE)) === FALSE)
-		{
-			$group = $this->getModelFacade()->get('ChannelFieldGroup', $id)
-				->with('ChannelFields')
-				->all();
-
-			$group = $group[0];
-
-			ee()->session->set_cache(__CLASS__, $cache_key, $group);
-		}
-
-		return $group;
+		return ($this->max_entries != 0 && $this->total_records >= $this->max_entries);
 	}
 }
 

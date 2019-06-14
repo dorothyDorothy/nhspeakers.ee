@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Service\View;
@@ -37,10 +38,12 @@ class ViewHelpers {
 			$disable_headings = TRUE;
 		}
 
+		$current_section = NULL;
 		foreach ($choices as $value => $label)
 		{
 			if ( ! $disable_headings && is_array($label))
 			{
+				$current_section = $value;
 				$return_array[] = ['section' => $value];
 				$return_array = array_merge($return_array, $this->normalizedChoices($label, $disable_headings));
 				continue;
@@ -49,7 +52,9 @@ class ViewHelpers {
 			$choice = [
 				'value' => $value,
 				'label' => $label,
-				'instructions' => isset($label['instructions']) ? $label['instructions'] : ''
+				'instructions' => isset($label['instructions']) ? $label['instructions'] : '',
+				'component' => isset($label['component']) ? $label['component'] : '',
+				'sectionLabel' => $current_section
 			];
 
 			// Any of these can be overridden by specifying them in the source array

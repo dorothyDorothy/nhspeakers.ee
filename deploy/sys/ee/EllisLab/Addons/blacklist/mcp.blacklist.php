@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -545,6 +546,11 @@ class Blacklist_mcp {
 	 */
 	private function _download_update_list($listtype = "black")
 	{
+		if (ee()->input->get('token') != CSRF_TOKEN)
+		{
+			show_error(lang('unauthorized_access'));
+		}
+
 		$vars['cp_page_title'] = lang('blacklist_module_name'); // both black and white lists share this title
 
 		if ( ! ee()->db->table_exists("{$listtype}listed"))
@@ -552,18 +558,10 @@ class Blacklist_mcp {
 			show_error(lang("ref_no_{$listtype}list_table"));
 		}
 
-		$license = ee('License')->getEELicense();
-
-		if ( ! $license->isValid())
-		{
-			show_error(lang('ref_no_license'));
-		}
-
 		//  Get Current List from ExpressionEngine.com
 		ee()->load->library('xmlrpc');
 		ee()->xmlrpc->server('http://ping.expressionengine.com/index.php', 80);
 		ee()->xmlrpc->method("ExpressionEngine.{$listtype}list");
-		ee()->xmlrpc->request(array($license->getData('license_number')));
 
 		if (ee()->xmlrpc->send_request() === FALSE)
 		{

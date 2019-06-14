@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -446,7 +447,47 @@ class Grid_model extends CI_Model {
 			}
 		}
 
-		return isset($this->_grid_data[$content_type][$field_id][$marker]) ? $this->_grid_data[$content_type][$field_id][$marker] : FALSE;
+		$entry_data = isset($this->_grid_data[$content_type][$field_id][$marker]) ? $this->_grid_data[$content_type][$field_id][$marker] : FALSE;
+		return $this->overrideWithPreviewData($entry_data, $field_id, $fluid_field_data_id);
+	}
+
+	private function overrideWithPreviewData($entry_data, $field_id, $fluid_field_data_id = 0)
+	{
+		if (ee('LivePreview')->hasEntryData())
+		{
+			$data = ee('LivePreview')->getEntryData();
+			$entry_id = $data['entry_id'];
+			$fluid_field = 0;
+
+			if ($fluid_field_data_id && ! is_int($fluid_field_data_id))
+			{
+				list($fluid_field, $sub_field_id) = explode(',', $fluid_field_data_id);
+				$data = $data[$fluid_field]['fields'][$sub_field_id];
+			}
+
+			if (array_key_exists($entry_id, $entry_data)
+				&& isset($data['field_id_' . $field_id])
+				&& is_array($data['field_id_' . $field_id])
+				&& array_key_exists('rows', $data['field_id_' . $field_id]))
+			{
+				$override = [];
+				$i = 0;
+				foreach ($data['field_id_' . $field_id]['rows'] as $row_id => $row_data)
+				{
+					$override[$i] = [
+						'row_id' => crc32($row_id),
+						'entry_id' => $entry_id,
+						'row_order' => $i,
+						'fluid_field_data_id' => $fluid_field_data_id
+					] + $row_data;
+					$i++;
+				}
+
+				$entry_data[$entry_id] = $override;
+			}
+		}
+
+		return $entry_data;
 	}
 
 	/**
@@ -624,7 +665,8 @@ class Grid_model extends CI_Model {
 	 * Gets array of all columns and settings for a given field ID
 	 *
 	 * @param	int		Field ID to get columns for
-	 * @param	boolean	Skip the cache and get a fresh set of columns
+	 * @param	string	Content type
+	 * @param	boolean	When FALSE, skip the cache and get a fresh set of columns
 	 * @return	array	Settings from grid_columns table
 	 */
 	public function get_columns_for_field($field_ids, $content_type, $cache = TRUE)
@@ -833,6 +875,149 @@ class Grid_model extends CI_Model {
 	protected function _data_table($content_type, $field_id)
 	{
 		return $content_type .'_'. $this->_table_prefix . $field_id;
+	}
+
+	/**
+	 * Update grid field(s) search values
+	 *
+	 * @param array $field_ids Array of field_ids
+	 * @return void
+	 */
+	public function update_grid_search(array $field_ids)
+	{
+		// Get the fields, and filter for grid as a safety measure. If this was somehow
+		// called with the wrong field IDs it could clobber those fields' contents
+		$fields = ee('Model')->get('ChannelField', $field_ids)
+			->fields('field_id', 'field_search', 'legacy_field_data')
+			->filter('field_type', 'grid')
+			->all();
+
+		if (empty($fields))
+		{
+			return;
+		}
+
+		$search_data = [];
+		$unsearchable = [];
+
+		foreach ($fields as $field)
+		{
+			$data_col = 'field_id_'.$field->field_id;
+			$table = $field->getDataStorageTable();
+
+			if ( ! $field->field_search)
+			{
+				$unsearchable[$table][$data_col] = NULL;
+				continue;
+			}
+
+			$columns = $this->get_columns_for_field($field->field_id, 'channel');
+			$searchable_columns = array_filter($columns, function($column) {
+				return ($column['col_search'] == 'y');
+			});
+			$searchable_columns = array_map(function($element) {
+				return 'col_id_'.$element['col_id'];
+			}, $searchable_columns);
+
+			$rows = ee()->db->select('row_id, entry_id')
+				->select($searchable_columns)
+				->where('fluid_field_data_id', 0)
+				->get($this->_data_table('channel', $field->field_id))
+				->result_array();
+
+			// No rows? Move on.
+			if (empty($rows))
+			{
+				continue;
+			}
+
+			foreach ($rows as $row)
+			{
+				// We need only the column data for insertion
+				$column_data = [];
+				foreach ($row as $key => $value)
+				{
+					if (strncmp($key, 'col_id_', 7) === 0)
+					{
+						$column_data[$key] = $value;
+					}
+				}
+
+				if ( ! isset($search_data[$table][$row['entry_id']]))
+				{
+					$search_data[$table][$row['entry_id']] = [];
+					$search_data[$table][$row['entry_id']][$data_col] = [];
+				}
+
+				// merge with existing data for this field
+				$search_data[$table][$row['entry_id']][$data_col] = array_merge(
+					$search_data[$table][$row['entry_id']][$data_col],
+					array_values($column_data)
+				);
+			}
+		}
+
+		// empty out unsearchable Grids
+		foreach ($unsearchable as $table => $columns)
+		{
+			ee()->db->update($table, $columns);
+		}
+
+		if (empty($search_data))
+		{
+			return;
+		}
+
+		// repopulate the searchable Grids
+		$entry_data = [];
+		ee()->load->helper('custom_field_helper');
+
+		foreach ($search_data as $table => $entries)
+		{
+			$entry_data = [];
+			foreach ($entries as $entry_id => $fields)
+			{
+				$fields = array_map('encode_multi_field', $fields);
+
+				$fields['entry_id'] = $entry_id;
+				$entry_data[] = $fields;
+			}
+
+			ee()->db->update_batch($table, $entry_data, 'entry_id');
+		}
+	}
+
+	/**
+	 * Search and replace a single Grid field's contents
+	 *
+	 * @param string $content_type Content type (typically 'channel')
+	 * @param int $field_id Grid field id
+	 * @param string $search String to search for in the Grid's rows
+	 * @param string $replace Replacement string
+	 * @return int Number of affected rows
+	 */
+	public function search_and_replace($content_type, $field_id, $search, $replace)
+	{
+		$table = $this->_data_table($content_type, $field_id);
+		$columns = $this->get_columns_for_field($field_id, 'channel');
+
+		if (empty($columns))
+		{
+			return 0;
+		}
+
+		$sql = "UPDATE `exp_{$table}` SET ";
+
+		foreach ($columns as $column)
+		{
+			$column_name = 'col_id_'.$column['col_id'];
+			$sql .= "`{$column_name}` = REPLACE(`{$column_name}`, '{$search}', '{$replace}'),";
+		}
+
+		$sql = rtrim($sql, ',');
+
+		ee()->db->query($sql);
+		return ee()->db->affected_rows();
 	}
 }
 

@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -104,6 +105,10 @@ class EE_Input {
 	 */
 	public function set_cookie($name = '', $value = '', $expire = '', $domain = '', $path = '/', $prefix = '')
 	{
+		if ( ! $this->cookieIsAllowed($name))
+		{
+			return;
+		}
 
 		$data = array(
 			'name' => $name,
@@ -234,6 +239,47 @@ class EE_Input {
 	}
 
 	/**
+	 * Is the cookie allowed?
+	 *
+	 * @param  string $name Name of the cookie
+	 * @return boolean Whether or not it's allowed to be set
+	 */
+	private function cookieIsAllowed($name)
+	{
+		// only worry about it if consent is required
+		if (bool_config_item('require_cookie_consent') !== TRUE)
+		{
+			return TRUE;
+		}
+
+		// Need a local ref for PHP < 7, can't do ee('CookieRegistry')::CONST
+		$cookie_reg = ee('CookieRegistry');
+
+		// unregistered cookies, pass, but log
+		if ( ! $cookie_reg->isRegistered($name))
+		{
+			ee()->load->library('logger');
+			ee()->logger->developer('A cookie ('.htmlentities($name).') is being sent without being properly registered, and does not meet cookie compliance policies. Register this cookie appropriately in your addon.setup.php file.', TRUE, 604800);
+			return TRUE;
+		}
+
+		switch ($cookie_reg->getType($name))
+		{
+			case $cookie_reg::NECESSARY:
+				return TRUE;
+			case $cookie_reg::FUNCTIONALITY:
+				return ee('Consent')->hasGranted('ee:cookies_functionality');
+			case $cookie_reg::PERFORMANCE:
+				return ee('Consent')->hasGranted('ee:cookies_performance');
+			case $cookie_reg::TARGETING:
+				return ee('Consent')->hasGranted('ee:cookies_targeting');
+		}
+
+		// something bad happened
+		return FALSE;
+	}
+
+	/**
 	 * Fetch from array
 	 *
 	 * This is a helper function to retrieve values from global arrays
@@ -331,6 +377,11 @@ class EE_Input {
 		if ($this->ip_address !== FALSE)
 		{
 			return $this->ip_address;
+		}
+
+		if (REQ == 'CLI')
+		{
+			return '0.0.0.0';
 		}
 
 		$proxy_ips = config_item('proxy_ips');
@@ -607,8 +658,8 @@ class EE_Input {
 	function cookie($index = '', $xss_clean = FALSE)
 	{
 		$prefix = ( ! ee()->config->item('cookie_prefix')) ? 'exp_' : ee()->config->item('cookie_prefix').'_';
-
-		return ( ! isset($_COOKIE[$prefix.$index]) ) ? FALSE : stripslashes($_COOKIE[$prefix.$index]);
+		$cookie = $this->_fetch_from_array($_COOKIE, $prefix.$index, $xss_clean);
+		return ($cookie) ? stripslashes($cookie) : FALSE;
 	}
 
 	/**
@@ -725,45 +776,6 @@ class EE_Input {
 			require(APPPATH.'libraries/Redirect.php');
 
 			exit();  // We halt system execution since we're done
-		}
-
-		$filter_keys = TRUE;
-
-		if ($request_type == 'CP'
-			&& isset($_GET['BK'])
-			&& isset($_GET['channel_id'])
-			&& isset($_GET['title'])
-			&& ee()->session->userdata('admin_sess') == 1)
-		{
-			if (in_array(ee()->input->get_post('channel_id'), ee()->functions->fetch_assigned_channels()))
-			{
-				$filter_keys = FALSE;
-			}
-		}
-
-		if (isset($_GET) && $filter_keys == TRUE)
-		{
-			foreach($_GET as $key => $val)
-			{
-				$clean = $this->_clean_get_input_data($val);
-
-				if ( ! $clean)
-				{
-					// Only notify super admins of the offending data
-					if (ee()->session->userdata('group_id') == 1)
-					{
-						$data = ((int) config_item('debug') == 2) ? '<br>'.htmlentities($val) : '';
-
-						set_status_header(503);
-						exit(sprintf("Invalid GET Data %s", $data));
-					}
-					// Otherwise, handle it more gracefully and just unset the variable
-					else
-					{
-						unset($_GET[$key]);
-					}
-				}
-			}
 		}
 	}
 
@@ -900,30 +912,13 @@ class EE_Input {
 	 *
 	 * @param	string Variable's key
 	 * @param	mixed Variable's value- may be string or array
+	 * @deprecated 5.2.3
 	 * @return	string
 	 */
 	function _clean_get_input_data($str)
 	{
-		if (is_array($str))
-		{
-			foreach ($str as $k => $v)
-			{
-				$out = $this->_clean_get_input_data($v);
-
-				if ($out == FALSE)
-				{
-					return FALSE;
-				}
-			}
-
-			return TRUE;
-		}
-
-		if (preg_match("#(;|exec\s*\(|system\s*\(|passthru\s*\(|cmd\s*\()#i", $str))
-		{
-			return FALSE;
-		}
-
+		ee()->load->library('logger');
+		ee()->logger->deprecated('5.2.3', "nada. Don't execute user input, duh. Use nothing");
 		return TRUE;
 	}
 
@@ -940,19 +935,6 @@ class EE_Input {
 	*/
 	function _clean_input_keys($str)
 	{
-		if ( ! preg_match("/^[a-z0-9:_\/ \-".EMOJI_REGEX."]+$/iu", $str))
-		{
-			set_status_header(503);
-			$error = 'Disallowed Key Characters';
-
-			if (DEBUG)
-			{
-				$error .= ': '.htmlentities($str, ENT_QUOTES, 'UTF-8');
-			}
-
-			exit($error);
-		}
-
 		// Clean UTF-8 if supported
 		if (UTF8_ENABLED === TRUE)
 		{

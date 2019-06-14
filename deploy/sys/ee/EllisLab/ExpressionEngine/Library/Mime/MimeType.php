@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Library\Mime;
@@ -185,8 +186,21 @@ class MimeType {
 
 		// If the reported mime-type is an image we'll do an extra validation
 		// step and try to create an image from the data.
-		$im = @imagecreatefromstring(file_get_contents($path));
-		return $im !== FALSE;
+		try
+		{
+			ee('Memory')->setMemoryForImageManipulation($path, 1.9);
+			$im = @imagecreatefromstring(file_get_contents($path));
+			return $im !== FALSE;
+		}
+		catch (\Exception $e)
+		{
+			if (DEBUG)
+			{
+				show_error($e->getMessage());
+			}
+
+			return FALSE;
+		}
 	}
 
 	/**

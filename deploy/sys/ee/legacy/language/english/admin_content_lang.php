@@ -234,7 +234,7 @@ $lang = array(
 
 'field' => 'Field',
 
-'fields_assign_to_group' => 'Assign one of more fields to this group.',
+'fields_assign_to_group' => 'Assign one or more fields to this group.',
 
 'field_content_text' => 'Allowed content',
 
@@ -766,15 +766,11 @@ $lang = array(
 
 'invalid_url_title_prefix' => 'Invalid URL Title Prefix',
 
-'live_look_template' => 'Live Look Template',
-
 'ltr' => 'Left to Right',
 
 'multiple_cat_group_preferences' => 'Multiple Category Group Preferences',
 
 'new_status' => 'New Status',
-
-'no_live_look_template' => '- No Live Look Template -',
 
 'rtl' => 'Right to Left',
 

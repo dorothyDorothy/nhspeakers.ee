@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Members;
@@ -211,6 +212,24 @@ class Groups extends Members\Members {
 			'file' => array('cp/confirm_remove'),
 		));
 
+		$session = ee('Model')->get('Session', ee()->session->userdata('session_id'))->first();
+
+		if ( ! $session->isWithinAuthTimeout())
+		{
+			$data['confirm_remove_secure_form_ctrls'] = [
+				'title' => 'your_password',
+				'desc' => 'your_password_delete_member_groups_desc',
+				'group' => 'verify_password',
+				'fields' => [
+					'verify_password' => [
+						'type'      => 'password',
+						'required'  => TRUE,
+						'maxlength' => PASSWORD_MAX_LENGTH
+					]
+				]
+			];
+		}
+
 		ee()->view->base_url = $this->base_url;
 		ee()->view->ajax_validate = TRUE;
 		ee()->view->cp_page_title = lang('all_member_groups');
@@ -298,9 +317,37 @@ class Groups extends Members\Members {
 	 */
 	public function delete()
 	{
-		if ( ! ee()->cp->allowed_group('can_delete_member_groups'))
+		$groups = ee()->input->post('selection');
+		$member = ee('Model')->get('Member', ee()->session->userdata('member_id'))->first();
+
+		if ( ! $member ||
+			! $member->Session ||
+			! ee()->cp->allowed_group('can_delete_member_groups') ||
+			! $groups)
 		{
 			show_error(lang('unauthorized_access'), 403);
+		}
+
+		if ( ! $member->Session->isWithinAuthTimeout())
+		{
+			$validator = ee('Validation')->make();
+			$validator->setRules(array(
+				'verify_password'  => 'authenticated'
+			));
+			$password_confirm = $validator->validate($_POST);
+
+			if ($password_confirm->failed())
+			{
+				ee('CP/Alert')->makeInline('member_groups')
+					->asIssue()
+					->withTitle(lang('member_groups_remove_problem'))
+					->addToBody(lang('invalid_password'))
+					->defer();
+
+				return ee()->functions->redirect($this->base_url);
+			}
+
+			$member->Session->resetAuthTimeout();
 		}
 
 		$replacement = ee()->input->post('replacement');
@@ -377,7 +424,7 @@ class Groups extends Members\Members {
 						return count($group->Members) > 0;
 					});
 
-		$vars['new_groups'] = array('delete' => 'None');
+		$vars['new_groups'] = ['delete' => lang('member_assignment_none')];
 		$vars['new_groups'] += ee('Model')->get('MemberGroup')
 								->filter('group_id', 'NOT IN', $groups)
 								->all()
@@ -404,10 +451,16 @@ class Groups extends Members\Members {
 
 		if ($replacement)
 		{
+			// Query bulder for speed as model update() is broken
+			$db = ee('db');
+			$db->where('group_id', $group_id);
+			$db->update('exp_members', ['group_id' => $replacement]);
+		}
+		else
+		{
 			ee('Model')->get('Member')
 				->filter('group_id', $group_id)
-				->set('group_id', $replacement)
-				->update();
+				->delete();
 		}
 
 		$sites = ee('Model')->get('Site')
@@ -1553,6 +1606,18 @@ class Groups extends Members\Members {
 									'value' => element('can_access_security_settings', $values)
 								)
 							)
+						),
+						array(
+							'title' => 'can_manage_consents',
+							'desc' => 'can_manage_consents_desc',
+							'group' => 'can_access_sys_prefs',
+							'caution' => TRUE,
+							'fields' => array(
+								'can_manage_consents' => array(
+									'type' => 'yes_no',
+									'value' => element('can_manage_consents', $values)
+								)
+							)
 						)
 					)
 				)
@@ -1562,7 +1627,7 @@ class Groups extends Members\Members {
 				->asWarning()
 				->cannotClose()
 				->addToBody(lang('access_privilege_warning'))
-				->addToBody(lang('access_privilege_caution'), 'caution')
+				->addToBody(lang('access_privilege_caution'), 'txt-enhance')
 				->now();
 		}
 

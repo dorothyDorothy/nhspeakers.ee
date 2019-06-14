@@ -39,7 +39,7 @@ $lang = array(
 
 'be_careful' => 'BE CAREFUL!',
 
-'build' => 'build date:',
+'build' => 'Build:',
 
 'captcha_explanation' => 'A CAPTCHA is an image containing a security code that users have to submit. Please consult the user guide for more info.',
 
@@ -62,6 +62,8 @@ $lang = array(
 'custom_limit' => 'custom limit',
 
 'details' => 'Details',
+
+'do_not_duplicate' => 'Do not duplicate',
 
 'e_no_css' => 'The requested CSS file could not be opened.',
 
@@ -153,7 +155,7 @@ $lang = array(
 
 'update_check_btn' => 'Check for Update',
 
-'update_btn' => 'Update Now',
+'update_btn' => 'Upgrade Now',
 
 'user_account' => 'Member Account',
 
@@ -174,6 +176,12 @@ $lang = array(
 
 /* Buttons */
 'cancel' => 'Cancel',
+
+'accept' => 'Accept',
+
+'decline' => 'Decline',
+
+'needs_review' => 'Needs Review',
 
 'delete' => 'Delete',
 
@@ -211,11 +219,15 @@ $lang = array(
 
 'ip_address' => 'IP Address',
 
-'member_changed_email' => 'Changed email for "%s" (%d)',
+'member_changed_email' => 'Changed email for "%s" (%d) from "%s" to "%s"',
 
 'member_changed_member_group' => 'Changed member group to "%s" for "%s" (%d)',
 
 'member_changed_password' => 'Changed password for "%s" (%d)',
+
+'member_anonymized_member' => 'Anonymized member with ID: %d',
+
+'member_hash_algo_changed' => 'Hash algorithm changed for "%s" (%d)',
 
 'member_id' => 'Member ID',
 
@@ -245,6 +257,8 @@ $lang = array(
 
 'custom_date_range' => 'Custom Date Range',
 
+'date_added' => 'Date Added',
+
 'edit' => 'Edit',
 
 'ee_wiki' => 'EE Wiki',
@@ -253,8 +267,7 @@ $lang = array(
 
 'limit_by' => 'limit by',
 
-'keyword_search' =>
-'Keyword Search',
+'keyword_search' => 'Keyword Search',
 
 'manage' => 'Manage',
 
@@ -278,7 +291,19 @@ $lang = array(
 
 'select_all' => 'select all',
 
+'search_in' => 'Search in',
+
 'show' => 'Show',
+
+'search_in_filter' => 'search in',
+
+'perpage_filter' => 'show',
+
+'date_filter' => 'date',
+
+'group_filter' => 'group',
+
+'type_filter' => 'type',
 
 'site' => 'Site',
 
@@ -302,6 +327,15 @@ $lang = array(
 
 'with_selected' => 'with selected',
 
+'export' => 'Export',
+
+'btn_exporting' => 'Exporting',
+
+'btn_downloading' => 'Downloading',
+
+'will_be_logged' => 'This action will be logged',
+
+'important' => 'Important!',
 
 /* Sites and Channels */
 'avatar_path' => 'Avatar Path',
@@ -384,9 +418,7 @@ $lang = array(
 
 'missing_license' => 'This copy of ExpressionEngine is <strong>unregistered</strong>. <a href="%s">Please upload your license.</a>',
 
-'missing_pubkey' => 'The ExpressionEngine product is missing data. Pleas visit <a href="%s" rel="external">EllisLab.com</a> and download a fresh copy.',
-
-'software_unregistered' => 'Software Unregistered',
+'missing_pubkey' => 'The ExpressionEngine product is missing data. Pleas visit <a href="%s" rel="external">expressionengine.com</a> and download a fresh copy.',
 
 
 /* CP Errors */
@@ -435,6 +467,8 @@ $lang = array(
 'edit' => 'Edit',
 
 'enable' => 'Enable',
+
+'filter_authors' => 'filter authors',
 
 'filter_categories' => 'filter categories',
 
@@ -522,11 +556,13 @@ $lang = array(
 
 'authenticating' => 'authenticating...',
 
+'checking_for_updates' => 'Checking for updates...',
+
 'download' => 'download',
 
 'installed' => 'Installed',
 
-'latest_version' => 'Latest Version',
+'latest_version' => 'Latest',
 
 'license_no' => 'License #',
 
@@ -538,9 +574,9 @@ $lang = array(
 
 'out_of_date' => 'out of date',
 
-'out_of_date_recommended' => 'Out of date, Recommended upgrade',
+'out_of_date_recommended' => 'Recommended Upgrade',
 
-'out_of_date_upgrade' => 'Out of date, please upgrade',
+'out_of_date_upgrade' => 'New version found',
 
 'owned_by' => 'Owned by',
 
@@ -554,6 +590,10 @@ $lang = array(
 
 'session_timeout' => 'Your administration access session has timed out. Please use the form below to log back into your control panel.',
 
+'up_to_date' => 'Up to date!',
+
+'version' => 'Version',
+
 
 /* confirm removal modal */
 'btn_confirm_and_remove' => 'Confirm, and Remove',
@@ -564,13 +604,17 @@ $lang = array(
 
 'confirm_removal_desc' => 'You are attempting to remove the following items, please confirm this action.',
 
+'btn_confirm_and_save' => 'Confirm, and Save',
+
+'btn_confirm_and_save_working' => 'Saving...',
+
 
 /*confirm show all modal */
 'all_items' => 'All %d items',
 
-'confirm_show_all' => 'Danger, Will Robinson!',
+'confirm_show_all' => 'Confirm Show All',
 
-'confirm_show_all_btn' => 'Damn the torpedoes, full speed ahead!',
+'confirm_show_all_btn' => 'Show All',
 
 'confirm_show_all_desc' => 'Viewing more than %d items at a time may result in reduced performance.',
 

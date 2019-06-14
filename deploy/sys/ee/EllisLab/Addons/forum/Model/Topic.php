@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\Addons\Forum\Model;
@@ -50,7 +51,6 @@ class Topic extends Model {
 			'type'     => 'belongsTo',
 			'model'    => 'ee:Member',
 			'from_key' => 'author_id',
-			'weak'     => TRUE,
 			'inverse' => array(
 				'name' => 'Topic',
 				'type' => 'hasMany'
@@ -66,7 +66,7 @@ class Topic extends Model {
 			'model'    => 'ee:Member',
 			'weak'     => TRUE,
 			'inverse' => array(
-				'name' => 'Topic',
+				'name' => 'EditedTopic',
 				'type' => 'hasMany'
 			)
 		),
@@ -86,7 +86,7 @@ class Topic extends Model {
 			'to_key'   => 'member_id',
 			'weak'     => TRUE,
 			'inverse' => array(
-				'name' => 'Topic',
+				'name' => 'LastPost',
 				'type' => 'hasMany',
 				'weak' => TRUE
 			)
@@ -121,7 +121,8 @@ class Topic extends Model {
 
 	protected static $_events = array(
 		'afterInsert',
-		'beforeDelete',
+		'beforeBulkDelete',
+		'afterBulkDelete',
 	);
 
 	protected $topic_id;
@@ -156,13 +157,26 @@ class Topic extends Model {
 		$this->Author->save();
 	}
 
-	public function onAfterDelete()
-	{
-		$this->Forum->forum_total_topics--;
-		$this->Forum->save();
+	protected static $_forum_ids = [];
 
-		$this->Author->total_forum_topics--;
-		$this->Author->save();
+	public static function onBeforeBulkDelete($delete_ids)
+	{
+		$posts = ee('Model')->get('forum:Post', $delete_ids)->all();
+		self::$_forum_ids = array_unique($posts->pluck('forum_id'));
+	}
+
+	public static function onAfterBulkDelete($delete_ids)
+	{
+		require_once PATH_ADDONS.'forum/mod.forum.php';
+		require_once PATH_ADDONS.'forum/mod.forum_core.php';
+
+		$forum_core = new \Forum_Core;
+
+		foreach (self::$_forum_ids as $forum_id)
+		{
+			$forum_core->_update_post_stats($forum_id);
+		}
+		$forum_core->_update_global_stats();
 	}
 
 }

@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -20,11 +21,6 @@ class Relationship_ft extends EE_Fieldtype {
 	public $has_array_data = FALSE;
 
 	private $_table = 'relationships';
-
-	// Cache variables
-	protected $channels = array();
-	protected $entries = array();
-	protected $children = array();
 
 	/**
 	 * Validate Field
@@ -81,7 +77,7 @@ class Relationship_ft extends EE_Fieldtype {
 			$cache_name .= $this->settings['grid_row_name'];
 		}
 
-		if (isset($model))
+		if (isset($model) && is_object($model))
 		{
 			$name = $this->field_name;
 			$model->$name = '';
@@ -125,8 +121,11 @@ class Relationship_ft extends EE_Fieldtype {
 		$data = $post['data'];
 
 		$all_rows_where = array(
-			'parent_id' => $entry_id,
-			'field_id' => $field_id,
+			'parent_id'     => $entry_id,
+			'field_id'      => $field_id,
+			'grid_col_id'   => 0,
+			'grid_field_id' => 0,
+			'grid_row_id'   => 0,
 			'fluid_field_data_id' => (isset($this->settings['fluid_field_data_id'])) ? $this->settings['fluid_field_data_id'] : 0
 		);
 
@@ -265,6 +264,9 @@ class Relationship_ft extends EE_Fieldtype {
 			$wheres = array(
 				'parent_id'     => $entry_id,
 				'field_id'      => $this->field_id,
+				'grid_col_id'   => 0,
+				'grid_field_id' => 0,
+				'grid_row_id'   => 0,
 				'fluid_field_data_id' => (isset($this->settings['fluid_field_data_id'])) ? $this->settings['fluid_field_data_id'] : 0
 			);
 
@@ -340,24 +342,22 @@ class Relationship_ft extends EE_Fieldtype {
 		);
 
 		// Create a cache of channel names
-		if (empty($this->channels))
+		if ( ! $channels = ee()->session->cache(__CLASS__, 'channels'))
 		{
-			$this->channels = ee('Model')->get('Channel')
-				->fields('channel_title')
+			$channels = ee('Model')->get('Channel')
+				->fields('channel_title', 'max_entries', 'total_records')
 				->all();
+
+			ee()->session->set_cache(__CLASS__, 'channels', $channels);
 		}
 
 		$limit_channels = $this->settings['channels'];
 		if (count($limit_channels))
 		{
-			$channels = $this->channels->filter(function($channel) use ($limit_channels)
+			$channels = $channels->filter(function($channel) use ($limit_channels)
 			{
 				return in_array($channel->getId(), $limit_channels);
 			});
-		}
-		else
-		{
-			$channels = $this->channels;
 		}
 
 		if (REQ != 'CP')
@@ -379,29 +379,39 @@ class Relationship_ft extends EE_Fieldtype {
 			}
 		}
 
-		ee()->cp->add_js_script(array(
-			'plugin' => array('ui.touch.punch', 'ee_interact.event'),
-			'file' => 'fields/relationship/relationship',
+		ee()->javascript->set_global([
+			'relationship.publishCreateUrl' => ee('CP/URL')->make('publish/create/###')->compile(),
+			'relationship.lang.creatingNew' => lang('creating_new_in_rel')
+		]);
+
+		ee()->cp->add_js_script([
+			'plugin' => ['ui.touch.punch', 'ee_interact.event'],
+			'file' => ['fields/relationship/mutable_relationship', 'fields/relationship/relationship'],
 			'ui' => 'sortable'
-		));
+		]);
+
+		$children_cache = ee()->session->cache(__CLASS__, 'children');
 
 		if ($entry_id)
 		{
-			if ( ! isset($this->children[$entry_id]))
+			if ( ! is_array($children_cache))
 			{
-				// Cache children for this entry
-				$this->children[$entry_id] = $children = ee('Model')->get('ChannelEntry', $entry_id)
-					->with('Children')
-					->fields('Children.entry_id', 'Children.title', 'Children.channel_id')
-					->first()
-					->Children;
-			}
-			else
-			{
-				$children = $this->children[$entry_id];
+				$children_cache = [];
 			}
 
-			$children = $children->indexBy('entry_id');
+			if ( ! isset($children_cache[$entry_id]))
+			{
+				// Cache children for this entry
+				$children_cache[$entry_id] = ee('Model')->get('ChannelEntry', $entry_id)
+					->with('Children', 'Channel')
+					->fields('Channel.channel_title', 'Children.entry_id', 'Children.title', 'Children.channel_id')
+					->first()
+					->Children;
+
+				ee()->session->set_cache(__CLASS__, 'children', $children_cache);
+			}
+
+			$children = $children_cache[$entry_id]->indexBy('entry_id');
 		}
 		else
 		{
@@ -498,6 +508,11 @@ class Relationship_ft extends EE_Fieldtype {
 			];
 		}
 
+		$channel_choices = $channels->filter(function($channel) {
+			return ! $channel->maxEntriesLimitReached()
+				&& in_array($channel->getId(), array_keys(ee()->session->userdata('assigned_channels')));
+		});
+
 		return ee('View')->make('relationship:publish')->render([
 			'field_name' => $field_name,
 			'choices' => $choices,
@@ -509,7 +524,9 @@ class Relationship_ft extends EE_Fieldtype {
 			'limit' => $this->settings['limit'] ?: 100,
 			'no_results' => ['text' => lang('no_entries_found')],
 			'no_related' => ['text' => lang('no_entries_related')],
-			'select_filters' => $select_filters
+			'select_filters' => $select_filters,
+			'channels' => $channel_choices,
+			'in_modal' => $this->get_setting('in_modal_context')
 		]);
 	}
 
@@ -717,7 +734,7 @@ class Relationship_ft extends EE_Fieldtype {
 		$save = $form->values();
 
 		// Boolstring conversion
-		$save['allow_multiple'] = ($save['allow_multiple'] === 'y') ? 1 : 0;
+		$save['allow_multiple'] = get_bool_from_string($save['allow_multiple']);
 
 		foreach ($save as $field => $value)
 		{

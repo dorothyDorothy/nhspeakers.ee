@@ -1,6 +1,6 @@
 # EE login
 username: captainnhs
-password: =8sugarFORWARD7=
+password: :2paintCLOTHES0:
 
 username: dorothy
 password: OmNubMeejnetFi3

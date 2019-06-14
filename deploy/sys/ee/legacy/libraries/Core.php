@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -66,11 +67,13 @@ class EE_Core {
 		define('PATH_JS',     'compressed');
 		define('PATH_DICT',   SYSPATH . 'user/config/');
 
-		// application constants
+		// retain in case third-party add-ons expect IS_CORE to be defined
 		define('IS_CORE',		FALSE);
-		define('APP_NAME',		'ExpressionEngine'.(IS_CORE ? ' Core' : ''));
-		define('APP_BUILD',		'20180116');
-		define('APP_VER',		'4.0.6');
+
+		// application constants
+		define('APP_NAME',		'ExpressionEngine');
+		define('APP_BUILD',		'20190527');
+		define('APP_VER',		'5.2.3');
 		define('APP_VER_ID',	'');
 		define('SLASH',			'&#47;');
 		define('LD',			'{');
@@ -82,7 +85,7 @@ class EE_Core {
 		define('AJAX_REQUEST',	ee()->input->is_ajax_request());
 		define('USERNAME_MAX_LENGTH', 75);
 		define('PASSWORD_MAX_LENGTH', 72);
-		define('DOC_URL',       'https://docs.expressionengine.com/v4/');
+		define('DOC_URL',       'https://docs.expressionengine.com/v5/');
 		define('URL_TITLE_MAX_LENGTH', 200);
 
 		ee()->load->helper('language');
@@ -94,13 +97,6 @@ class EE_Core {
 		ee()->load->database();
 		ee()->db->swap_pre = 'exp_';
 		ee()->db->db_debug = FALSE;
-
-		// For core we need to alias our replacement classes or they'll get
-		// not found errors
-		if (IS_CORE)
-		{
-			require_once SYSPATH.'ee/EllisLab/ExpressionEngine/FreeVersion/aliases.php';
-		}
 
 		// boot the addons
 		ee('App')->setupAddons(SYSPATH . 'ee/EllisLab/Addons/');
@@ -176,11 +172,6 @@ class EE_Core {
 			ee()->config->set_item('index_page', ee()->config->item('site_index'));
 		}
 
-		if (IS_CORE)
-		{
-			ee()->config->set_item('enable_template_routes', 'n');
-		}
-
 		// Backwards compatibility for the removed secure forms setting.
 		// Developers are still checking against this key, so we'll wait some
 		// time before removing it.
@@ -227,6 +218,11 @@ class EE_Core {
 
 		define('PATH_MBR_THEMES', PATH_THEMES.'member/');
 		define('PATH_CP_GBL_IMG', URL_THEMES_GLOBAL_ASSET.'img/');
+
+		define('PATH_THEME_TEMPLATES', SYSPATH . 'ee/templates/_themes/');
+		define('PATH_THIRD_THEME_TEMPLATES', SYSPATH . 'user/templates/_themes/');
+
+
 		unset($theme_path);
 
 		// Load the very, very base classes
@@ -353,30 +349,38 @@ class EE_Core {
 		// Load up any Snippets
 		if (REQ == 'ACTION' OR REQ == 'PAGE')
 		{
-			$fresh = ee('Model')->make('Snippet')->loadAll();
+			$this->loadSnippets();
+		}
+	}
 
-			if ($fresh->count() > 0)
+	/**
+	 * Load Snippets into config's _global_vars
+	 */
+	public function loadSnippets()
+	{
+		$fresh = ee('Model')->make('Snippet')->loadAll();
+
+		if ($fresh->count() > 0)
+		{
+			$snippets = $fresh->getDictionary('snippet_name', 'snippet_contents');
+
+			// Thanks to @litzinger for the code suggestion to parse
+			// global vars in snippets...here we go.
+
+			$var_keys = array();
+
+			foreach (ee()->config->_global_vars as $k => $v)
 			{
-				$snippets = $fresh->getDictionary('snippet_name', 'snippet_contents');
-
-				// Thanks to @litzinger for the code suggestion to parse
-				// global vars in snippets...here we go.
-
-				$var_keys = array();
-
-				foreach (ee()->config->_global_vars as $k => $v)
-				{
-					$var_keys[] = LD.$k.RD;
-				}
-
-				$snippets = str_replace($var_keys, ee()->config->_global_vars, $snippets);
-
-				ee()->config->_global_vars = ee()->config->_global_vars + $snippets;
-
-				unset($snippets);
-				unset($fresh);
-				unset($var_keys);
+				$var_keys[] = LD.$k.RD;
 			}
+
+			$snippets = str_replace($var_keys, ee()->config->_global_vars, $snippets);
+
+			ee()->config->_global_vars = ee()->config->_global_vars + $snippets;
+
+			unset($snippets);
+			unset($fresh);
+			unset($var_keys);
 		}
 	}
 
@@ -443,13 +447,13 @@ class EE_Core {
 		// Does an admin session exist?
 		// Only the "login" class can be accessed when there isn't an admin session
 		if (ee()->session->userdata('admin_sess') == 0 &&
-			ee()->router->fetch_class() != 'login' &&
+			ee()->router->fetch_class(TRUE) != 'login' &&
 			ee()->router->fetch_class() != 'css')
 		{
 			// has their session Timed out and they are requesting a page?
 			// Grab the URL, base64_encode it and send them to the login screen.
 			$safe_refresh = ee()->cp->get_safe_refresh();
-			$return_url = ($safe_refresh == 'C=homepage') ? '' : AMP.'return='.base64_encode($safe_refresh);
+			$return_url = ($safe_refresh == 'C=homepage') ? '' : AMP.'return='.urlencode(ee('Encrypt')->encode($safe_refresh));
 
 			ee()->functions->redirect(BASE.AMP.'C=login'.$return_url);
 		}
@@ -550,7 +554,7 @@ class EE_Core {
 		$forum_trigger = (ee()->config->item('forum_is_installed') == "y") ? ee()->config->item('forum_trigger') : '';
 		$profile_trigger = ee()->config->item('profile_trigger');
 
-		if ( ! IS_CORE && $forum_trigger &&
+		if ($forum_trigger &&
 			in_array(ee()->uri->segment(1), preg_split('/\|/', $forum_trigger, -1, PREG_SPLIT_NO_EMPTY)))
 		{
 			require PATH_MOD.'forum/mod.forum.php';
@@ -559,7 +563,7 @@ class EE_Core {
 			return;
 		}
 
-		if ( ! IS_CORE && $profile_trigger && $profile_trigger == ee()->uri->segment(1))
+		if ($profile_trigger && $profile_trigger == ee()->uri->segment(1))
 		{
 			// We do the same thing with the member profile area.
 

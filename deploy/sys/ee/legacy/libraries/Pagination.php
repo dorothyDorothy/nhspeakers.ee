@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -673,11 +674,14 @@ class Pagination_object {
 						{
 							if (isset($row['field_id_'.$cfields[$val]]) AND $row['field_id_'.$cfields[$val]] != '')
 							{
-								$m_fields[] = $val;
+								// Need unique field shortnames
+								$m_fields[$val] = $val;
 							}
 						}
 					}
 				}
+
+				$m_fields = array_values($m_fields);
 
 				$this->per_page = 1;
 				$this->total_items = count($m_fields);

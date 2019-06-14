@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 use EllisLab\ExpressionEngine\Library\CP\Table;
@@ -731,7 +732,7 @@ class Simple_commerce_mcp {
 				),
 				$purchase->Member->screen_name,
 				ee()->localize->human_time($purchase->purchase_date),
-				$purchase->subscription_end_date ?: '--',
+				$purchase->subscription_end_date ?  ee()->localize->human_time($purchase->subscription_end_date) : '--',
 				'$'.$purchase->item_cost,
 				array('toolbar_items' => array(
 					'edit' => array(

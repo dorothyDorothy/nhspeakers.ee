@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Msm;
@@ -39,26 +40,19 @@ class Msm extends CP_Controller {
 
 	protected function stdHeader()
 	{
-		$license = ee('License')->getEELicense();
-		$can_add = $license->canAddSites(ee('Model')->get('Site')->count());
-
-		$header = array(
+		$header = [
 			'title' => lang('msm_manager'),
-			'toolbar_items' => array(
-				'settings' => array(
+			'toolbar_items' => [
+				'settings' => [
 					'href' => ee('CP/URL')->make('settings/general'),
 					'title' => lang('settings')
-				)
-			)
-		);
-
-		if ($can_add)
-		{
-			$header['action_button'] = [
+				]
+			],
+			'action_button' => [
 				'text' => lang('add_site'),
 				'href' => ee('CP/URL')->make('msm/create')
-			];
-		}
+			]
+		];
 
 		ee()->view->header = $header;
 	}
@@ -77,19 +71,6 @@ class Msm extends CP_Controller {
 		}
 
 		$base_url = ee('CP/URL')->make('msm');
-
-		$license = ee('License')->getEELicense();
-		$can_add = $license->canAddSites(ee('Model')->get('Site')->count());
-
-		if ( ! $can_add)
-		{
-			ee('CP/Alert')->makeInline('site-limit-reached')
-				->asIssue()
-				->withTitle(lang('site_limit_reached'))
-				->addToBody(sprintf(lang('site_limit_reached_desc'), 'https://expressionengine.com/store/purchases'))
-				->cannotClose()
-				->now();
-		}
 
 		$sites = ee('Model')->get('Site', array_keys(ee()->session->userdata('assigned_sites')))->all();
 
@@ -203,14 +184,6 @@ class Msm extends CP_Controller {
 			show_error(lang('unauthorized_access'), 403);
 		}
 
-		$license = ee('License')->getEELicense();
-		$can_add = $license->canAddSites(ee('Model')->get('Site')->count());
-
-		if ( ! $can_add && ! empty($_POST))
-		{
-			show_error(lang('unauthorized_access'), 403);
-		}
-
 		ee()->view->cp_breadcrumbs = array(
 			ee('CP/URL')->make('msm')->compile() => lang('msm_manager'),
 		);
@@ -240,7 +213,18 @@ class Msm extends CP_Controller {
 					->addToBody(sprintf(lang('create_site_success_desc'), $site->site_label))
 					->defer();
 
-				ee()->functions->redirect(ee('CP/URL')->make('msm'));
+				if (ee('Request')->post('submit') == 'save_and_new')
+				{
+					ee()->functions->redirect(ee('CP/URL')->make('msm/create'));
+				}
+				elseif (ee()->input->post('submit') == 'save_and_close')
+				{
+					ee()->functions->redirect(ee('CP/URL')->make('msm'));
+				}
+				else
+				{
+					ee()->functions->redirect(ee('CP/URL')->make('msm/edit/' . $site->getId()));
+				}
 			}
 			else
 			{
@@ -256,36 +240,41 @@ class Msm extends CP_Controller {
 			'ajax_validate' => TRUE,
 			'base_url' => ee('CP/URL')->make('msm/create'),
 			'errors' => $errors,
-			'save_btn_text' => sprintf(lang('btn_save'), lang('site')),
-			'save_btn_text_working' => 'btn_saving',
-			'sections' => $this->getForm($site, $can_add),
-		);
-
-		if ( ! $can_add)
-		{
-			$vars['buttons'] = array(
-				array(
-					'text' => 'btn_site_limit_reached',
-					'working' => 'btn_site_limit_reached',
-					'value' => 'btn_site_limit_reached',
-					'class' => 'disable',
+			'buttons' => [
+				[
 					'name' => 'submit',
-					'type' => 'submit'
-				)
-			);
-		}
+					'type' => 'submit',
+					'value' => 'save',
+					'text' => 'save',
+					'working' => 'btn_saving'
+				],
+				[
+					'name' => 'submit',
+					'type' => 'submit',
+					'value' => 'save_and_new',
+					'text' => 'save_and_new',
+					'working' => 'btn_saving'
+				],
+				[
+					'name' => 'submit',
+					'type' => 'submit',
+					'value' => 'save_and_close',
+					'text' => 'save_and_close',
+					'working' => 'btn_saving'
+				]
+
+			],
+			'sections' => $this->getForm($site),
+		);
 
 		ee()->view->cp_page_title = lang('create_site');
 
-		if ($can_add)
-		{
-			ee()->cp->add_js_script('plugin', 'ee_url_title');
-			ee()->javascript->output('
-				$("input[name=site_label]").bind("keyup keydown", function() {
-					$(this).ee_url_title("input[name=site_name]");
-				});
-			');
-		}
+		ee()->cp->add_js_script('plugin', 'ee_url_title');
+		ee()->javascript->output('
+			$("input[name=site_label]").bind("keyup keydown", function() {
+				$(this).ee_url_title("input[name=site_name]");
+			});
+		');
 
 		ee()->cp->render('settings/form', $vars);
 	}
@@ -327,7 +316,18 @@ class Msm extends CP_Controller {
 
 				ee()->logger->log_action(lang('site_updated') . ': ' . $site->site_label);
 
-				ee()->functions->redirect(ee('CP/URL')->make('msm/edit/' . $site_id));
+				if (ee('Request')->post('submit') == 'save_and_new')
+				{
+					ee()->functions->redirect(ee('CP/URL')->make('msm/create'));
+				}
+				elseif (ee()->input->post('submit') == 'save_and_close')
+				{
+					ee()->functions->redirect(ee('CP/URL')->make('msm'));
+				}
+				else
+				{
+					ee()->functions->redirect(ee('CP/URL')->make('msm/edit/' . $site_id));
+				}
 			}
 			else
 			{
@@ -343,8 +343,30 @@ class Msm extends CP_Controller {
 			'ajax_validate' => TRUE,
 			'base_url' => ee('CP/URL')->make('msm/edit/' . $site_id),
 			'errors' => $errors,
-			'save_btn_text' => sprintf(lang('btn_save'), lang('site')),
-			'save_btn_text_working' => 'btn_saving',
+			'buttons' => [
+				[
+					'name' => 'submit',
+					'type' => 'submit',
+					'value' => 'save',
+					'text' => 'save',
+					'working' => 'btn_saving'
+				],
+				[
+					'name' => 'submit',
+					'type' => 'submit',
+					'value' => 'save_and_new',
+					'text' => 'save_and_new',
+					'working' => 'btn_saving'
+				],
+				[
+					'name' => 'submit',
+					'type' => 'submit',
+					'value' => 'save_and_close',
+					'text' => 'save_and_close',
+					'working' => 'btn_saving'
+				]
+
+			],
 			'sections' => $this->getForm($site, TRUE),
 		);
 
@@ -358,24 +380,10 @@ class Msm extends CP_Controller {
 	 * shared/form view.
 	 *
 	 * @param Site $site A Site entity for populating the values of this form
-	 * @param bool $can_add Have they reached their site limit?
 	 */
-	private function getForm($site, $can_add = FALSE)
+	private function getForm($site)
 	{
 		$sections = array(array());
-
-		$disabled = ! $can_add;
-
-		if ( ! $can_add)
-		{
-			$alert = ee('CP/Alert')->makeInline('site-limit-reached')
-				->asIssue()
-				->withTitle(lang('site_limit_reached'))
-				->addToBody(sprintf(lang('site_limit_reached_desc'), 'https://expressionengine.com/store/purchases'))
-				->cannotClose()
-				->render();
-			$sections[0][] = $alert;
-		}
 
 		$name = array(
 			'title' => 'name',
@@ -385,7 +393,6 @@ class Msm extends CP_Controller {
 					'type' => 'text',
 					'value' => $site->site_label ?: '',
 					'required' => TRUE,
-					'disabled' => $disabled
 				)
 			)
 		);
@@ -399,7 +406,6 @@ class Msm extends CP_Controller {
 					'type' => 'text',
 					'value' => $site->site_name ?: '',
 					'required' => TRUE,
-					'disabled' => $disabled
 				)
 			)
 		);
@@ -427,7 +433,6 @@ class Msm extends CP_Controller {
 				'site_description' => array(
 					'type' => 'textarea',
 					'value' => $site->site_description,
-					'disabled' => $disabled
 				)
 			)
 		);

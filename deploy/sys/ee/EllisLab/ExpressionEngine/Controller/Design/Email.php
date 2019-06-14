@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Design;
@@ -163,6 +164,14 @@ class Email extends AbstractDesignController {
 			ee('CP/URL', 'design')->compile() => lang('template_manager'),
 			ee('CP/URL', 'design/email/')->compile() => sprintf(lang('breadcrumb_group'), lang('email'))
 		);
+
+		if (lang($template->template_name.'_desc') != $template->template_name.'_desc')
+		{
+			ee('CP/Alert')->makeInline('shared-form')
+				->asTip()
+				->addToBody(lang($template->template_name.'_desc'))
+				->now();
+		}
 
 		ee()->cp->render('settings/form', $vars);
 	}

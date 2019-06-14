@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Members\Profile;
@@ -59,7 +60,7 @@ class Group extends Profile {
 					->asWarning()
 					->addToBody(lang('access_privilege_warning'))
 					->addToBody(
-						sprintf(lang('access_privilege_caution'), '<span title="excercise caution"></span>'),
+						sprintf(lang('access_privilege_caution'), '<span class="icon--caution" title="exercise caution"></span>'),
 						'caution'
 					)
 					->cannotClose()

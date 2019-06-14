@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Channels;
@@ -248,7 +249,18 @@ class Layouts extends AbstractChannelsController {
 				->addToBody(sprintf(lang('create_layout_success_desc'), $channel_layout->layout_name))
 				->defer();
 
-			ee()->functions->redirect(ee('CP/URL', 'channels/layouts/' . $channel_id));
+			if (ee('Request')->post('submit') == 'save_and_new')
+			{
+				ee()->functions->redirect(ee('CP/URL')->make('channels/layouts/create/'.$channel_id));
+			}
+			elseif (ee()->input->post('submit') == 'save_and_close')
+			{
+				ee()->functions->redirect(ee('CP/URL')->make('channels/layouts/' . $channel_id));
+			}
+			else
+			{
+				ee()->functions->redirect(ee('CP/URL')->make('channels/layouts/edit/'.$channel_layout->getId()));
+			}
 		}
 		elseif (ee()->form_validation->errors_exist())
 		{
@@ -265,7 +277,29 @@ class Layouts extends AbstractChannelsController {
 			'layout' => $entry->getDisplay($channel_layout),
 			'channel_layout' => $channel_layout,
 			'form' => $this->getForm($channel_layout),
-			'submit_button_text' => lang('save')
+			'buttons' => [
+				[
+					'name' => 'submit',
+					'type' => 'submit',
+					'value' => 'save',
+					'text' => 'save',
+					'working' => 'btn_saving'
+				],
+				[
+					'name' => 'submit',
+					'type' => 'submit',
+					'value' => 'save_and_new',
+					'text' => 'save_and_new',
+					'working' => 'btn_saving'
+				],
+				[
+					'name' => 'submit',
+					'type' => 'submit',
+					'value' => 'save_and_close',
+					'text' => 'save_and_close',
+					'working' => 'btn_saving'
+				]
+			]
 		);
 
 		ee()->view->cp_breadcrumbs = array(
@@ -347,7 +381,18 @@ class Layouts extends AbstractChannelsController {
 				->addToBody(sprintf(lang('edit_layout_success_desc'), ee()->input->post('layout_name')))
 				->defer();
 
-			ee()->functions->redirect(ee('CP/URL', 'channels/layouts/' . $channel_layout->Channel->channel_id));
+			if (ee('Request')->post('submit') == 'save_and_new')
+			{
+				ee()->functions->redirect(ee('CP/URL')->make('channels/layouts/create/' . $channel->getId()));
+			}
+			elseif (ee()->input->post('submit') == 'save_and_close')
+			{
+				ee()->functions->redirect(ee('CP/URL')->make('channels/layouts/' . $channel->getId()));
+			}
+			else
+			{
+				ee()->functions->redirect(ee('CP/URL')->make('channels/layouts/edit/' . $channel_layout->getId()));
+			}
 		}
 		elseif (ee()->form_validation->errors_exist())
 		{
@@ -364,7 +409,29 @@ class Layouts extends AbstractChannelsController {
 			'layout' => $entry->getDisplay($channel_layout),
 			'channel_layout' => $channel_layout,
 			'form' => $this->getForm($channel_layout),
-			'submit_button_text' => lang('save')
+			'buttons' => [
+				[
+					'name' => 'submit',
+					'type' => 'submit',
+					'value' => 'save',
+					'text' => 'save',
+					'working' => 'btn_saving'
+				],
+				[
+					'name' => 'submit',
+					'type' => 'submit',
+					'value' => 'save_and_new',
+					'text' => 'save_and_new',
+					'working' => 'btn_saving'
+				],
+				[
+					'name' => 'submit',
+					'type' => 'submit',
+					'value' => 'save_and_close',
+					'text' => 'save_and_close',
+					'working' => 'btn_saving'
+				]
+			]
 		);
 
 		ee()->view->cp_breadcrumbs = array(
@@ -375,7 +442,7 @@ class Layouts extends AbstractChannelsController {
 		ee()->view->cp_page_title = lang('edit_form_layout');
 
 		$this->addJSAlerts();
-		ee()->javascript->set_global('publish_layout', $channel_layout->field_layout);
+		ee()->javascript->set_global('publish_layout', $this->prepareLayoutForJS($channel_layout));
 
 		ee()->cp->add_js_script('ui', array('droppable', 'sortable'));
 		ee()->cp->add_js_script('file', 'cp/channel/layout');
@@ -502,6 +569,62 @@ class Layouts extends AbstractChannelsController {
 			->addToBody(lang('layouts_removed_desc'))
 			->addToBody($layout_names)
 			->defer();
+	}
+
+	private function prepareLayoutForJS($channel_layout)
+	{
+		$field_layout = $channel_layout->field_layout;
+
+		if (bool_config_item('enable_comments') && $channel_layout->Channel->comment_system_enabled)
+		{
+			$comment_expiration_date = [
+				'field'     => 'comment_expiration_date',
+				'visible'   => TRUE,
+				'collapsed' => FALSE
+			];
+
+			$allow_comments = [
+				'field'     => 'allow_comments',
+				'visible'   => TRUE,
+				'collapsed' => FALSE
+			];
+
+			$has_comment_expiration_date = FALSE;
+			$has_allow_comments = FALSE;
+
+			foreach ($field_layout as $i => $section)
+			{
+				foreach ($section['fields'] as $j => $field_info)
+				{
+					if ($field_info['field'] == 'comment_expiration_date')
+					{
+						$has_comment_expiration_date = TRUE;
+						continue;
+					}
+
+					if ($field_info['field'] == 'allow_comments')
+					{
+						$has_allow_comments = TRUE;
+						continue;
+					}
+				}
+			}
+
+			// Order matters...
+
+			if ( ! $has_allow_comments)
+			{
+				$field_layout[0]['fields'][] = $allow_comments;
+			}
+
+			if ( ! $has_comment_expiration_date)
+			{
+				$field_layout[0]['fields'][] = $comment_expiration_date;
+			}
+
+		}
+
+		return $field_layout;
 	}
 }
 

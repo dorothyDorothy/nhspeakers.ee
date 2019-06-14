@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Model\Content;
@@ -526,6 +527,49 @@ abstract class FieldModel extends Model {
 			$tag = $tag.':'.$modifier;
 		}
 		return str_replace(LD.$tag.RD, $data, $tagdata);
+	}
+
+	public function getCompatibleFieldtypes()
+	{
+		$fieldtypes = array();
+		$compatibility = array();
+
+		foreach (ee('Addon')->installed() as $addon)
+		{
+			if ($addon->hasFieldtype())
+			{
+				foreach ($addon->get('fieldtypes', array()) as $fieldtype => $metadata)
+				{
+					if (isset($metadata['compatibility']))
+					{
+						$compatibility[$fieldtype] = $metadata['compatibility'];
+					}
+				}
+
+				$fieldtypes = array_merge($fieldtypes, $addon->getFieldtypeNames());
+			}
+		}
+
+		if ($this->getFieldType())
+		{
+			if ( ! isset($compatibility[$this->getFieldType()]))
+			{
+				return array($this->getFieldType() => $fieldtypes[$this->getFieldType()]);
+			}
+
+			$my_type = $compatibility[$this->getFieldType()];
+
+			$compatible = array_filter($compatibility, function($v) use($my_type)
+			{
+				return $v == $my_type;
+			});
+
+			$fieldtypes = array_intersect_key($fieldtypes, $compatible);
+		}
+
+		asort($fieldtypes);
+
+		return $fieldtypes;
 	}
 }
 // EOF

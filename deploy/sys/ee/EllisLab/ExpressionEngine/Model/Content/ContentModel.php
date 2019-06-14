@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Model\Content;
@@ -93,9 +94,14 @@ abstract class ContentModel extends VariableColumnModel {
 	 */
 	public function onBeforeDelete()
 	{
-		foreach ($this->getCustomFields() as $field)
+		// These models don't yet support any fieldtypes that implement delete(),
+		// skip for now for performance
+		if ( ! in_array($this->getName(), ['ee:Member', 'ee:Category']))
 		{
-			$field->delete();
+			foreach ($this->getCustomFields() as $field)
+			{
+				$field->delete();
+			}
 		}
 
 		$this->deleteFieldData();
@@ -322,6 +328,12 @@ abstract class ContentModel extends VariableColumnModel {
 	{
 		foreach ($data as $name => $value)
 		{
+			// Optimization, skip if null
+			if ( ! isset($value))
+			{
+				continue;
+			}
+
 			if (strpos($name, 'field_ft_') !== FALSE)
 			{
 				$name = str_replace('field_ft_', 'field_id_', $name);
@@ -494,6 +506,11 @@ abstract class ContentModel extends VariableColumnModel {
 			}
 			else
 			{
+				// Don't try to insert null values in case they're not allowed,
+				// fall back to column default instead
+				$values = array_filter($values, function($value) {
+					return ! is_null($value);
+				});
 				$values[$key_column] = $this->getId();
 				$query->set($values);
 				$query->insert($field->getTableName());

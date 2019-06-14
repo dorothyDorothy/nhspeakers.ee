@@ -4,7 +4,7 @@
 	<?=form_open($form_url, 'class="ajax-validate"')?>
 	<div class="form-btns form-btns-top">
 		<h1><?=$cp_page_title?></h1>
-		<?=cp_form_submit($submit_button_text, lang('btn_saving'))?>
+		<?php $this->embed('ee:_shared/form/buttons'); ?>
 	</div>
 	<div class="tab-wrap">
 		<ul class="tabs layout">
@@ -31,7 +31,7 @@
 			<?php endforeach; ?>
 		</ul>
 		<a class="add-tab m-link" rel="modal-add-new-tab" href="#"><?=lang('add_tab')?></a>
-			<input type="hidden" name="field_layout" value="<?=json_encode($channel_layout->field_layout)?>">
+			<input type="hidden" name="field_layout" value='<?=json_encode($channel_layout->field_layout)?>'>
 			<?=ee('CP/Alert')->get('layout-form')?>
 			<?php foreach ($layout->getTabs() as $index => $tab): ?>
 			<div class="tab t-<?=$index?><?php if ($index == 0): ?> tab-open<?php endif; ?>">
@@ -64,7 +64,7 @@
 			<?=$form?>
 
 			<div class="form-btns">
-				<?=cp_form_submit($submit_button_text, lang('btn_saving'))?>
+				<?php $this->embed('ee:_shared/form/buttons'); ?>
 			</div>
 		</form>
 	</div>

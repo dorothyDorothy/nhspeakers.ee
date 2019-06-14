@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 use EllisLab\Addons\FilePicker\FilePicker;
@@ -71,7 +72,7 @@ class Textarea_ft extends EE_Fieldtype {
 			ee()->cp->add_js_script(array('plugin' => array('markitup')));
 			ee()->javascript->output('
 				$("textarea[data-markitup]")
-					.not(".grid-textarea textarea, .fluid-item textarea")
+					.not(".grid-textarea textarea, .fluid-field-templates textarea")
 					.markItUp(EE.markitup.settings);
 
 				$("li.html-upload").addClass("m-link").attr({
@@ -97,6 +98,9 @@ class Textarea_ft extends EE_Fieldtype {
 						rel: "modal-file",
 						href: "'.ee('CP/URL')->make('addons/settings/filepicker/modal', array('directory' => 'all')).'"
 					});
+
+					$(".textarea-field-filepicker").FilePicker({callback: EE.filePickerCallback});
+
 				});
 			');
 
@@ -185,6 +189,12 @@ class Textarea_ft extends EE_Fieldtype {
 			'rows'     => $this->settings['field_ta_rows'],
 			'dir'      => $this->settings['field_text_direction']
 		);
+
+		if (isset($this->settings['field_show_formatting_btns']) &&
+			$this->settings['field_show_formatting_btns'] == 'y')
+		{
+			$params['data-markitup'] = 'yes';
+		}
 
 		if ($this->get_setting('field_disabled'))
 		{

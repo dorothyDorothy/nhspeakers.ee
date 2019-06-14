@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -1300,14 +1301,19 @@ class EE_Config {
 			return;
 		}
 
-		if (function_exists('opcache_invalidate'))
-		{
-			opcache_invalidate($path);
-		}
-
 		if (function_exists('apc_delete_file'))
 		{
 			@apc_delete_file($path) || apc_clear_cache();
+		}
+
+		if (function_exists('opcache_invalidate'))
+		{
+			if (($opcache_api_path = (string) ini_get('opcache.restrict_api')) && stripos(SYSPATH, $opcache_api_path) !== 0)
+			{
+				return;
+			}
+
+			opcache_invalidate($path);
 		}
 	}
 
@@ -1497,11 +1503,6 @@ class EE_Config {
 		if (defined('MASKED_CP') && MASKED_CP === TRUE)
 		{
 			unset($f_data['general_cfg']['cp_url']);
-		}
-
-		if ( ! file_exists(APPPATH.'libraries/Sites.php') OR IS_CORE)
-		{
-			unset($f_data['general_cfg']['multiple_sites_enabled']);
 		}
 
 		if ($this->item('multiple_sites_enabled') == 'y')

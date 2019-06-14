@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Service\Model\Query;
@@ -53,11 +54,7 @@ class Select extends Query {
 			$aliases = array_merge(array($this->root_alias), array_keys($withs));
 			foreach ($aliases as $alias)
 			{
-				if (stripos($alias, ' as ') !== FALSE)
-				{
-					$parts = explode(' ', $alias);
-					$alias = end($parts);
-				}
+				list($from, $alias) = $this->splitAlias($alias);
 
 				$class = $this->getClass($alias);
 				if ( ! is_null($class::getMetaData('field_data')))
@@ -172,6 +169,14 @@ class Select extends Query {
 			$fields[] = $primary_key_alias;
  		}
 
+		// Gather columns needed to fulfill relationships from this model
+		$relation_keys = array_map(function($relation) use ($alias)
+		{
+			$keys = $relation->getKeys();
+			return array_shift($keys);
+		}, $this->store->getAllRelations($model));
+		$relation_keys = array_unique(array_values($relation_keys));
+
 		foreach ($tables as $table => $table_fields)
 		{
 			$table_alias = "{$alias}_{$table}";
@@ -200,8 +205,12 @@ class Select extends Query {
 				$this->model_fields[$alias]["{$alias}__{$column}"] = "{$table_alias}.{$column}";
 
 				// but only select it if they did not specify fields to select
-				// or they specifically chose this one to be selected
-				if (empty($fields) OR in_array("{$alias}.{$column}", $fields) OR in_array("{$alias}.*", $fields))
+				// or they specifically chose this one to be selected,
+				// or the column is needed to fulfill a relationship
+				if (empty($fields) OR
+					in_array("{$alias}.{$column}", $fields) OR
+					in_array("{$alias}.*", $fields) OR
+					in_array($column, $relation_keys))
 				{
 					$query->select("{$table_alias}.{$column} as {$alias}__{$column}", FALSE);
 				}
@@ -446,14 +455,10 @@ class Select extends Query {
 			}
 		}
 
-		foreach ($this->builder->getFilters() as $filter)
-		{
-			$field = $filter[0];
-			if (strpos($field, $column_prefix.'field_id') === 0)
-			{
-				$field_ids[] = str_replace($column_prefix.'field_id_', '', $field);
-			}
-		}
+		$field_ids = array_merge(
+			$field_ids,
+			$this->getFieldIdsFromFilters($this->builder->getFilters(), $column_prefix)
+		);
 
 		foreach ($this->builder->getOrders() as $order)
 		{
@@ -481,6 +486,39 @@ class Select extends Query {
 				$this->model_fields[$table_prefix][$column_alias] = $table_alias . ".{$column_prefix}field_id_{$field_id}";
 			}
 		}
+	}
+
+	/**
+	 * Given an array of filters from the Builder, extracts all the custom field
+	 * IDs from them
+	 *
+	 * @param array $filters Result of getFilters() on Builder
+	 * @param string $column_prefix Field model's content prefix
+	 */
+	protected function getFieldIdsFromFilters($filters, $column_prefix)
+	{
+		$field_ids = [];
+
+		foreach ($filters as $filter)
+		{
+			// Nested filter group
+			if (count($filter) == 2)
+			{
+				list($connective, $nested) = $filter;
+
+				$field_ids = array_merge($field_ids, $this->getFieldIdsFromFilters($nested, $column_prefix));
+			}
+			else
+			{
+				$field = $filter[0];
+				if (strpos($field, $column_prefix.'field_id') === 0)
+				{
+					$field_ids[] = str_replace($column_prefix.'field_id_', '', $field);
+				}
+			}
+		}
+
+		return $field_ids;
 	}
 
 	/**
@@ -589,6 +627,9 @@ class Select extends Query {
 
 		if (is_null($value) || (is_string($value) && strtoupper($value) == 'NULL'))
 		{
+			// in case it was a string
+			$value = NULL;
+
 			switch ($operator)
 			{
 				case '!=':

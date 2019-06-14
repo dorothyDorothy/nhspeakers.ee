@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -30,7 +31,7 @@ class Channel {
 	public $gfields					= array();
 	public $mfields					= array();
 	public $pfields					= array();
-	public $ffields                = array();
+	public $ffields                 = array();
 	public $categories				= array();
 	public $catfields				= array();
 	public $channel_name	 		= array();
@@ -54,6 +55,8 @@ class Channel {
 	public $pager_sql 				= '';
 
 	protected $chunks               = array();
+
+	protected $preview_conditions   = array();
 
 	// SQL cache key prefix
 	protected $_sql_cache_prefix	= 'sql_cache';
@@ -214,26 +217,9 @@ class Channel {
 					$per_page = ( ! is_numeric(ee()->TMPL->fetch_param('limit'))) ? '100' : ee()->TMPL->fetch_param('limit');
 				}
 
-				if (($this->fetch_cache('field_pagination')) !== FALSE)
+				if ($this->pagination->build(trim($cache), $per_page) == FALSE)
 				{
-					if (($pg_query = $this->fetch_cache('pagination_query')) !== FALSE)
-					{
-						$this->pagination->paginate = TRUE;
-						$this->pagination->field_pagination = TRUE;
-						$this->pagination->cfields = $this->cfields;
-						$this->pagination->field_pagination_query = ee()->db->query(trim($pg_query));
-						if ($this->pagination->build(trim($cache), $per_page) == FALSE)
-						{
-							$this->sql = '';
-						}
-					}
-				}
-				else
-				{
-					if ($this->pagination->build(trim($cache), $per_page) == FALSE)
-					{
-						$this->sql = '';
-					}
+					$this->sql = '';
 				}
 			}
 		}
@@ -243,37 +229,48 @@ class Channel {
 			$this->build_sql_query();
 		}
 
-		if ($this->sql == '')
+		if ( ! $this->isLivePreviewEntry() && $this->sql == '')
 		{
 			return ee()->TMPL->no_results();
 		}
 
-		if ($save_cache == TRUE)
+		if ($this->sql)
 		{
-			$this->save_cache($this->sql);
-			if ( ! empty($this->chunks))
+			if ($save_cache == TRUE)
 			{
-				$this->save_cache($this->chunks, 'chunks');
+				$this->save_cache($this->sql);
+				if ( ! empty($this->chunks))
+				{
+					$this->save_cache($this->chunks, 'chunks');
+				}
 			}
-		}
 
-		$this->query = ee()->db->query($this->sql);
+			$this->query = ee()->db->query($this->sql);
 
-		// -------------------------------------
-		//  "Relaxed" View Tracking
-		//
-		//  Some people have tags that are used to mimic a single-entry
-		//  page without it being dynamic. This allows Entry View Tracking
-		//  to work for ANY combination that results in only one entry
-		//  being returned by the tag, including channel query caching.
-		//
-		//  Hidden Configuration Variable
-		//  - relaxed_track_views => Allow view tracking on non-dynamic
-		//  	single entries (y/n)
-		// -------------------------------------
-		if (ee()->config->item('relaxed_track_views') === 'y' && $this->query->num_rows() == 1)
-		{
-			$this->hit_tracking_id = $this->query->row('entry_id') ;
+			// Spanning an entry pagination needs the query result
+			if ($this->pagination->field_pagination	== TRUE)
+			{
+				$this->pagination->cfields = $this->cfields;
+				$this->pagination->field_pagination_query = ($this->query->num_rows() == 1) ? $this->query : NULL;
+				$this->pagination->build(1, 1);
+			}
+
+			// -------------------------------------
+			//  "Relaxed" View Tracking
+			//
+			//  Some people have tags that are used to mimic a single-entry
+			//  page without it being dynamic. This allows Entry View Tracking
+			//  to work for ANY combination that results in only one entry
+			//  being returned by the tag, including channel query caching.
+			//
+			//  Hidden Configuration Variable
+			//  - relaxed_track_views => Allow view tracking on non-dynamic
+			//  	single entries (y/n)
+			// -------------------------------------
+			if (ee()->config->item('relaxed_track_views') === 'y' && $this->query->num_rows() == 1)
+			{
+				$this->hit_tracking_id = $this->query->row('entry_id') ;
+			}
 		}
 
 		if ($this->enable['categories'] == TRUE)
@@ -441,81 +438,134 @@ class Channel {
 	  */
 	public function fetch_categories()
 	{
-		list($field_sqla, $field_sqlb) = $this->generateCategoryFieldSQL();
-
-		$sql = "SELECT c.cat_name, c.cat_url_title, c.cat_id, c.cat_image, c.cat_description, c.parent_id,
-						p.cat_id, p.entry_id, c.group_id {$field_sqla}
-				FROM	(exp_categories AS c, exp_category_posts AS p)
-				{$field_sqlb}
-				WHERE	c.cat_id = p.cat_id
-				AND		p.entry_id IN (";
-
-		$categories = array();
-
-		foreach ($this->query->result_array() as $row)
+		if ( ! is_null($this->query))
 		{
-			$categories[] = $row['entry_id'];
+			list($field_sqla, $field_sqlb) = $this->generateCategoryFieldSQL();
+
+			$sql = "SELECT c.cat_name, c.cat_url_title, c.cat_id, c.cat_image, c.cat_description, c.parent_id,
+							p.cat_id, p.entry_id, c.group_id {$field_sqla}
+					FROM	(exp_categories AS c, exp_category_posts AS p)
+					{$field_sqlb}
+					WHERE	c.cat_id = p.cat_id
+					AND		p.entry_id IN (";
+
+			$categories = array();
+
+			foreach ($this->query->result_array() as $row)
+			{
+				$categories[] = $row['entry_id'];
+			}
+
+			if (empty($categories) && ! ee('LivePreview')->hasEntryData())
+			{
+				return;
+			}
+
+			$sql .= implode(array_unique(array_filter($categories)), ',') . ')';
+
+			$sql .= " ORDER BY c.group_id, c.parent_id, c.cat_order";
+
+			$query = ee()->db->query($sql);
+
+			if ($query->num_rows() == 0 && ! ee('LivePreview')->hasEntryData())
+			{
+				return;
+			}
+
+			foreach ($categories as $val)
+			{
+				$this->temp_array = array();
+				$this->cat_array  = array();
+				$parents = array();
+
+				foreach ($query->result_array() as $row)
+				{
+					if ($val == $row['entry_id'])
+					{
+						$this->temp_array[$row['cat_id']] = array($row['cat_id'], $row['parent_id'], $row['cat_name'], $row['cat_image'], $row['cat_description'], $row['group_id'], $row['cat_url_title']);
+
+						foreach ($row as $k => $v)
+						{
+							if (strpos($k, 'field') !== FALSE)
+							{
+								$this->temp_array[$row['cat_id']][$k] = $v;
+							}
+						}
+
+						if ($row['parent_id'] > 0 && ! isset($this->temp_array[$row['parent_id']])) $parents[$row['parent_id']] = '';
+						unset($parents[$row['cat_id']]);
+					}
+				}
+
+				if (count($this->temp_array) == 0)
+				{
+					$temp = FALSE;
+				}
+				else
+				{
+					foreach($this->temp_array as $k => $v)
+					{
+						if (isset($parents[$v[1]])) $v[1] = 0;
+
+						if (0 == $v[1])
+						{
+							$this->cat_array[] = $this->temp_array[$k];
+							$this->process_subcategories($k);
+						}
+					}
+				}
+
+				$this->categories[$val] = $this->cat_array;
+			}
+
+			unset($this->temp_array);
+			unset($this->cat_array);
 		}
 
-		$sql .= implode(array_unique(array_filter($categories)), ',') . ')';
-
-		$sql .= " ORDER BY c.group_id, c.parent_id, c.cat_order";
-
-		$query = ee()->db->query($sql);
-
-		if ($query->num_rows() == 0)
+		if (ee('LivePreview')->hasEntryData())
 		{
-			return;
-		}
+			$data = ee('LivePreview')->getEntryData();
+			unset($this->categories[$data['entry_id']]);
 
-		foreach ($categories as $val)
-		{
+			$cats = [];
+
+			if (isset($data['categories']) && is_array($data['categories']))
+			{
+				foreach ($data['categories'] as $cat_group)
+				{
+					foreach ($cat_group as $cat)
+					{
+						$cats[] = $cat;
+					}
+				}
+			}
+
 			$this->temp_array = array();
 			$this->cat_array  = array();
 			$parents = array();
 
-			foreach ($query->result_array() as $row)
+			$categories = ee('Model')->get('Category', $cats)->all();
+			foreach ($categories as $cat)
 			{
-				if ($val == $row['entry_id'])
+				$this->temp_array[$cat->cat_id] = array($cat->cat_id, $cat->parent_id, $cat->cat_name, $cat->cat_image, $cat->cat_description, $cat->group_id, $cat->cat_url_title);
+				if ($cat->parent_id > 0 && ! isset($this->temp_array[$cat->parent_id])) $parents[$cat->parent_id] = '';
+				unset($parents[$cat->cat_id]);
+
+			}
+
+			foreach($this->temp_array as $k => $v)
+			{
+				if (isset($parents[$v[1]])) $v[1] = 0;
+
+				if (0 == $v[1])
 				{
-					$this->temp_array[$row['cat_id']] = array($row['cat_id'], $row['parent_id'], $row['cat_name'], $row['cat_image'], $row['cat_description'], $row['group_id'], $row['cat_url_title']);
-
-					foreach ($row as $k => $v)
-					{
-						if (strpos($k, 'field') !== FALSE)
-						{
-							$this->temp_array[$row['cat_id']][$k] = $v;
-						}
-					}
-
-					if ($row['parent_id'] > 0 && ! isset($this->temp_array[$row['parent_id']])) $parents[$row['parent_id']] = '';
-					unset($parents[$row['cat_id']]);
+					$this->cat_array[] = $this->temp_array[$k];
+					$this->process_subcategories($k);
 				}
 			}
 
-			if (count($this->temp_array) == 0)
-			{
-				$temp = FALSE;
-			}
-			else
-			{
-				foreach($this->temp_array as $k => $v)
-				{
-					if (isset($parents[$v[1]])) $v[1] = 0;
-
-					if (0 == $v[1])
-					{
-						$this->cat_array[] = $this->temp_array[$k];
-						$this->process_subcategories($k);
-					}
-				}
-			}
-
-			$this->categories[$val] = $this->cat_array;
+			$this->categories[$data['entry_id']] = $this->cat_array;
 		}
-
-		unset($this->temp_array);
-		unset($this->cat_array);
 	}
 
 	/**
@@ -642,7 +692,7 @@ class Channel {
 		foreach ($search_fields as $field_name => $search_terms)
 		{
 			// Log empty terms to notify the user.
-			if(empty($search_terms) || $search_terms === '=')
+			if ($search_terms == '' || $search_terms === '=')
 			{
 				ee()->TMPL->log_item('WARNING: Field search parameter for field "' . $field_name . '" was empty.  If you wish to search for an empty field, use IS_EMPTY.');
 				continue;
@@ -662,18 +712,18 @@ class Channel {
 			$sites = ($site_ids ? $site_ids : array(ee()->config->item('site_id')));
 			foreach ($sites as $site_name => $site_id)
 			{
-				// If fields_sql isn't empty then this isn't a first
-				// loop and we have terms that need to be ored together.
-				if($fields_sql !== '') {
-					$fields_sql .= ' OR ';
-				}
-
 				// We're goign to repeat the search on each site
 				// so store the terms in a temp.  FIXME Necessary?
 				$terms = $search_terms;
 				if ( ! isset($this->cfields[$site_id][$field_name]))
 				{
 					continue;
+				}
+
+				// If fields_sql isn't empty then this isn't a first
+				// loop and we have terms that need to be ored together.
+				if($fields_sql !== '') {
+					$fields_sql .= ' OR ';
 				}
 
 				$field_id = $this->cfields[$site_id][$field_name];
@@ -1221,19 +1271,10 @@ class Channel {
 
 		$sql_b .= ", exp_channels.channel_id ";
 
-		if ($this->pagination->field_pagination == TRUE)
-		{
-			$sql_b .= ",wd.* ";
-		}
-
 		$sql = "FROM exp_channel_titles AS t
 				LEFT JOIN exp_channels ON t.channel_id = exp_channels.channel_id ";
 
-		if ($this->pagination->field_pagination == TRUE)
-		{
-			$sql .= "LEFT JOIN exp_channel_data AS wd ON t.entry_id = wd.entry_id ";
-		}
-		elseif (in_array('custom_field', $order_array))
+		if (in_array('custom_field', $order_array))
 		{
 			$sql .= "LEFT JOIN exp_channel_data AS wd ON t.entry_id = wd.entry_id ";
 		}
@@ -1265,7 +1306,7 @@ class Channel {
 			}
 		}
 
-		$sql .= "WHERE t.entry_id !='' AND t.site_id IN ('".implode("','", ee()->TMPL->site_ids)."') ";
+		$sql .= "WHERE t.entry_id != '' AND t.site_id IN ('".implode("','", ee()->TMPL->site_ids)."') ";
 
 		/**------
 		/**  We only select entries that have not expired
@@ -1951,6 +1992,7 @@ class Channel {
 		{
 			$joins = '';
 			$legacy_fields = array();
+			$joined_fields = [];
 			foreach (array_keys(ee()->TMPL->search_fields) as $field_name)
 			{
 				$sites = (ee()->TMPL->site_ids ? ee()->TMPL->site_ids : array(ee()->config->item('site_id')));
@@ -1959,12 +2001,21 @@ class Channel {
 					if (isset($this->cfields[$site_id][$field_name]))
 					{
 						$field_id = $this->cfields[$site_id][$field_name];
+
+						if (isset($joined_fields[$field_id]))
+						{
+							continue;
+						}
+
 						$field = ee('Model')->get('ChannelField', $field_id)
 							->fields('legacy_field_data')
 							->first();
+
 						if ( ! $field->legacy_field_data)
 						{
 							$joins .= "LEFT JOIN exp_channel_data_field_{$field_id} ON exp_channel_data_field_{$field_id}.entry_id = t.entry_id ";
+
+							$joined_fields[$field_id] = TRUE;
 						}
 						else
 						{
@@ -2080,11 +2131,13 @@ class Channel {
 							$vc = $order.$view_ct;
 
 							$end .= " t.{$vc} ".$sort_array[$key];
+							$distinct_select .= ",  t.{$vc} ";
 
 							if (count($order_array)-1 == $key)
 							{
 								$end .= ", t.entry_date ".$sort_array[$key];
 							}
+
 
 							$sort_array[$key] = FALSE;
 						break;
@@ -2128,6 +2181,7 @@ class Channel {
 						break;
 
 						case 'custom_field' :
+
 							if (strpos($corder[$key], '|') !== FALSE)
 							{
 								$field_list = [];
@@ -2144,7 +2198,7 @@ class Channel {
 									{
 										if (strpos($sql, "exp_channel_data_field_{$field_id}") === FALSE)
 										{
-											$join .= "LEFT JOIN exp_channel_data_field_{$field_id} ON exp_channel_data_field_{$field_id}.entry_id = t.entry_id ";
+											$join = "LEFT JOIN exp_channel_data_field_{$field_id} ON exp_channel_data_field_{$field_id}.entry_id = t.entry_id ";
 											$sql = str_replace('WHERE ', $join . 'WHERE ', $sql);
 										}
 
@@ -2152,6 +2206,8 @@ class Channel {
 
 									}
 								}
+
+								$field_list = implode(', ', $field_list);
 
 								$end .= "CONCAT(".$field_list.")";
 								$distinct_select .= ', '.$field_list.' ';
@@ -2247,7 +2303,7 @@ class Channel {
 		// We do this hear so we can use the offset into next, then later one as well
 		$offset = ( ! ee()->TMPL->fetch_param('offset') OR ! is_numeric(ee()->TMPL->fetch_param('offset'))) ? '0' : ee()->TMPL->fetch_param('offset');
 
-		// Do we need pagination?
+		// Do we need entry pagination?
 		// We'll run the query to find out
 		if ($this->pagination->paginate == TRUE)
 		{
@@ -2275,36 +2331,23 @@ class Channel {
 				}
 
 				$this->pagination->build($total, $this->pagination->per_page);
-			}
-			else
-			{
-				$this->pager_sql = $sql_a.$sql_b.$sql;
-
-				$query = ee()->db->query($this->pager_sql);
-
-				$total = $query->num_rows;
-				$this->absolute_results = $total;
-
-				$this->pagination->cfields = $this->cfields;
-				$this->pagination->field_pagination_query = $query;
-				$this->pagination->build($total, 1);
 
 				if (ee()->config->item('enable_sql_caching') == 'y')
 				{
-					$this->save_cache($this->pager_sql, 'pagination_query');
-					$this->save_cache('1', 'field_pagination');
+					$this->save_cache($total, 'pagination_count');
 				}
-			}
-
-			if (ee()->config->item('enable_sql_caching') == 'y')
-			{
-				$this->save_cache($total, 'pagination_count');
 			}
 		}
 
 		/**------
 		/**  Add Limits to query
 		/**------*/
+
+		if (ee('LivePreview')->hasEntryData())
+		{
+			$parts = explode(' WHERE ', $sql);
+			$this->preview_conditions = explode(' AND ', $parts[1]);
+		}
 
 		$sql .= $end;
 
@@ -2368,7 +2411,7 @@ class Channel {
 		}
 
 		$entries = array();
-		$channel_ids = isset($channel_ids) ? $channel_ids : array();
+		$channel_ids = array();
 
 		foreach ($query->result_array() as $row)
 		{
@@ -2514,6 +2557,192 @@ class Channel {
 		return $offset;
 	}
 
+	private function isLivePreviewEntry()
+	{
+		$return = FALSE;
+
+		if (ee('LivePreview')->hasEntryData())
+		{
+			$data = ee('LivePreview')->getEntryData();
+			if (in_array($this->query_string, [$data['entry_id'], $data['url_title']]))
+			{
+				$return = TRUE;
+
+				if ($channels = ee()->TMPL->fetch_param('channel'))
+				{
+					if (strpos($channels, $data['channel_name']) === FALSE
+						|| strpos($channels, 'not ' . $data['channel_name']) !== FALSE)
+					{
+						$return = FALSE;
+					}
+				}
+			}
+		}
+
+		return $return;
+	}
+
+	private function overrideWithPreviewData($result_array)
+	{
+		if (ee('LivePreview')->hasEntryData())
+		{
+			$found = FALSE;
+			$show_closed = FALSE;
+			$show_expired = (ee()->TMPL->fetch_param('show_expired') == 'yes');
+
+			if (($status = ee()->TMPL->fetch_param('status')) !== FALSE)
+			{
+				$status = strtolower($status);
+				$parts = preg_split('/\|/', $status, -1, PREG_SPLIT_NO_EMPTY);
+				$parts = array_map('trim', $parts);
+				$show_closed = in_array('closed', $parts);
+			}
+
+			$data = ee('LivePreview')->getEntryData();
+
+			foreach ($result_array as $i => $row)
+			{
+				if ($row['entry_id'] == $data['entry_id'])
+				{
+					if (( ! $show_closed && $data['status'] == 'closed')
+						|| ( ! $show_expired && $data['expiration_date'] && $data['expiration_date'] < ee()->localize->now))
+					{
+						unset($result_array[$i]);
+					}
+					else
+					{
+						$result_array[$i] = $data;
+					}
+
+					$found = TRUE;
+					break;
+				}
+			}
+
+			// One of the things we will not find are new entries that are
+			// being previewed. They will not be in the database and thus will
+			// not be returned.
+			if ( ! $found)
+			{
+				$add = FALSE;
+
+				if (in_array($this->query_string, [$data['entry_id'], $data['url_title']]))
+				{
+					$add = TRUE;
+				}
+
+				foreach ($this->preview_conditions as $condition)
+				{
+					if (strpos('OR', $condition) === FALSE)
+					{
+						$valid = $this->previewDataPassesCondition($condition, $data);
+					}
+					else
+					{
+						$valid = FALSE;
+
+						$condition = trim($condition, '()');
+						$conditions = explode(' OR ', $condition);
+						foreach ($conditions as $sub_condition)
+						{
+							$valid = $this->previewDataPassesCondition($sub_condition, $data);
+							if ($valid)
+							{
+								break;
+							}
+						}
+					}
+
+					if ($valid)
+					{
+						$add = TRUE;
+					}
+					else
+					{
+						$add = FALSE;
+						break;
+					}
+				}
+
+				if ($add)
+				{
+					array_unshift($result_array, $data);
+				}
+			}
+		}
+
+		return $result_array;
+	}
+
+	private function previewDataPassesCondition($condition, $data)
+	{
+		list($column, $comparison, $value) = explode(' ',  trim($condition));
+		list($table, $key) = explode('.', $column);
+
+		$datum = $data[$key];
+		$value = trim($value, "'");
+
+		$passes = FALSE;
+
+		switch ($comparison)
+		{
+			case '=':
+				if (is_array($datum))
+				{
+					$passes = in_array($value, $datum);
+				}
+				else
+				{
+					$passes = ($datum == $value);
+				}
+				break;
+
+			case '!=':
+				if (is_array($datum))
+				{
+					$passes = ! in_array($value, $datum);
+				}
+				else
+				{
+					$passes = ($datum != $value);
+				}
+				break;
+
+			case '>':
+				$passes = ($datum > $value);
+				break;
+
+			case '<':
+				$passes = ($datum < $value);
+				break;
+
+			case '>=':
+				$passes = ($datum >= $value);
+				break;
+
+			case '<=':
+				$passes = ($datum <= $value);
+				break;
+
+			case 'IN':
+				$value = trim($value, '()');
+				$value = explode(',', str_replace("'", '', $value));
+
+				if (is_array($datum))
+				{
+					$passes = array_intersect($datum, $value);
+					$passes = ! empty($passes);
+				}
+				else
+				{
+					$passes = in_array($datum, $value);
+				}
+				break;
+		}
+
+		return $passes;
+	}
+
 	/**
 	  *  Parse channel entries
 	  *  @param Callable $per_row_callback A callable to send each row's tagdata
@@ -2524,16 +2753,21 @@ class Channel {
 	public function parse_channel_entries($per_row_callback = NULL)
 	{
 		// For our hook to work, we need to grab the result array
-		$query_result = $this->query->result_array();
+		$query_result = ($this->query) ? $this->query->result_array() : [];
 
 		if ( ! empty($this->chunks))
 		{
 			$query_result = $this->getExtraData($query_result);
 		}
 
+		$query_result = $this->overrideWithPreviewData($query_result);
+
 		// Ditch everything else
-		$this->query->free_result();
-		unset($this->query);
+		if ($this->query)
+		{
+			$this->query->free_result();
+			unset($this->query);
+		}
 
 		// -------------------------------------------
 		// 'channel_entries_query_result' hook.
@@ -2550,7 +2784,9 @@ class Channel {
 
 		if (empty($query_result))
 		{
-			return ee()->TMPL->no_results();
+			$this->enable['pagination'] = FALSE;
+			$this->return_data = ee()->TMPL->no_results();
+			return;
 		}
 
 		ee()->load->library('channel_entries_parser');
@@ -5223,7 +5459,6 @@ class Channel {
 			return ee()->TMPL->no_results();
 		}
 
-
 		$this->query = ee()->db->query($this->sql);
 
 		if (ee()->TMPL->fetch_param('member_data') !== FALSE && ee()->TMPL->fetch_param('member_data') == 'yes')
@@ -5293,30 +5528,6 @@ class Channel {
 
 		$WC = new Channel_calendar();
 		return $WC->calendar();
-	}
-
-	/**
-	  *  Ajax Image Upload
-	  *
-	  * Used by the SAEF
-	  */
-
-	public function filemanager_endpoint($function = '', $params = array())
-	{
-		ee()->load->library('filemanager');
-		ee()->lang->loadfile('content');
-		//ee()->load->library('cp');
-
-		$config = array();
-
-		if ($function)
-		{
-			ee()->filemanager->_initialize($config);
-
-			return call_user_func_array(array($this->filemanager, $function), $params);
-		}
-
-		ee()->filemanager->process_request($config);
 	}
 
 	/**

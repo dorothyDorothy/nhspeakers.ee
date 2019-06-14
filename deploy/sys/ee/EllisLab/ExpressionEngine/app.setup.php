@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 use EllisLab\ExpressionEngine\Library;
@@ -15,6 +16,8 @@ use EllisLab\ExpressionEngine\Service\Alert;
 use EllisLab\ExpressionEngine\Service\Category;
 use EllisLab\ExpressionEngine\Service\ChannelSet;
 use EllisLab\ExpressionEngine\Service\Config;
+use EllisLab\ExpressionEngine\Service\Consent;
+use EllisLab\ExpressionEngine\Service\Cookie;
 use EllisLab\ExpressionEngine\Service\CustomMenu;
 use EllisLab\ExpressionEngine\Service\Database;
 use EllisLab\ExpressionEngine\Service\Encrypt;
@@ -23,9 +26,12 @@ use EllisLab\ExpressionEngine\Service\Event;
 use EllisLab\ExpressionEngine\Service\File;
 use EllisLab\ExpressionEngine\Service\Filter;
 use EllisLab\ExpressionEngine\Service\Formatter;
+use EllisLab\ExpressionEngine\Service\IpAddress;
 use EllisLab\ExpressionEngine\Service\License;
+use EllisLab\ExpressionEngine\Service\LivePreview;
 use EllisLab\ExpressionEngine\Service\Logger;
 use EllisLab\ExpressionEngine\Service\Member;
+use EllisLab\ExpressionEngine\Service\Memory;
 use EllisLab\ExpressionEngine\Service\Modal;
 use EllisLab\ExpressionEngine\Service\Model;
 use EllisLab\ExpressionEngine\Service\Permission;
@@ -42,7 +48,7 @@ use EllisLab\Addons\Spam\Service\Spam;
 use EllisLab\Addons\FilePicker\Service\FilePicker;
 
 // TODO should put the version in here at some point ...
-return array(
+return [
 
 	'author' => 'EllisLab',
 	'name' => 'ExpressionEngine',
@@ -62,14 +68,16 @@ return array(
 			return new CustomMenu\Menu;
 		},
 
-		'CP/EntryListing' => function($ee, $search_value)
+		'CP/EntryListing' => function($ee, $search_value, $search_in = NULL, $include_author_filter = FALSE)
 		{
 			 return new EntryListing\EntryListing(
 				ee()->config->item('site_id'),
 				(ee()->session->userdata['group_id'] == 1),
 				array_keys(ee()->session->userdata['assigned_channels']),
 				ee()->localize->now,
-				$search_value
+				$search_value,
+				$search_in,
+				$include_author_filter
 			);
 		},
 
@@ -126,7 +134,7 @@ return array(
 			$session_id = ee()->session->session_id();
 			$default_cp_url = SELF;
 
-			$factory = new URL\URLFactory($cp_url, $site_index, $uri_string, $session_id, $default_cp_url);
+			$factory = new URL\URLFactory($cp_url, $site_index, $uri_string, $session_id, $default_cp_url, $ee->make('Encrypt'));
 
 			return (is_null($path)) ? $factory : $factory->make($path);
 		},
@@ -151,8 +159,9 @@ return array(
 		{
 			$filesystem = $ee->make('Filesystem');
 			$backup_query = $ee->make('Database/Backup/Query');
+			$row_limit = ee()->config->item('db_backup_row_limit');
 
-			return new Database\Backup\Backup($filesystem, $backup_query, $file_path);
+			return new Database\Backup\Backup($filesystem, $backup_query, $file_path, $row_limit);
 		},
 
 		'Database/Backup/Query' => function($ee)
@@ -208,6 +217,11 @@ return array(
 			return new View\ViewFactory($ee);
 		},
 
+		'Memory' => function($ee)
+		{
+			return new Memory\Memory();
+		},
+
 		'Model' => function($ee)
 		{
 			$facade = new Model\Facade($ee->make('Model/Datastore'));
@@ -223,7 +237,7 @@ return array(
 
 		'Theme' => function($ee)
 		{
-			return new Theme\Theme(PATH_THEMES, URL_THEMES, PATH_THIRD_THEMES, URL_THIRD_THEMES);
+			return new Theme\Theme(PATH_THEME_TEMPLATES, URL_THEMES, PATH_THIRD_THEME_TEMPLATES, URL_THIRD_THEMES, PATH_THEMES, PATH_THIRD_THEMES);
 		},
 
 		'ThemeInstaller' => function($ee)
@@ -312,10 +326,39 @@ return array(
 			return new Encrypt\Encrypt($key);
 		},
 
+		'LivePreview' => function($ee)
+		{
+			return new LivePreview\LivePreview(ee()->session);
+		},
+
 		'Variables/Parser' => function ($ee)
 		{
 			return new Template\Variables\LegacyParser();
 		},
+
+		'Consent' => function($ee, $member_id = NULL)
+		{
+			$actor_userdata = ee()->session->userdata;
+			if ( ! ee()->session->userdata('member_id'))
+			{
+				$actor_userdata['screen_name'] = lang('anonymous');
+				$actor_userdata['username'] = lang('anonymous');
+			}
+
+			if ( ! $member_id)
+			{
+				$member_id = $actor_userdata['member_id'];
+			}
+
+			return new Consent\Consent(
+				$ee->make('Model'),
+				ee()->input,
+				ee()->session,
+				$member_id,
+				$actor_userdata,
+				ee()->localize->now);
+		},
+
 	),
 
 	'services.singletons' => array(
@@ -335,6 +378,16 @@ return array(
 			return new ChannelSet\Factory(
 				ee()->config->item('site_id')
 			);
+		},
+
+		'Cookie' => function($ee)
+		{
+			return new Cookie\Cookie();
+		},
+
+		'CookieRegistry' => function($ee)
+		{
+			return new Consent\CookieRegistry();
 		},
 
 		'CP/Alert' => function($ee)
@@ -400,6 +453,11 @@ return array(
 		'File' => function($ee)
 		{
 			return new File\Factory();
+		},
+
+		'IpAddress' => function($ee)
+		{
+			return new IpAddress\Factory();
 		},
 
 		'License' => function($ee)
@@ -496,7 +554,8 @@ return array(
 			'ResetPassword' => 'Model\Security\ResetPassword',
 
 			// ..\Session
-			// empty
+			'Session' => 'Model\Session\Session',
+			'RememberMe' => 'Model\Session\RememberMe',
 
 			// ..\Site
 			'Site' => 'Model\Site\Site',
@@ -528,12 +587,20 @@ return array(
 			'Comment' => 'Model\Comment\Comment',
 			'CommentSubscription' => 'Model\Comment\CommentSubscription',
 
+			// ..\Message
+			'Message' => 'Model\Message\Message',
+			'MessageAttachment' => 'Model\Message\Attachment',
+			'MessageFolder' => 'Model\Message\Folder',
+			'ListedMember' => 'Model\Message\ListedMember',
+			'MessageCopy' => 'Model\Message\Copy',
+
 			// ..\Member
 			'HTMLButton' => 'Model\Member\HTMLButton',
 			'Member' => 'Model\Member\Member',
 			'MemberField' => 'Model\Member\MemberField',
 			'MemberGroup' => 'Model\Member\MemberGroup',
 			'MemberNewsView' => 'Model\Member\NewsView',
+			'OnlineMember' => 'Model\Member\Online',
 
 			// ..\Menu
 			'MenuSet' => 'Model\Menu\MenuSet',
@@ -547,8 +614,37 @@ return array(
 			'EmailTracker' => 'Model\Email\EmailTracker',
 
 			// ..\Revision
-			'RevisionTracker' => 'Model\Revision\RevisionTracker'
-	)
-);
+			'RevisionTracker' => 'Model\Revision\RevisionTracker',
+
+			// ..\Consent
+			'Consent' => 'Model\Consent\Consent',
+			'ConsentAuditLog' => 'Model\Consent\ConsentAuditLog',
+			'ConsentRequest' => 'Model\Consent\ConsentRequest',
+			'ConsentRequestVersion' => 'Model\Consent\ConsentRequestVersion'
+	),
+	'cookies.necessary' => [
+		'cp_last_site_id',
+		'csrf_token',
+		'flash',
+		'last_activity',
+		'last_visit',
+		'remember',
+		'sessionid',
+		'visitor_consents',
+	],
+	'cookies.functionality' => [
+		'anon',
+		'expiration',
+		'forum_theme',
+		'forum_topics',
+		'my_email',
+		'my_location',
+		'my_name',
+		'my_url',
+		'notify_me',
+		'save_info',
+		'tracker',
+	],
+];
 
 // EOF

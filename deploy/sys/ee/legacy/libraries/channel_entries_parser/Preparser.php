@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -16,7 +17,9 @@ class EE_Channel_preparser {
 	public $singles = array();
 
 	public $subscriber_totals = array();
-	public $modified_conditionals = array();
+	public $field_names = [];
+	public $grid_field_names = [];
+	public $fluid_field_names = [];
 
 	protected $_prefix;
 	protected $_tagdata;
@@ -80,7 +83,9 @@ class EE_Channel_preparser {
 
 		// Get subscriber totals and modified conditionals
 		$this->subscriber_totals	 = $this->_subscriber_totals();
-		$this->modified_conditionals = $this->_find_modified_conditionals();
+		$this->field_names = $this->getFieldNamesInTagdata();
+		$this->grid_field_names = $this->getFieldNamesInTagdata('gfields');
+		$this->fluid_field_names = $this->getFieldNamesInTagdata('ffields');
 
 		// Run through component pre_processing steps, skipping any that
 		// were specified as being disabled.
@@ -320,51 +325,28 @@ class EE_Channel_preparser {
 	}
 
 	/**
-	 * Find modified conditionals
+	 * Get an array of field names that are present in the tagdata
 	 *
-	 * The regular custom field conditional prep does not correctly identify
-	 * custom fields with modifiers in conditionals ie. {if image:small}, so
-	 * we grab those separately.
-	 *
-	 * @return list of modified variables in conditionals
+	 * @return Array Field names
 	 */
-	public function _find_modified_conditionals()
+	protected function getFieldNamesInTagdata($type = 'cfields')
 	{
-		$prefix = $this->_prefix;
-		$unfiltered_all_field_names = array();
 		$all_field_names = array();
+		$present_field_names = array();
 
-		if (strpos($this->_tagdata, LD.'if') === FALSE)
+		foreach($this->channel()->$type as $site_id => $fields)
 		{
-			return array();
+			$all_field_names = array_unique(array_merge($all_field_names, $fields));
 		}
 
-		foreach($this->_channel->cfields as $site_id => $fields)
-		{
-			$unfiltered_all_field_names = array_unique(array_merge($unfiltered_all_field_names, $fields));
-		}
-
-		// Do a rough cut to slim down the number of fields
-		// else the string can be too long for the preg_match_all
-		foreach (array_keys($unfiltered_all_field_names) as $name)
+		foreach (array_keys($all_field_names) as $name)
 		{
 			if (strpos($this->_tagdata, $name) !== FALSE)
 			{
-				$all_field_names[] = $name;
+				$present_field_names[] = $name;
 			}
 		}
 
-		$modified_field_options = $prefix.implode('|'.$prefix, $all_field_names);
-		$modified_conditionals = array();
-
-		if (preg_match_all("/".preg_quote(LD)."((if:(else))*if)\s+(($modified_field_options):(\w+))(.*?)".preg_quote(RD)."/s", $this->_tagdata, $matches))
-		{
-			foreach($matches[5] as $match_key => $field_name)
-			{
-				$modified_conditionals[$field_name][] = $matches[6][$match_key];
-			}
-		}
-
-		return array_map('array_unique', $modified_conditionals);
+		return $present_field_names;
 	}
 }

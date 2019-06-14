@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -135,6 +136,7 @@ class Api_channel_entries extends Api {
 			'comment_expiration_date'	=> $data['comment_expiration_date'],
 			'sticky'					=> (isset($data['sticky']) && $data['sticky'] == 'y') ? 'y' : 'n',
 			'status'					=> $data['status'],
+			'status_id'                 => (isset($data['status_id'])) ? $data['status_id'] : 2, // closed if not sent
 			'allow_comments'			=> $data['allow_comments'],
 		);
 

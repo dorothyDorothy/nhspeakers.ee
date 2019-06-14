@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Members\Profile;
@@ -25,6 +26,7 @@ class CpSettings extends Profile {
 	{
 		$field['allowed_channels'] = array();
 		$all_sites_have_channels = TRUE;
+		$assigned_channels = $this->member->MemberGroup->AssignedChannels->pluck('channel_id');
 
 		// If MSM is enabled, let them choose a channel for each site, should they
 		// want to redirect to the publish form on each site
@@ -32,7 +34,6 @@ class CpSettings extends Profile {
 		{
 			$sites = ee('Model')->get('Site')->all();
 			$field['sites'] = $sites->getDictionary('site_id', 'site_label');
-			$assigned_channels = $this->member->MemberGroup->AssignedChannels->pluck('channel_id');
 
 			foreach ($sites as $site)
 			{
@@ -52,15 +53,16 @@ class CpSettings extends Profile {
 		}
 		else
 		{
-			$allowed_channels = ee('Model')->get('Channel')
-				->filter('site_id', ee()->config->item('site_id'));
+			$field['allowed_channels'] = NULL;
 
-			if ( ! empty(ee()->session->userdata['assigned_channels']))
+			if ($assigned_channels)
 			{
-				$allowed_channels->filter('channel_id', 'IN', array_keys(ee()->session->userdata['assigned_channels']));
+				$allowed_channels = ee('Model')->get('Channel')
+					->filter('site_id', ee()->config->item('site_id'));
+				$allowed_channels->filter('channel_id', 'IN', $assigned_channels);
+				$field['allowed_channels'] = $allowed_channels->all()->getDictionary('channel_id', 'channel_title');
 			}
 
-			$field['allowed_channels'] = $allowed_channels->all()->getDictionary('channel_id', 'channel_title');
 
 			if (empty($field['allowed_channels']))
 			{

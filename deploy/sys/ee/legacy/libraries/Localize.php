@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -721,6 +722,29 @@ EOF;
 		$date_format = str_replace('%y', 'y', $date_format);
 
 		return $date_format;
+	}
+
+	/**
+	 * Converts our build date constant into a timestamp so we can format it
+	 * for display
+	 *
+	 * @param  string Build date in the format of yyyymmdd, uses APP_BUILD by default
+	 * @return int Timestamp representing the build date
+	 */
+	public function parse_build_date($build = NULL)
+	{
+		if (empty($build))
+		{
+			$build = APP_BUILD;
+		}
+
+		$year = substr($build, 0, 4);
+		$month = substr($build, 4, 2);
+		$day = substr($build, 6, 2);
+
+		$string = $year . '-' . $month . '-' . $day;
+
+		return ee()->localize->string_to_timestamp($string, TRUE, '%Y-%m-%d');
 	}
 }
 // END CLASS

@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 use EllisLab\ExpressionEngine\Service\Template;
@@ -62,6 +63,7 @@ class EE_Template {
 	public $layout_vars          = array();		// This array can be set via the {layout} tag
 	public $segment_vars         = array();		// Array of segment variables
 	public $template_route_vars  = array();		// Array of segment variables
+	public $consent_vars         = [];          // Array of consent variables
 
 	public $tagparts             = array();		// The parts of the tag: {exp:comment:form}
 	public $tagdata              = '';			// The chunk between tag pairs.  This is what modules will utilize
@@ -119,7 +121,7 @@ class EE_Template {
 			$this->sites[ee()->config->item('site_id')] = ee()->config->item('site_short_name');
 		}
 
-		if (ee()->config->item('show_profiler') === 'y' && ee()->session->userdata['group_id'] == 1)
+		if (ee()->config->item('show_profiler') === 'y')
 		{
 			$this->debugging = TRUE;
 
@@ -128,8 +130,8 @@ class EE_Template {
 
 		$this->user_vars = array(
 			'member_id', 'group_id', 'group_description', 'group_title', 'username', 'screen_name',
-			'email', 'ip_address', 'location', 'total_entries',
-			'total_comments', 'private_messages', 'total_forum_posts', 'total_forum_topics', 'total_forum_replies'
+			'email', 'ip_address', 'total_entries', 'total_comments', 'private_messages',
+			'total_forum_posts', 'total_forum_topics', 'total_forum_replies'
 		);
 
 		$this->marker = md5(ee()->config->site_url().$this->marker);
@@ -154,6 +156,7 @@ class EE_Template {
 		if (rand(1, 10) == 1)
 		{
 			$this->_garbage_collect_cache();
+			ee('ChannelSet')->garbageCollect();
 		}
 
 		$this->log_item("URI: ".ee()->uri->uri_string);
@@ -172,6 +175,8 @@ class EE_Template {
 		{
 			$this->final_template = $this->parse_globals($this->final_template);
 		}
+
+		$this->final_template = $this->decode_channel_form_ee_tags($this->final_template);
 
 		$this->log_item("Template Parsing Finished");
 
@@ -313,18 +318,19 @@ class EE_Template {
 		$seg_array = ee()->uri->segment_array();
 
 		// Define some path and template related global variables
-		$added_globals = array(
-			'last_segment'         => end($seg_array),
-			'current_url'          => ee()->functions->fetch_current_uri(),
-			'current_path'         => (ee()->uri->uri_string) ? str_replace(array('"', "'"), array('%22', '%27'), ee()->uri->uri_string) : '/',
-			'current_query_string' => http_build_query($_GET), // GET has been sanitized!
-			'template_name'        => $this->template_name,
-			'template_group'       => $this->group_name,
-			'template_group_id'    => $this->template_group_id,
-			'template_id'          => $this->template_id,
-			'template_type'        => $this->embed_type ?: $this->template_type,
-			'is_ajax_request'      => AJAX_REQUEST
-		);
+		$added_globals = [
+			'last_segment'            => end($seg_array),
+			'current_url'             => ee()->functions->fetch_current_uri(),
+			'current_path'            => (ee()->uri->uri_string) ? str_replace(array('"', "'"), array('%22', '%27'), ee()->uri->uri_string) : '/',
+			'current_query_string'    => http_build_query($_GET), // GET has been sanitized!
+			'template_name'           => $this->template_name,
+			'template_group'          => $this->group_name,
+			'template_group_id'       => $this->template_group_id,
+			'template_id'             => $this->template_id,
+			'template_type'           => $this->embed_type ?: $this->template_type,
+			'is_ajax_request'         => AJAX_REQUEST,
+			'is_live_preview_request' => ee('LivePreview')->hasEntryData(),
+		];
 
 		foreach ($this->user_vars as $user_var)
 		{
@@ -333,7 +339,8 @@ class EE_Template {
 
 		ee()->config->_global_vars = array_merge(ee()->config->_global_vars, $added_globals);
 
-		ee()->config->_global_vars['is_core'] = (IS_CORE) ? TRUE : FALSE;
+		// retain in case templates contain is_core conditionals
+		ee()->config->_global_vars['is_core'] = FALSE;
 
 		// Mark our template for better errors
 		$this->template = $this->markContext().$this->template;
@@ -449,8 +456,33 @@ class EE_Template {
 			$dates['current_time'] = ee()->localize->now;
 		}
 
+		// variable_time {variable_time date="yesterday" format="%Y %m %d %H:%i:%s"}
+		if (strpos($this->template, LD.'variable_time') !== FALSE)
+		{
+			$dates['variable_time'] = ee()->localize->now;
+		}
+
 		$this->template = $this->parse_date_variables($this->template, $dates);
 		unset($dates);
+
+		// Parse Consent variables. Since this adds a query or two, only do it if needed
+		if (strpos($this->template, LD.'consent:') != FALSE OR strpos($this->template, ' consent:'))
+		{
+			$requests = ee('Model')->get('ConsentRequest')
+				->with('CurrentVersion')
+				->all();
+
+			$this->consent_vars = [];
+			foreach ($requests as $request)
+			{
+				$var_name = 'consent:'.$request->consent_name;
+				$responded_name = 'consent:has_responded:'.$request->consent_name;
+				$this->consent_vars[$var_name] = ee('Consent')->hasGranted($request->consent_name);
+				$this->consent_vars[$responded_name] = ee('Consent')->hasResponded($request->consent_name);
+				$this->template = str_replace(LD.$var_name.RD, $this->consent_vars[$var_name], $this->template);
+				$this->template = str_replace(LD.$responded_name.RD, $this->consent_vars[$responded_name], $this->template);
+			}
+		}
 
 		// Is the main template cached?
 		// If a cache file exists for the primary template
@@ -509,7 +541,8 @@ class EE_Template {
 			$this->layout_conditionals,
 			array('layout:contents' => $this->layout_contents),
 			$logged_in_user_cond,
-			ee()->config->_global_vars
+			ee()->config->_global_vars,
+			$this->consent_vars
 		);
 
 		$this->template = ee()->functions->prep_conditionals(
@@ -658,7 +691,7 @@ class EE_Template {
 			//       1 => string 'titles' (length=6)
 			//       2 => string ''' (length=1)
 			//       3 => string '4' (length=1)
-			preg_match_all("/".LD."layout:(\w+?)\s+index\s*=\s*(\042|\047)([^\\2]*?)\\2\s*".RD."/si", $str, $matches, PREG_SET_ORDER);
+			preg_match_all("/".LD."layout:([^\s]+?)\s+index\s*=\s*(\042|\047)([^\\2]*?)\\2\s*".RD."/si", $str, $matches, PREG_SET_ORDER);
 
 			foreach ($matches as $match)
 			{
@@ -1163,7 +1196,7 @@ class EE_Template {
 		{
 			$name = substr($ex[0], 0, strpos($ex[0], ':'));
 
-			if (ee()->config->item('multiple_sites_enabled') == 'y' && ! IS_CORE)
+			if (ee()->config->item('multiple_sites_enabled') == 'y')
 			{
 				if (count($this->sites) == 0)
 				{
@@ -1689,6 +1722,10 @@ class EE_Template {
 				$this->tagparts			= $this->tag_data[$i]['tagparts'];
 				$this->no_results		= $this->tag_data[$i]['no_results'];
 				$this->search_fields	= $this->tag_data[$i]['search_fields'];
+
+				// reset cached date and modified vars
+				$this->date_vars        = [];
+				$this->modified_vars    = [];
 
 				// Assign Sites for Tag
 				$this->_fetch_site_ids();
@@ -2589,24 +2626,25 @@ class EE_Template {
 		}
 
 		// Is the current user allowed to view this template?
-		if ($query->row('enable_http_auth') != 'y' && $query->row('no_auth_bounce')  != '')
+		if ($query->row('enable_http_auth') != 'y' && ee()->session->userdata('group_id') != 1)
 		{
-			if (ee()->session->userdata('group_id') != 1)
+			ee()->db->select('COUNT(*) as count');
+			ee()->db->where('template_id', $query->row('template_id'));
+			ee()->db->where('member_group', ee()->session->userdata('group_id'));
+			$result = ee()->db->get('template_no_access');
+
+			if ($result->row('count') > 0)
 			{
-				ee()->db->select('COUNT(*) as count');
-				ee()->db->where('template_id', $query->row('template_id'));
-				ee()->db->where('member_group', ee()->session->userdata('group_id'));
-				$result = ee()->db->get('template_no_access');
+				$this->log_item("No Template Access Privileges");
 
-				if ($result->row('count') > 0)
+				if ($this->depth > 0)
 				{
-					$this->log_item("No Template Access Privileges");
+					return '';
+				}
 
-					if ($this->depth > 0)
-					{
-						return '';
-					}
-
+				// If no access redirect template was defined, 404
+				if ($query->row('no_auth_bounce') != '')
+				{
 					$query = ee()->db->select('a.template_id, a.template_data,
 						a.template_name, a.template_type, a.edit_date,
 						a.cache, a.refresh, a.hits, a.protect_javascript,
@@ -2615,13 +2653,38 @@ class EE_Template {
 						->join('template_groups b', 'a.group_id = b.group_id')
 						->where('template_id', $query->row('no_auth_bounce'))
 						->get();
+
+					// If the redirect template is not allowed, give them a 404
+					ee()->db->select('COUNT(*) as count');
+					ee()->db->where('template_id', $query->row('template_id'));
+					ee()->db->where('member_group', ee()->session->userdata('group_id'));
+					$result = ee()->db->get('template_no_access');
+
+					if ($result->row('count') > 0)
+					{
+						$this->log_item("Access redirect denied, Show 404");
+
+						// The redirect page with no access is the 404 template- throw a manual 404
+						if (ee()->config->item('site_404') == $template_group.'/'.$template)
+						{
+							show_404(ee()->uri->uri_string);
+						}
+
+						$this->show_404();
+					}
+				}
+				elseif ($query->row('no_auth_bounce')  == '')
+				{
+					$this->log_item("Access denied, Show 404");
+					// The redirect page with no access is the 404 template- throw a manual 404
+					if (ee()->config->item('site_404') == $template_group.'/'.$template)
+					{
+						show_404(ee()->uri->uri_string);
+					}
+
+					$this->show_404();
 				}
 			}
-		}
-
-		if ($query->num_rows() == 0)
-		{
-			return FALSE;
 		}
 
 		$row = $query->row_array();
@@ -3028,6 +3091,19 @@ class EE_Template {
 		{
 			$this->plugins = $plugins->pluck('plugin_package');
 		}
+	}
+
+	/**
+	 * Decode tags encoded by Channel_form_lib::encode_ee_tags to prevent
+	 * modules from being parsed inside Channel Form fields but preserve
+	 * original content on edit.
+	 *
+	 * @param string $template
+	 * @return string Decoded string
+	 */
+	private function decode_channel_form_ee_tags($template)
+	{
+		return str_replace(['CFORM-ENCODE-LEFT-BRACKET', 'CFORM-ENCODE-RIGHT-BRACKET'], [LD, RD], $template);
 	}
 
 	/**
@@ -3513,7 +3589,7 @@ class EE_Template {
 		if (isset($this->tagparams['site']))
 		{
 			if (count($this->sites) == 0 &&
-				ee()->config->item('multiple_sites_enabled') == 'y' && ! IS_CORE)
+				ee()->config->item('multiple_sites_enabled') == 'y')
 			{
 				$sites_query = ee()->db->query("SELECT site_id, site_name FROM exp_sites ORDER BY site_id");
 
@@ -4108,6 +4184,14 @@ class EE_Template {
 						if (strpos($val, ':relative') !== FALSE) {
 							$relative = TRUE;
 						}
+
+						// variable_time timestamp needs to be created on the fly
+						if ($matches[1][$key] == 'variable_time')
+						{
+							$timestamp = (isset($args['date'])) ? ee()->localize->string_to_timestamp($args['date']) : $timestamp;
+						}
+
+
 						$dt = $this->process_date($timestamp, $args, $relative, $localize);
 					}
 

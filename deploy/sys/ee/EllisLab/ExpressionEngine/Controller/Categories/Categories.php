@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Categories;
@@ -408,29 +409,30 @@ class Categories extends AbstractCategoriesController {
 
 		if ( ! AJAX_REQUEST)
 		{
+			ee()->load->library('file_field');
 			$vars['sections'][0][] = array(
 				'title' => 'image',
 				'fields' => array(
-					'cat_image_select' => array(
-						'type' => 'radio',
-						'choices' => array(
-							'none' => 'cat_image_none',
-							'choose' => 'cat_image_choose'
-						),
-						'value' => 'none',
-						'encode' => FALSE
-					),
 					'cat_image' => array(
-						'type' => 'image',
-						'id' => 'cat_image',
-						'image' => ee()->file_field->parse_string($category->cat_image),
-						'value' => $category->cat_image
+						'type' => 'html',
+						'content' => ee()->file_field->dragAndDropField(
+							'cat_image',
+							$category->cat_image,
+							'all',
+							'image'
+						)
 					)
 				)
 			);
 		}
 
 		$parent_id_options = [0 => lang('none')] + $cat_group->buildCategoryOptionsTree();
+
+		$disabled_choices = [];
+		if ( ! $category->isNew())
+		{
+			$disabled_choices = array_merge([$category->getId()], $category->getAllChildren()->getIds());
+		}
 
 		$vars['sections'][0][] = array(
 			'title' => 'parent_category',
@@ -439,7 +441,7 @@ class Categories extends AbstractCategoriesController {
 					'type' => 'radio',
 					'value' => $category->parent_id === NULL ? 0 : $category->parent_id,
 					'choices' => $parent_id_options,
-					'disabled_choices' => $category->isNew() ? [] : [$category->getId()],
+					'disabled_choices' => $disabled_choices,
 					'no_results' => [
 						'text' => sprintf(lang('no_found'), lang('categories'))
 					]
@@ -497,6 +499,10 @@ class Categories extends AbstractCategoriesController {
 				{
 					ee()->functions->redirect(ee('CP/URL')->make('categories/create/'.$cat_group->group_id));
 				}
+				elseif (ee()->input->post('submit') == 'save_and_close')
+				{
+					ee()->functions->redirect(ee('CP/URL')->make('categories/group/'.$cat_group->group_id));
+				}
 				else
 				{
 					ee()->functions->redirect(ee('CP/URL')->make('categories/edit/'.$cat_group->group_id.'/'.$category->getId()));
@@ -508,8 +514,8 @@ class Categories extends AbstractCategoriesController {
 				ee()->form_validation->_error_array = $result->renderErrors();
 				ee('CP/Alert')->makeInline('shared-form')
 					->asIssue()
-					->withTitle(lang('category_group_not_'.$alert_key))
-					->addToBody(lang('category_group_not_'.$alert_key.'_desc'))
+					->withTitle(lang('category_not_'.$alert_key))
+					->addToBody(lang('category_not_'.$alert_key.'_desc'))
 					->now();
 			}
 		}
@@ -528,6 +534,13 @@ class Categories extends AbstractCategoriesController {
 				'value' => 'save_and_new',
 				'text' => 'save_and_new',
 				'working' => 'btn_saving'
+			],
+			[
+				'name' => 'submit',
+				'type' => 'submit',
+				'value' => 'save_and_close',
+				'text' => 'save_and_close',
+				'working' => 'btn_saving'
 			]
 		];
 
@@ -535,18 +548,6 @@ class Categories extends AbstractCategoriesController {
 		{
 			return ee()->cp->render('_shared/form', $vars);
 		}
-
-		$filepicker = new FilePicker();
-		$filepicker->inject(ee()->view);
-		ee()->cp->add_js_script('file', 'cp/channel/category_edit');
-		ee()->javascript->set_global(
-			'category_edit.filepicker_url',
-			ee('CP/URL')->make($filepicker->controller, array('directory' => 'all', 'type' => 'img'))->compile()
-		);
-
-		ee()->javascript->output('$(document).ready(function () {
-			EE.cp.categoryEdit.init();
-		});');
 
 		ee()->cp->set_breadcrumb(ee('CP/URL')->make('categories'), lang('category_manager'));
 		ee()->cp->set_breadcrumb(ee('CP/URL')->make('categories/group/'.$cat_group->group_id), $cat_group->group_name . ' &mdash; ' . lang('categories'));
@@ -584,6 +585,7 @@ class Categories extends AbstractCategoriesController {
 			->filter('cat_id', 'IN', $selected['cat_group_id_'.$group_id])
 			->all();
 		$field->setData(implode('|', $selected_cats->pluck('cat_id')));
+		$field->setItem('editing', TRUE);
 
 		return $field->getForm();
 	}

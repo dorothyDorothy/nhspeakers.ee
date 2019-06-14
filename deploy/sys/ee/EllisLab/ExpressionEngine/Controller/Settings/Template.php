@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Settings;
@@ -123,15 +124,17 @@ class Template extends Settings {
 	private function templateListSearch()
 	{
 		$search_query = ee('Request')->get('search');
+		$selected = ee()->config->item('site_404');
 
 		$templates = ee('Model')->get('Template')
 			->with('TemplateGroup')
+			->filter('site_id', ee()->config->item('site_id'))
 			->order('TemplateGroup.group_name')
 			->order('Template.template_name');
 
 		if ($search_query)
 		{
-			$templates = $templates = $templates->all()->filter(function($template) use ($search_query) {
+			$templates = $templates->all()->filter(function($template) use ($search_query) {
 				return strpos(strtolower($template->getPath()), strtolower($search_query)) !== FALSE;
 			});
 		}
@@ -144,6 +147,11 @@ class Template extends Settings {
 		foreach ($templates as $template)
 		{
 			$results[$template->getPath()] = $template->getPath();
+		}
+
+		if ($selected && ! array_key_exists($selected, $results) && ! $search_query)
+		{
+			$results[$selected] = $selected;
 		}
 
 		return $results;

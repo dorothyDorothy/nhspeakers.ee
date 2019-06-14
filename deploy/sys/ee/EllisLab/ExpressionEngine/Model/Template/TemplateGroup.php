@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Model\Template;
@@ -49,7 +50,7 @@ class TemplateGroup extends Model {
 
 	protected static $_validation_rules = array(
 		'is_site_default' => 'enum[y,n]',
-		'group_name' => 'required|alphaDashPeriodEmoji|validateTemplateGroupName|unique',
+		'group_name' => 'required|alphaDashPeriodEmoji|validateTemplateGroupName|unique[site_id]',
 	);
 
 	protected static $_events = array(
@@ -211,6 +212,31 @@ class TemplateGroup extends Model {
 		}
 
 		return TRUE;
+	}
+
+	/**
+	 * Override of the parent validateUnique to alter the lang key if it's a failure.
+	 *
+	 * @param String $key    Property name
+	 * @param String $value  Property value
+	 * @param Array  $params Rule parameters
+	 * @return Mixed String if error, TRUE if success
+	 */
+	public function validateUnique($key, $value, array $params = array())
+	{
+		$return = parent::validateUnique($key, $value, $params);
+		if (is_bool($return))
+		{
+			// Don't allow case insensitive matches on template group names
+			if (strcasecmp($value, $this->getBackup($key)) == 0)
+			{
+				return 'template_group_taken';
+			}
+
+			return $return;
+		}
+
+		return 'template_group_taken';
 	}
 
 }

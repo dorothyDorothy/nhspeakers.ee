@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Service\ChannelSet;
@@ -308,7 +309,7 @@ class Set {
 			$field_ids = array();
 			foreach ($fields as $field_name)
 			{
-				$field = $this->fields[$field_name];
+				$field = $this->getFieldByName($field_name);
 				$field_ids[] = $field->getId();
 			}
 
@@ -507,13 +508,28 @@ class Set {
 
 			if (isset($channel_data->field_group))
 			{
-				$field_groups[] = $this->field_groups[$channel_data->field_group];
+				$field_group_name = $channel_data->field_group;
+				if (isset($this->aliases['ee:ChannelFieldGroup'][$field_group_name]))
+				{
+					$field_group_name = $this->aliases['ee:ChannelFieldGroup'][$field_group_name]['group_name'];
+				}
+
+				$field_groups[] = $this->field_groups[$field_group_name];
 			}
 
 			if (isset($channel_data->field_groups))
 			{
 				foreach ($channel_data->field_groups as $field_group)
 				{
+					if (is_null($field_group))
+					{
+						continue;
+					}
+
+					if (isset($this->aliases['ee:ChannelFieldGroup'][$field_group]))
+					{
+						$field_group = $this->aliases['ee:ChannelFieldGroup'][$field_group]['group_name'];
+					}
 					$field_groups[] = $this->field_groups[$field_group];
 				}
 			}
@@ -624,6 +640,8 @@ class Set {
 
 				$cat_group->Categories[] = $category;
 			}
+
+			$this->applyOverrides($cat_group, $group_name);
 
 			$this->category_groups[$group_name] = $cat_group;
 		}
@@ -836,7 +854,7 @@ class Set {
 
 		foreach ($data as $key => $value)
 		{
-			if ($type == 'grid' && $key == 'columns')
+			if (($type == 'grid' || $type == 'file_grid') && $key == 'columns')
 			{
 				$this->importGrid($field, $value);
 
@@ -1073,11 +1091,14 @@ class Set {
 		{
 			$settings = $field_data;
 
-			$settings['field_channel_fields'] = ee('Model')->get('ChannelField')
-				->fields('field_id')
-				->filter('field_name', 'IN', $field_data['field_channel_fields'])
-				->all()
-				->pluck('field_id');
+			if ($field_data['field_channel_fields'])
+			{
+				$settings['field_channel_fields'] = ee('Model')->get('ChannelField')
+					->fields('field_id')
+					->filter('field_name', 'IN', $field_data['field_channel_fields'])
+					->all()
+					->pluck('field_id');
+			}
 
 			$field->set($settings);
 			$field->save();

@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 /**
@@ -126,9 +127,6 @@ class Member {
 		ee()->lang->loadfile('myaccount');
 		ee()->lang->loadfile('member');
 
-		// For custom fields that use the template library
-		ee()->load->library('template', NULL, 'TMPL');
-
 		ee()->functions->template_type = 'webpage';
 
 		if (isset(ee()->TMPL) && is_object(ee()->TMPL))
@@ -138,6 +136,8 @@ class Member {
 		}
 		else
 		{
+			// For custom fields that use the template library
+			ee()->load->library('template', NULL, 'TMPL');
 			$this->trigger = ee()->config->item('profile_trigger');
 		}
 	}
@@ -1288,8 +1288,7 @@ class Member {
 		}
 
 		// No turning back, get to deletin'!
-		ee()->load->model('member_model');
-		ee()->member_model->delete_member(ee()->session->userdata('member_id'));
+		ee('Model')->get('Member', ee()->session->userdata('member_id'))->delete();
 
 		// Email notification recipients
 		if (ee()->session->userdata('mbr_delete_notify_emails') != '')
@@ -2009,24 +2008,7 @@ class Member {
 		}
 		// -------
 
-		// Set some paths
-		$theme_images = URL_THEMES.'member/'.ee()->config->item('member_theme').'/images/';
-
-		if (ee()->session->userdata('profile_theme') != '')
-		{
-			$img_path = ee()->config->slash_item('theme_folder_url').'member/'.ee()->session->userdata('profile_theme').'/images/';
-		}
-		else
-		{
-			$img_path = URL_THEMES.'member/'.ee()->config->item('member_theme').'/images/';
-		}
-
 		$simple = ($this->show_headings == FALSE) ? '/simple' : '';
-
-		if ($this->css_file_path == '')
-		{
-			$this->css_file_path = URL_THEMES.'member/'.ee()->config->item('member_theme').'profile.css';
-		}
 
 		// Parse {switch="foo|bar"} variables
 		if (preg_match_all("/".LD."(switch\s*=.+?)".RD."/i", $str, $matches, PREG_SET_ORDER))
@@ -2048,6 +2030,16 @@ class Member {
 			}
 		}
 
+
+		// Set some paths
+		$theme = (ee()->session->userdata('profile_theme') != '') ? ee()->session->userdata('profile_theme') : ee()->config->item('member_theme');
+
+		if ($this->image_url == '')
+		{
+			$theme = ($theme == '') ? 'default' : $theme;
+			$this->image_url = ee('Theme')->getUrl('member/'.$theme.'/images/');
+		}
+
 		// Finalize the output
 		$str = ee()->functions->prep_conditionals($str, array('current_request' => $this->request));
 
@@ -2056,7 +2048,7 @@ class Member {
 			array(
 				'lang'                    => ee()->config->item('xml_lang'),
 				'charset'                 => ee()->config->item('output_charset'),
-				'path:image_url'          => ($this->image_url == '') ? $theme_images : $this->image_url,
+				'path:image_url'          => $this->image_url,
 				'path:your_control_panel' => $this->_member_path('profile'),
 				'path:your_profile'       => $this->_member_path(ee()->session->userdata('member_id')),
 				'path:edit_preferences'   => $this->_member_path('edit_preferences'),
@@ -2072,7 +2064,7 @@ class Member {
 				'path:delete'             => $this->_member_path('delete'),
 				'page_title'              => $this->page_title,
 				'site_name'               => stripslashes(ee()->config->item('site_name')),
-				'path:theme_css'          => $this->css_file_path,
+				'path:theme_css'          => '',
 				'current_request'         => $this->request,
 				'username_max_length'     => USERNAME_MAX_LENGTH,
 				'password_max_length'     => PASSWORD_MAX_LENGTH
@@ -2226,33 +2218,23 @@ class Member {
 
 		$member_id = ( ! ee()->TMPL->fetch_param('member_id')) ? ee()->session->userdata('member_id') : ee()->TMPL->fetch_param('member_id');
 
-		// Default Member Data
-		$member = ee('Model')->get('Member', $member_id)
+		$member = ee('Model')
+			->get('Member', $member_id)
+			->with('MemberGroup')
 			->first();
 
-		$total_results = count($member);
-
-		if ($total_results == 0)
+		if ( ! $member)
 		{
 			return ee()->TMPL->tagdata = '';
 		}
 
-		$results = $member->getValues();
-
+		$results = $member->getValues() + array('group_title' => $member->MemberGroup->group_title);
 		$default_fields = $results;
 
 		// Is there an avatar?
-		if (ee()->config->item('enable_avatars') == 'y' AND $results['avatar_filename'] != '')
+		$avatar_path = $member->getAvatarUrl();
+		if (ee()->config->item('enable_avatars') == 'y' && ! empty($avatar_path))
 		{
-			$avatar_url = ee()->config->slash_item('avatar_url');
-			$avatar_fs_path = ee()->config->slash_item('avatar_path');
-
-			if (file_exists($avatar_fs_path.'default/'.$results['avatar_filename']))
-			{
-				$avatar_url .= 'default/';
-			}
-
-			$avatar_path	= $avatar_url.$results['avatar_filename'];
 			$avatar_width	= $results['avatar_width'];
 			$avatar_height	= $results['avatar_height'];
 			$avatar			= TRUE;
@@ -2282,9 +2264,9 @@ class Member {
 		}
 
 		// Is there a signature image?
-		if (ee()->config->item('enable_signatures') == 'y' AND $results['sig_img_filename'] != '')
+		if (ee()->config->item('enable_signatures') == 'y')
 		{
-			$sig_img_path	= ee()->config->item('sig_img_url').$results['sig_img_filename'];
+			$sig_img_path	= $member->getSignatureImageUrl();
 			$sig_img_width	= $results['sig_img_width'];
 			$sig_img_height	= $results['sig_img_height'];
 			$sig_img_image	= TRUE;
@@ -2379,48 +2361,36 @@ class Member {
 			$cond['avatar']	= $avatar;
 			$cond['photo'] = $photo;
 
+			foreach($fields as $key =>  $value)
+			{
+				$cond[$key] = ee()->typography->parse_type($row['m_field_id_'.$value['0']],
+					array(
+						'text_format'	=> $value['1'],
+						'html_format'	=> 'safe',
+						'auto_links'	=> 'y',
+						'allow_img_url' => 'n'
+						)
+					);
+			}
+
 			ee()->TMPL->tagdata = ee()->functions->prep_conditionals(ee()->TMPL->tagdata, $cond);
+
+			$dates = array(
+				'last_visit' => (empty($default_fields['last_visit'])) ? '' : $default_fields['last_visit'],
+				'last_activity' => (empty($default_fields['last_activity'])) ? '' : $default_fields['last_activity'],
+				'join_date' => (empty($default_fields['join_date'])) ? '' : $default_fields['last_entry_date'],
+				'last_entry_date' => (empty($default_fields['last_entry_date'])) ? '' : $default_fields['last_entry_date'],
+				'last_forum_post_date' => (empty($default_fields['last_forum_post_date'])) ? '' : $default_fields['last_forum_post_date'],
+				'last_comment_date' => (empty($default_fields['last_comment_date'])) ? '' : $default_fields['last_comment_date']
+			);
+
+			// parse date variables
+			ee()->TMPL->tagdata = ee()->TMPL->parse_date_variables(ee()->TMPL->tagdata, $dates);
 
 			// Swap Variables
 			foreach (ee()->TMPL->var_single as $key => $val)
 			{
 				// parse default member data
-
-				//  "last_visit"
-				if (strncmp($key, 'last_visit', 10) == 0)
-				{
-					ee()->TMPL->tagdata = $this->_var_swap_single($key, ($default_fields['last_visit'] > 0) ? ee()->localize->format_date($val, $default_fields['last_visit']) : '', ee()->TMPL->tagdata);
-				}
-
-				//  "last_activity"
-				if (strncmp($key, 'last_activity', 10) == 0)
-				{
-					ee()->TMPL->tagdata = $this->_var_swap_single($key, ($default_fields['last_activity'] > 0) ? ee()->localize->format_date($val, $default_fields['last_activity']) : '', ee()->TMPL->tagdata);
-				}
-
-				//  "join_date"
-				if (strncmp($key, 'join_date', 9) == 0)
-				{
-					ee()->TMPL->tagdata = $this->_var_swap_single($key, ($default_fields['join_date'] > 0) ? ee()->localize->format_date($val, $default_fields['join_date']) : '', ee()->TMPL->tagdata);
-				}
-
-				//  "last_entry_date"
-				if (strncmp($key, 'last_entry_date', 15) == 0)
-				{
-					ee()->TMPL->tagdata = $this->_var_swap_single($key, ($default_fields['last_entry_date'] > 0) ? ee()->localize->format_date($val, $default_fields['last_entry_date']) : '', ee()->TMPL->tagdata);
-				}
-
-				//  "last_forum_post_date"
-				if (strncmp($key, 'last_forum_post_date', 20) == 0)
-				{
-					ee()->TMPL->tagdata = $this->_var_swap_single($key, ($default_fields['last_forum_post_date'] > 0) ? ee()->localize->format_date($val, $default_fields['last_forum_post_date']) : '', ee()->TMPL->tagdata);
-				}
-
-				//  parse "recent_comment"
-				if (strncmp($key, 'last_comment_date', 17) == 0)
-				{
-					ee()->TMPL->tagdata = $this->_var_swap_single($key, ($default_fields['last_comment_date'] > 0) ? ee()->localize->format_date($val, $default_fields['last_comment_date']) : '', ee()->TMPL->tagdata);
-				}
 
 				//  {name}
 				$name = ( ! $default_fields['screen_name']) ? $default_fields['username'] : $default_fields['screen_name'];

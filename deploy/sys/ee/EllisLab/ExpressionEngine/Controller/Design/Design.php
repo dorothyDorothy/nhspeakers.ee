@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Design;
@@ -27,62 +28,23 @@ class Design extends AbstractDesignController {
 
 	public function export()
 	{
-		$templates = ee('Model')->get('Template')
-			->fields('template_id')
-			->filter('site_id', ee()->config->item('site_id'));
-
 		if (ee()->session->userdata['group_id'] != 1)
 		{
-			$templates->filter('group_id', 'IN', array_keys(ee()->session->userdata['assigned_template_groups']));
+			show_error(lang('unauthorized_access'));
 		}
 
-		$template_ids = $templates->all()
-			->pluck('template_id');
-
-		$this->exportTemplates($template_ids);
+		$this->exportTemplates();
 	}
 
 	public function manager($group_name = NULL)
 	{
-		$assigned_groups = NULL;
-
-		if (ee()->session->userdata['group_id'] != 1)
-		{
-			$assigned_groups = array_keys(ee()->session->userdata['assigned_template_groups']);
-
-			if (empty($assigned_groups))
-			{
-				ee()->functions->redirect(ee('CP/URL')->make('design/system'));
-			}
-		}
-
 		if (is_null($group_name))
 		{
-			$group = ee('Model')->get('TemplateGroup')
-				->fields('group_id', 'group_name')
-				->filter('is_site_default', 'y')
-				->filter('site_id', ee()->config->item('site_id'));
-
-			if ($assigned_groups)
-			{
-				$group->filter('group_id', 'IN', $assigned_groups);
-			}
-
-			$group = $group->first();
+			$group = $this->getAssignedTemplateGroup(NULL, TRUE);
 
 			if ( ! $group)
 			{
-				$group = ee('Model')->get('TemplateGroup')
-					->fields('group_id', 'group_name')
-					->filter('site_id', ee()->config->item('site_id'))
-					->order('group_name', 'asc');
-
-				if ($assigned_groups)
-				{
-					$group->filter('group_id', 'IN', $assigned_groups);
-				}
-
-				$group = $group->first();
+				$group = $this->getAssignedTemplateGroup();
 			}
 
 			if ( ! $group)
@@ -92,21 +54,17 @@ class Design extends AbstractDesignController {
 		}
 		else
 		{
-			$group = ee('Model')->get('TemplateGroup')
-				->fields('group_id', 'group_name')
-				->filter('group_name', $group_name)
-				->filter('site_id', ee()->config->item('site_id'));
-
-			if ($assigned_groups)
-			{
-				$group->filter('group_id', 'IN', $assigned_groups);
-			}
-
-			$group = $group->first();
+			$group = $this->getAssignedTemplateGroup($group_name);
 
 			if ( ! $group)
 			{
-				show_error(sprintf(lang('error_no_template_group'), $group_name));
+				$group_name = str_replace('_', '.', $group_name);
+				$group = $this->getAssignedTemplateGroup($group_name);
+
+				if ( ! $group)
+				{
+					show_error(sprintf(lang('error_no_template_group'), $group_name));
+				}
 			}
 		}
 
@@ -136,7 +94,7 @@ class Design extends AbstractDesignController {
 
 		$vars = $this->buildTableFromTemplateQueryBuilder($templates);
 
-		$vars['show_new_template_button'] = ee()->cp->allowed_group('can_create_templates');
+		$vars['show_new_template_button'] = ee()->cp->allowed_group('can_create_new_templates');
 		$vars['show_bulk_delete'] = ee()->cp->allowed_group('can_delete_templates');
 		$vars['group_id'] = $group->group_name;
 
@@ -157,6 +115,43 @@ class Design extends AbstractDesignController {
 		ee()->view->cp_heading = sprintf(lang('templates_in_group'), $group->group_name);
 
 		ee()->cp->render('design/index', $vars);
+	}
+
+	private function getAssignedTemplateGroup($group_name = NULL, $site_default = FALSE)
+	{
+		$assigned_groups = NULL;
+
+		if (ee()->session->userdata['group_id'] != 1)
+		{
+			$assigned_groups = array_keys(ee()->session->userdata['assigned_template_groups']);
+
+			if (empty($assigned_groups))
+			{
+				ee()->functions->redirect(ee('CP/URL')->make('design/system'));
+			}
+		}
+
+		$group = ee('Model')->get('TemplateGroup')
+			->fields('group_id', 'group_name')
+			->filter('site_id', ee()->config->item('site_id'))
+			->order('group_name', 'asc');
+
+		if ($group_name)
+		{
+			$group->filter('group_name', $group_name);
+		}
+
+		if ($site_default)
+		{
+			$group->filter('is_site_default', 'y');
+		}
+
+		if ($assigned_groups)
+		{
+			$group->filter('group_id', 'IN', $assigned_groups);
+		}
+
+		return $group->first();
 	}
 
 	/**

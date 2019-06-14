@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Members;
@@ -58,7 +59,7 @@ class Members extends CP_Controller {
 
 		$header = $sidebar->addHeader(lang('all_members'), ee('CP/URL')->make('members')->compile());
 
-		if ( ! $this->hasMaximumMembers() && ee()->cp->allowed_group('can_create_members'))
+		if (ee()->cp->allowed_group('can_create_members'))
 		{
 			$header->withButton(lang('new'), ee('CP/URL')->make('members/create'));
 		}
@@ -110,16 +111,6 @@ class Members extends CP_Controller {
 	}
 
 	/**
-	 * Maximum number of members reached?
-	 *
-	 * @return bool
-	 **/
-	protected function hasMaximumMembers()
-	{
-		return (IS_CORE && ee('Model')->get('Member')->count() >= 3);
-	}
-
-	/**
 	 * MemberList
 	 */
 	public function index()
@@ -168,8 +159,26 @@ class Members extends CP_Controller {
 
 		ee()->javascript->set_global('lang.remove_confirm', lang('members') . ': <b>### ' . lang('members') . '</b>');
 		ee()->cp->add_js_script(array(
-			'file' => array('cp/confirm_remove'),
+			'file' => array('cp/confirm_remove', 'cp/members/members'),
 		));
+
+		$session = ee('Model')->get('Session', ee()->session->userdata('session_id'))->first();
+
+		if ( ! $session->isWithinAuthTimeout())
+		{
+			$data['confirm_remove_secure_form_ctrls'] = [
+				'title' => 'your_password',
+				'desc' => 'your_password_delete_members_desc',
+				'group' => 'verify_password',
+				'fields' => [
+					'verify_password' => [
+						'type'      => 'password',
+						'required'  => TRUE,
+						'maxlength' => PASSWORD_MAX_LENGTH
+					]
+				]
+			];
+		}
 
 		$data['can_delete_members'] = ee()->cp->allowed_group('can_delete_members');
 
@@ -581,6 +590,8 @@ class Members extends CP_Controller {
 
 		foreach ($members as $member)
 		{
+			$can_edit_member = ee()->session->userdata('group_id') == 1 || $member->MemberGroup->getId() == 1;
+
 			$edit_link = ee('CP/URL')->make('members/profile/', array('id' => $member->member_id));
 			$toolbar = array(
 				'edit' => array(
@@ -615,13 +626,13 @@ class Members extends CP_Controller {
 
 			$email = "<a href = '" . ee('CP/URL')->make('utilities/communicate/member/' . $member->member_id) . "'>".$member->email."</a>";
 
-			if (ee()->cp->allowed_group('can_edit_members'))
+			if ($can_edit_member && ee()->cp->allowed_group('can_edit_members'))
 			{
 				$username_display = "<a href = '" . $edit_link . "'>". $member->username."</a>";
 			}
 			else
 			{
-				$username_display = $member['username'];
+				$username_display = $member->username;
 				unset($toolbar['edit']);
 			}
 
@@ -641,9 +652,13 @@ class Members extends CP_Controller {
 			$toolbar = array('toolbar_items' => $toolbar);
 
 			// add the toolbar if they can edit members
-			if (ee()->cp->allowed_group('can_edit_members'))
+			if ($can_edit_member && ee()->cp->allowed_group('can_edit_members'))
 			{
 				$column[] = $toolbar;
+			}
+			else
+			{
+				$column[] = ['toolbar_items' => []];
 			}
 
 			// add the checkbox if they can delete members
@@ -654,7 +669,8 @@ class Members extends CP_Controller {
 					'value' => $member->member_id,
 					'data' => array(
 						'confirm' => lang('member') . ': <b>' . htmlentities($member->username, ENT_QUOTES, 'UTF-8') . '</b>'
-					)
+					),
+					'disabled' => ! $can_edit_member
 				);
 			}
 
@@ -718,7 +734,7 @@ class Members extends CP_Controller {
 		$options = $group_ids;
 		$options['all'] = lang('all');
 
-		$group = ee('CP/Filter')->make('group', 'member_group', $options);
+		$group = ee('CP/Filter')->make('group', 'member_group_filter', $options);
 		$group->setPlaceholder(lang('all'));
 		$group->disableCustomValue();
 
@@ -746,6 +762,8 @@ class Members extends CP_Controller {
 
 		foreach ($members as $member)
 		{
+			$can_edit_member = ee()->session->userdata('group_id') == 1 || $member['group_id'] != 1;
+
 			$attributes = array();
 			$edit_link = ee('CP/URL')->make('members/profile/', array('id' => $member['member_id']));
 			$toolbar = array('toolbar_items' => array(
@@ -764,7 +782,7 @@ class Members extends CP_Controller {
 				case 'Pending':
 					$group = "<span class='st-pending'>" . lang('pending') . "</span>";
 					$attributes['class'] = 'pending';
-					if (ee()->cp->allowed_group('can_edit_members'))
+					if ($can_edit_member && ee()->cp->allowed_group('can_edit_members'))
 					{
 						$toolbar['toolbar_items']['approve'] = array(
 							'href' => '#',
@@ -784,7 +802,7 @@ class Members extends CP_Controller {
 
 			$email = "<a href = '" . ee('CP/URL')->make('utilities/communicate/member/' . $member['member_id']) . "'>".$member['email']."</a>";
 
-			if (ee()->cp->allowed_group('can_edit_members'))
+			if ($can_edit_member && ee()->cp->allowed_group('can_edit_members'))
 			{
 				$username_display = "<a href = '" . $edit_link . "'>". $member['username']."</a>";
 			}
@@ -809,9 +827,13 @@ class Members extends CP_Controller {
 			);
 
 			// add the toolbar if they can edit members
-			if (ee()->cp->allowed_group('can_edit_members'))
+			if ($can_edit_member && ee()->cp->allowed_group('can_edit_members'))
 			{
 				$row['columns'][] = $toolbar;
+			}
+			else
+			{
+				$row['columns'][] = ['toolbar_items' => []];
 			}
 
 			// add the checkbox if they can delete members
@@ -822,7 +844,8 @@ class Members extends CP_Controller {
 					'value' => $member['member_id'],
 					'data'	=> array(
 						'confirm' => lang('member') . ': <b>' . htmlentities($member['username'], ENT_QUOTES, 'UTF-8') . '</b>'
-					)
+					),
+					'disabled' => ! $can_edit_member
 				);
 			}
 
@@ -859,6 +882,7 @@ class Members extends CP_Controller {
 
 		$members = ee('Model')->get('Member', $ids)
 			->fields('member_id', 'username', 'screen_name', 'email', 'group_id')
+			->filter('group_id', 4)
 			->all();
 
 		if (ee()->config->item('approved_member_notification') == 'y')
@@ -925,6 +949,7 @@ class Members extends CP_Controller {
 
 		$members = ee('Model')->get('Member', $ids)
 			->fields('member_id', 'username', 'screen_name', 'email', 'group_id')
+			->filter('group_id', 4)
 			->all();
 
 		if (ee()->config->item('declined_member_notification') == 'y')
@@ -991,6 +1016,7 @@ class Members extends CP_Controller {
 
 		$members = ee('Model')->get('Member', $ids)
 			->fields('member_id', 'username', 'screen_name', 'email', 'group_id', 'authcode')
+			->filter('group_id', 4)
 			->all();
 
 		$template = ee('Model')->get('SpecialtyTemplate')
@@ -1207,14 +1233,39 @@ class Members extends CP_Controller {
 	 */
 	public function delete()
 	{
-		// Verify the member is allowed to delete
-		if ( ! ee()->cp->allowed_group('can_delete_members'))
+		$member_ids = ee()->input->post('selection', TRUE);
+		$session = ee('Model')->get('Session', ee()->session->userdata('session_id'))
+			->filter('member_id', ee()->session->userdata('member_id'))
+			->first();
+
+		if ( ! $session ||
+			! ee()->cp->allowed_group('can_delete_members') ||
+			! $member_ids)
 		{
 			show_error(lang('unauthorized_access'), 403);
 		}
 
-		//  Fetch member ID numbers and build the query
-		$member_ids = ee()->input->post('selection', TRUE);
+		if ( ! $session->isWithinAuthTimeout())
+		{
+			$validator = ee('Validation')->make();
+			$validator->setRules(array(
+				'verify_password'  => 'required|authenticated'
+			));
+			$password_confirm = $validator->validate($_POST);
+
+			if ($password_confirm->failed())
+			{
+				ee('CP/Alert')->makeInline('view-members')
+					->asIssue()
+					->withTitle(lang('member_delete_problem'))
+					->addToBody(lang('invalid_password'))
+					->defer();
+
+				return ee()->functions->redirect($this->base_url);
+			}
+
+			$session->resetAuthTimeout();
+		}
 
 		if ( ! is_array($member_ids))
 		{
@@ -1233,37 +1284,30 @@ class Members extends CP_Controller {
 		// First, assign an heir if we are to do so
 		if (ee()->input->post('heir_action') == 'assign')
 		{
-			$heir = ee('Model')->get('Member', ee()->input->post('heir'))->first();
-
-			// We need to update the versions first else we'll trigger a new
-			// version when we update the entries
-			$entries = ee('Model')->get('ChannelEntryVersion')->filter('author_id', 'IN', $member_ids)->all();
-
-			foreach ($entries as $entry)
+			if ( ! ee()->input->post('heir'))
 			{
-				$entry->version_data['author_id'] = $heir->getId();
+				show_error(lang('heir_required'));
 			}
 
-			$entries->Author = $heir;
-			$entries->save();
+			$heir = ee('Model')->get('Member', ee()->input->post('heir'))->first();
 
-			$entries = ee('Model')->get('ChannelEntry')->filter('author_id', 'IN', $member_ids)->all();
-			$entries->Author = $heir;
-			$entries->save();
+			ee()->db->where_in('author_id', $member_ids);
+			ee()->db->update('entry_versioning', array('author_id' => $heir->getId()));
 
-			$entries = ee('Model')->get('File')->filter('uploaded_by_member_id', 'IN', $member_ids)->all();
-			$entries->UploadAuthor = $heir;
-			$entries->save();
+			ee()->db->where_in('author_id', $member_ids);
+			ee()->db->update('channel_titles', array('author_id' => $heir->getId()));
 
-			$entries = ee('Model')->get('File')->filter('modified_by_member_id', 'IN', $member_ids)->all();
-			$entries->ModifyAuthor = $heir;
-			$entries->save();
+			ee()->db->where_in('uploaded_by_member_id', $member_ids);
+			ee()->db->update('files', array('uploaded_by_member_id' => $heir->getId()));
+
+			ee()->db->where_in('modified_by_member_id', $member_ids);
+			ee()->db->update('files', array('modified_by_member_id' => $heir->getId()));
 
 			$heir->updateAuthorStats();
 		}
 
 		// If we got this far we're clear to delete the members
-		ee('Model')->get('Member')->filter('member_id', 'IN', $member_ids)->delete();
+		ee('Model')->get('Member')->with('MemberGroup')->filter('member_id', 'IN', $member_ids)->delete();
 
 		// Send member deletion notifications
 		$this->_member_delete_notifications($member_ids);
@@ -1277,9 +1321,6 @@ class Members extends CP_Controller {
 		/*
 		/* -------------------------------------------*/
 
-		// Update
-		ee()->stats->update_member_stats();
-
 		$cp_message = (count($member_ids) == 1) ?
 			lang('member_deleted') : lang('members_deleted');
 
@@ -1290,6 +1331,69 @@ class Members extends CP_Controller {
 			->defer();
 
 		ee()->functions->redirect($this->base_url);
+	}
+
+	/**
+	 * Member Anonymize
+	 */
+	public function anonymize()
+	{
+		$member_id = ee()->input->post('selection', TRUE);
+		$member = ee('Model')->get('Member')
+			->filter('member_id', $member_id)
+			->first();
+
+		$session = ee('Model')->get('Session', ee()->session->userdata('session_id'))
+			->filter('member_id', ee()->session->userdata('member_id'))
+			->first();
+
+		if ( ! $session ||
+			! ee()->cp->allowed_group('can_delete_members') ||
+			! $member)
+		{
+			show_error(lang('unauthorized_access'), 403);
+		}
+
+		$profile_url = ee('CP/URL')->make('members/profile/settings', ['id' => $member_id]);
+
+		if ( ! $session->isWithinAuthTimeout())
+		{
+			$validator = ee('Validation')->make();
+			$validator->setRules(array(
+				'verify_password'  => 'required|authenticated'
+			));
+			$password_confirm = $validator->validate($_POST);
+
+			if ($password_confirm->failed())
+			{
+				ee('CP/Alert')->makeInline('shared-form')
+					->asIssue()
+					->withTitle(lang('member_anonymize_problem'))
+					->addToBody(lang('invalid_password'))
+					->defer();
+
+				return ee()->functions->redirect($profile_url);
+			}
+
+			$session->resetAuthTimeout();
+		}
+
+		if ($member_id == ee()->session->userdata('member_id'))
+		{
+			show_error(lang('can_not_delete_self'));
+		}
+
+		$this->_super_admin_delete_check($member_id);
+
+		$member->anonymize();
+
+		ee('CP/Alert')->makeInline('shared-form')
+			->asSuccess()
+			->withTitle(lang('member_anonymize_success'))
+			->addToBody(lang('member_anonymize_success_desc'))
+			->defer();
+
+		ee()->functions->redirect($profile_url);
 	}
 
 	/**

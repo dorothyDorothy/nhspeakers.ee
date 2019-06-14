@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Utilities;
@@ -187,7 +188,7 @@ class Query extends Utilities {
 		}
 
 		// Get the total results on the orignal query before we paginate it
-		$query = (isset($new_sql)) ? ee()->db->query($new_sql) : ee()->db->query($sql);
+		$query = (isset($new_sql)) ? ee()->db->query($new_sql) : $query;
 		$total_results = (is_object($query)) ? $query->num_rows() : 0;
 
 		// Does this query already have a limit?
@@ -224,11 +225,6 @@ class Query extends Utilities {
 			{
 				$query = ee()->db->query($new_sql);
 			}
-		}
-
-		if ( ! isset($new_sql))
-		{
-			$query = ee()->db->query($sql);
 		}
 
 		$data = (is_object($query)) ? $query->result_array() : array();

@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Design;
@@ -36,6 +37,9 @@ class Snippets extends AbstractDesignController {
 		$this->stdHeader();
 
 		$this->msm = (ee()->config->item('multiple_sites_enabled') == 'y');
+
+		// make sure all partials are synced from the filesystem
+		ee('Model')->make('Snippet')->loadAll();
 	}
 
 	public function index()

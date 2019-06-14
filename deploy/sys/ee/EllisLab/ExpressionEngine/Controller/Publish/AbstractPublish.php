@@ -1,10 +1,11 @@
 <?php
 /**
+ * This source file is part of the open source project
  * ExpressionEngine (https://expressionengine.com)
  *
  * @link      https://expressionengine.com/
- * @copyright Copyright (c) 2003-2017, EllisLab, Inc. (https://ellislab.com)
- * @license   https://expressionengine.com/license
+ * @copyright Copyright (c) 2003-2019, EllisLab Corp. (https://ellislab.com)
+ * @license   https://expressionengine.com/license Licensed under Apache License, Version 2.0
  */
 
 namespace EllisLab\ExpressionEngine\Controller\Publish;
@@ -96,6 +97,9 @@ abstract class AbstractPublish extends CP_Controller {
 			'lang.loading'                   => lang('loading'),
 			'publish.autosave.interval'      => (int) $autosave_interval_seconds,
 			'publish.autosave.URL'           => ee('CP/URL')->make('publish/autosave/' . $channel_id . '/' . $entry_id)->compile(),
+			'publish.channel_title'          => ee('Format')->make('Text', $entry->Channel->channel_title)
+				->convertToEntities()
+				->compile(),
 			'publish.default_entry_title'    => $entry->Channel->default_entry_title,
 			'publish.foreignChars'           => $foreign_characters,
 			'publish.urlLength'              => URL_TITLE_MAX_LENGTH,
@@ -147,9 +151,34 @@ abstract class AbstractPublish extends CP_Controller {
 
 		$data = array();
 		$authors = array();
-		$i = 1;
+		$i = $entry->Versions->count();
 
-		foreach ($entry->Versions as $version)
+		if ( ! $entry->isNew())
+		{
+			$attrs = (!$version_id) ? array('class' => 'selected') : array();
+
+			if ( ! isset($authors[$entry->author_id]))
+			{
+				$authors[$entry->author_id] = $entry->getAuthorName();
+			}
+
+			// Current
+			$edit_date = ($entry->edit_date)
+				? ee()->localize->human_time($entry->edit_date->format('U'))
+				: NULL;
+
+			$data[] = array(
+				'attrs'   => $attrs,
+				'columns' => array(
+					$i + 1,
+					$edit_date,
+					$authors[$entry->author_id],
+					'<span class="st-open">' . lang('current') . '</span>'
+				)
+			);
+		}
+
+		foreach ($entry->Versions->sortBy('version_date')->reverse() as $version)
 		{
 			if ( ! isset($authors[$version->author_id]))
 			{
@@ -178,15 +207,37 @@ abstract class AbstractPublish extends CP_Controller {
 					$toolbar
 				)
 			);
-			$i++;
+			$i--;
 		}
+
+		$table->setData($data);
+
+		return ee('View')->make('_shared/table')->render($table->viewData(''));
+	}
+
+	protected function getAutosavesTable($entry, $autosave_id = FALSE)
+	{
+		$table = ee('CP/Table');
+		
+		$table->setColumns(
+			array(
+				'rev_id',
+				'rev_date',
+				'rev_author',
+				'manage' => array(
+					'encode' => FALSE
+				)
+			)
+		);
+
+		$data = array();
+		$authors = array();
+		$i = $entry->getAutosaves()->count();
 
 		if ( ! $entry->isNew())
 		{
-			if ( ! $version_id)
-			{
-				$attrs = array('class' => 'selected');
-			}
+			$i++;
+			$attrs = ( ! $autosave_id) ? ['class' => 'selected'] : [];
 
 			if ( ! isset($authors[$entry->author_id]))
 			{
@@ -207,33 +258,10 @@ abstract class AbstractPublish extends CP_Controller {
 					'<span class="st-open">' . lang('current') . '</span>'
 				)
 			);
+			$i--;
 		}
 
-		$table->setData($data);
-
-		return ee('View')->make('_shared/table')->render($table->viewData(''));
-	}
-
-	protected function getAutosavesTable($entry, $autosave_id = FALSE)
-	{
-		$table = ee('CP/Table');
-
-		$table->setColumns(
-			array(
-				'rev_id',
-				'rev_date',
-				'rev_author',
-				'manage' => array(
-					'encode' => FALSE
-				)
-			)
-		);
-
-		$data = array();
-		$authors = array();
-		$i = 1;
-
-		foreach ($entry->getAutosaves()->sortBy('edit_date') as $autosave)
+		foreach ($entry->getAutosaves()->sortBy('edit_date')->reverse() as $autosave)
 		{
 			if ( ! isset($authors[$autosave->author_id]) && $autosave->Author)
 			{
@@ -264,32 +292,7 @@ abstract class AbstractPublish extends CP_Controller {
 					$toolbar
 				)
 			);
-			$i++;
-		}
-
-		if ( ! $entry->isNew())
-		{
-			$attrs = ( ! $autosave_id) ? ['class' => 'selected'] : [];
-
-			if ( ! isset($authors[$entry->author_id]))
-			{
-				$authors[$entry->author_id] = $entry->getAuthorName();
-			}
-
-			// Current
-			$edit_date = ($entry->edit_date)
-				? ee()->localize->human_time($entry->edit_date->format('U'))
-				: NULL;
-
-			$data[] = array(
-				'attrs'   => $attrs,
-				'columns' => array(
-					$i,
-					$edit_date,
-					$authors[$entry->author_id],
-					'<span class="st-open">' . lang('current') . '</span>'
-				)
-			);
+			$i--;
 		}
 
 		$table->setData($data);
@@ -367,13 +370,39 @@ abstract class AbstractPublish extends CP_Controller {
 
 		ee()->session->set_flashdata('entry_id', $entry->entry_id);
 
-		ee('CP/Alert')->makeInline('entry-form')
-			->asSuccess()
+		$alert = (ee('Request')->get('modal_form') == 'y' && ee('Request')->get('next_entry_id'))
+			? ee('CP/Alert')->makeStandard()
+			: ee('CP/Alert')->makeInline('entry-form');
+
+		$alert->asSuccess()
 			->withTitle(lang($action . '_entry_success'))
 			->addToBody(sprintf(lang($action . '_entry_success_desc'), htmlentities($entry->title, ENT_QUOTES, 'UTF-8')))
 			->defer();
 
-		if (ee()->input->post('submit') == 'save')
+
+		if (ee('Request')->get('modal_form') == 'y')
+		{
+			$next_entry_id = ee('Request')->get('next_entry_id');
+
+			$result = [
+				'saveId' => $entry->getId(),
+				'item' => [
+					'value' => $entry->getId(),
+					'label' => $entry->title,
+					'instructions' => $entry->Channel->channel_title
+				]
+			];
+
+			if (is_numeric($next_entry_id))
+			{
+				$next_entry = ee('CP/URL')->getCurrentUrl();
+				$next_entry->path = 'publish/edit/entry/' . $next_entry_id;
+				$result += ['redirect' => $next_entry->compile()];
+			}
+
+			return $result;
+		}
+		elseif (ee()->input->post('submit') == 'save')
 		{
 			ee()->functions->redirect(ee('CP/URL')->make('publish/edit/entry/' . $entry->getId()));
 		}
@@ -417,6 +446,89 @@ abstract class AbstractPublish extends CP_Controller {
 		$autosave = ee('Model')->get('ChannelEntryAutosave')
 			->filter('edit_date', '<', $cutoff)
 			->delete();
+	}
+
+	/**
+	 * Get Submit Buttons for Publish Edit Form
+	 * @param  ChannelEntry $entry ChannelEntry model entity
+	 * @return array Submit button array
+	 */
+	protected function getPublishFormButtons(ChannelEntry $entry)
+	{
+		$buttons = [
+			[
+				'name' => 'submit',
+				'type' => 'submit',
+				'value' => 'save',
+				'text' => 'save',
+				'working' => 'btn_saving',
+				// Disable these while JS is still loading key components, re-enabled in publish.js
+				'attrs' => 'disabled="disabled"'
+			]
+		];
+
+		if (ee('Permission')->has('can_create_entries'))
+		{
+			$buttons[] = [
+				'name' => 'submit',
+				'type' => 'submit',
+				'value' => 'save_and_new',
+				'text' => 'save_and_new',
+				'working' => 'btn_saving',
+				'attrs' => 'disabled="disabled"'
+			];
+		}
+
+		$buttons[] = [
+			'name' => 'submit',
+			'type' => 'submit',
+			'value' => 'save_and_close',
+			'text' => 'save_and_close',
+			'working' => 'btn_saving',
+			'attrs' => 'disabled="disabled"'
+		];
+
+		// get rid of Save & New button if we've reached the max entries for this channel
+		if ($entry->Channel->maxEntriesLimitReached())
+		{
+			unset($buttons[1]);
+		}
+
+		$has_preview_button  = FALSE;
+		$show_preview_button = FALSE;
+
+		if ($entry->hasLivePreview())
+		{
+			$has_preview_button  = TRUE;
+			$show_preview_button = TRUE;
+		}
+
+		$pages_module = ee('Addon')->get('pages');
+		if ($pages_module && $pages_module->isInstalled())
+		{
+			$has_preview_button = TRUE;
+			if ($entry->hasPageURI())
+			{
+				$show_preview_button = TRUE;
+			}
+		}
+
+		if ($has_preview_button)
+		{
+			$extra_class = ($show_preview_button) ? '' : ' hidden';
+
+			$buttons[] = [
+				'name'    => 'submit',
+				'type'    => 'submit',
+				'value'   => 'preview',
+				'text'    => 'preview',
+				'class'   => 'action js-modal-link--side' . $extra_class,
+				'attrs'   => 'rel="live-preview" disabled="disabled"',
+				'working' => 'btn_previewing'
+			];
+		}
+
+		return $buttons;
 	}
 }
 
