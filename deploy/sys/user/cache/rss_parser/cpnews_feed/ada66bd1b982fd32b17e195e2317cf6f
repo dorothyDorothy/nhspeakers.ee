@@ -1,4 +1,4 @@
-a:3:{s:4:"time";i:1560542066;s:3:"ttl";i:0;s:4:"data";a:4:{s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:1:{s:4:"feed";a:1:{i:0;a:6:{s:4:"data";s:105:"
+a:3:{s:4:"time";i:1560865484;s:3:"ttl";i:0;s:4:"data";a:4:{s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:1:{s:4:"feed";a:1:{i:0;a:6:{s:4:"data";s:105:"
 
 		
 		
@@ -32,7 +32,7 @@ a:3:{s:4:"time";i:1560542066;s:3:"ttl";i:0;s:4:"data";a:4:{s:5:"child";a:1:{s:27
 			
 		
 
-	";s:7:"attribs";a:1:{s:36:"http://www.w3.org/XML/1998/namespace";a:1:{s:4:"lang";s:2:"en";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:8:{s:5:"title";a:1:{i:0;a:5:{s:4:"data";s:16:"ExpressionEngine";s:7:"attribs";a:1:{s:0:"";a:1:{s:4:"type";s:4:"text";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:8:"subtitle";a:1:{i:0;a:5:{s:4:"data";s:4:"Blog";s:7:"attribs";a:1:{s:0:"";a:1:{s:4:"type";s:4:"text";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:4:"link";a:2:{i:0;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:3:"rel";s:9:"alternate";s:4:"type";s:9:"text/html";s:4:"href";s:0:"";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}i:1;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:3:"rel";s:4:"self";s:4:"type";s:20:"application/atom+xml";s:4:"href";s:49:"https://expressionengine.com/blog/rss-feed/cpnews";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:7:"updated";a:1:{i:0;a:5:{s:4:"data";s:25:"2019-05-31T12:36:08+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:6:"rights";a:1:{i:0;a:5:{s:4:"data";s:33:"Copyright (c) 2019, James Mathias";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:9:"generator";a:1:{i:0;a:5:{s:4:"data";s:16:"ExpressionEngine";s:7:"attribs";a:1:{s:0:"";a:2:{s:3:"uri";s:28:"http://expressionengine.com/";s:7:"version";s:5:"5.1.3";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:2:"id";a:1:{i:0;a:5:{s:4:"data";s:29:"https://expressionengine.com/";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:5:"entry";a:10:{i:0;a:6:{s:4:"data";s:123:"
+	";s:7:"attribs";a:1:{s:36:"http://www.w3.org/XML/1998/namespace";a:1:{s:4:"lang";s:2:"en";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:8:{s:5:"title";a:1:{i:0;a:5:{s:4:"data";s:16:"ExpressionEngine";s:7:"attribs";a:1:{s:0:"";a:1:{s:4:"type";s:4:"text";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:8:"subtitle";a:1:{i:0;a:5:{s:4:"data";s:4:"Blog";s:7:"attribs";a:1:{s:0:"";a:1:{s:4:"type";s:4:"text";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:4:"link";a:2:{i:0;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:3:"rel";s:9:"alternate";s:4:"type";s:9:"text/html";s:4:"href";s:0:"";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}i:1;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:3:"rel";s:4:"self";s:4:"type";s:20:"application/atom+xml";s:4:"href";s:49:"https://expressionengine.com/blog/rss-feed/cpnews";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:7:"updated";a:1:{i:0;a:5:{s:4:"data";s:25:"2019-06-15T18:46:02+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:6:"rights";a:1:{i:0;a:5:{s:4:"data";s:33:"Copyright (c) 2019, James Mathias";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:9:"generator";a:1:{i:0;a:5:{s:4:"data";s:16:"ExpressionEngine";s:7:"attribs";a:1:{s:0:"";a:2:{s:3:"uri";s:28:"http://expressionengine.com/";s:7:"version";s:5:"5.1.3";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:2:"id";a:1:{i:0;a:5:{s:4:"data";s:29:"https://expressionengine.com/";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:5:"entry";a:10:{i:0;a:6:{s:4:"data";s:123:"
 				
 				
 				
@@ -56,12 +56,12 @@ a:3:{s:4:"time";i:1560542066;s:3:"ttl";i:0;s:4:"data";a:4:{s:5:"child";a:1:{s:27
 					
 					
 				
-			";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:10:{s:5:"title";a:1:{i:0;a:5:{s:4:"data";s:41:"The Brand New ExpressionEngine User Guide";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:4:"link";a:1:{i:0;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:3:"rel";s:9:"alternate";s:4:"type";s:9:"text/html";s:4:"href";s:75:"https://expressionengine.com/blog/the-brand-new-expressionengine-user-guide";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:2:"id";a:1:{i:0;a:5:{s:4:"data";s:75:"https://expressionengine.com/blog/the-brand-new-expressionengine-user-guide";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:9:"published";a:1:{i:0;a:5:{s:4:"data";s:25:"2019-02-06T16:22:00+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:7:"updated";a:1:{i:0;a:5:{s:4:"data";s:25:"2019-02-06T16:27:41+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:6:"author";a:1:{i:0;a:6:{s:4:"data";s:23:"
+			";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:10:{s:5:"title";a:1:{i:0;a:5:{s:4:"data";s:41:"The Brand New ExpressionEngine User Guide";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:4:"link";a:1:{i:0;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:3:"rel";s:9:"alternate";s:4:"type";s:9:"text/html";s:4:"href";s:75:"https://expressionengine.com/blog/the-brand-new-expressionengine-user-guide";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:2:"id";a:1:{i:0;a:5:{s:4:"data";s:75:"https://expressionengine.com/blog/the-brand-new-expressionengine-user-guide";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:9:"published";a:1:{i:0;a:5:{s:4:"data";s:25:"2019-02-06T16:22:00+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:7:"updated";a:1:{i:0;a:5:{s:4:"data";s:25:"2019-06-14T21:58:03+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:6:"author";a:1:{i:0;a:6:{s:4:"data";s:23:"
 					
 					
 					
-				";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:2:{s:4:"name";a:1:{i:0;a:5:{s:4:"data";s:12:"Jordan Ellis";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:5:"email";a:1:{i:0;a:5:{s:4:"data";s:25:"jordan.ellis@ellislab.com";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}}}}}s:8:"category";a:3:{i:0;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:4:"term";s:17:"CP Accessory Feed";s:6:"scheme";s:60:"https://expressionengine.com/blog/category/cp-accessory-feed";s:5:"label";s:17:"CP Accessory Feed";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}i:1;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:4:"term";s:9:"Education";s:6:"scheme";s:52:"https://expressionengine.com/blog/category/education";s:5:"label";s:9:"Education";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}i:2;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:4:"term";s:4:"News";s:6:"scheme";s:47:"https://expressionengine.com/blog/category/news";s:5:"label";s:4:"News";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:7:"content";a:1:{i:0;a:5:{s:4:"data";s:2693:"
-				<figure><img src="https://expressionengine.com/asset/img/blog/brand-new-docs.png" alt=""></figure>
+				";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:2:{s:4:"name";a:1:{i:0;a:5:{s:4:"data";s:12:"Jordan Ellis";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:5:"email";a:1:{i:0;a:5:{s:4:"data";s:25:"jordan.ellis@ellislab.com";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}}}}}s:8:"category";a:3:{i:0;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:4:"term";s:17:"CP Accessory Feed";s:6:"scheme";s:60:"https://expressionengine.com/blog/category/cp-accessory-feed";s:5:"label";s:17:"CP Accessory Feed";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}i:1;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:4:"term";s:9:"Education";s:6:"scheme";s:52:"https://expressionengine.com/blog/category/education";s:5:"label";s:9:"Education";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}i:2;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:4:"term";s:4:"News";s:6:"scheme";s:47:"https://expressionengine.com/blog/category/news";s:5:"label";s:4:"News";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:7:"content";a:1:{i:0;a:5:{s:4:"data";s:2699:"
+				<figure><img src="https://expressionengine.com/asset/img/blog/brand-new-user-guide.png" alt=""></figure>
 
 <p>ExpressionEngine&#8217;s documentation just got a brand new look and is now easier to use. <a href="https://docs.expressionengine.com">Check it out!</a></p>
 
@@ -88,7 +88,7 @@ a:3:{s:4:"time";i:1560542066;s:3:"ttl";i:0;s:4:"data";a:4:{s:5:"child";a:1:{s:27
 
 <p>That&#8217;s it. Go explore <a href="https://docs.expressionengine.com/">the new docs</a>! If you&#8217;re a developer, <a href="https://github.com/ExpressionEngine/ExpressionEngine-User-Guide/blob/stability/CONTRIBUTING.md" title="" rel="external">feel free to check out the repo</a> and see how easy it is to build and contribute.</p>
 
-				";s:7:"attribs";a:1:{s:0:"";a:1:{s:4:"type";s:4:"html";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:7:"pubDate";a:1:{i:0;a:5:{s:4:"data";s:31:"Wed, 06 Feb 2019 16:22:00 +0000";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:11:"description";a:1:{i:0;a:5:{s:4:"data";s:2683:"<figure><img src="https://expressionengine.com/asset/img/blog/brand-new-docs.png" alt=""></figure>
+				";s:7:"attribs";a:1:{s:0:"";a:1:{s:4:"type";s:4:"html";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:7:"pubDate";a:1:{i:0;a:5:{s:4:"data";s:31:"Wed, 06 Feb 2019 16:22:00 +0000";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:11:"description";a:1:{i:0;a:5:{s:4:"data";s:2689:"<figure><img src="https://expressionengine.com/asset/img/blog/brand-new-user-guide.png" alt=""></figure>
 
 <p>ExpressionEngine&#8217;s documentation just got a brand new look and is now easier to use. <a href="https://docs.expressionengine.com">Check it out!</a></p>
 
@@ -138,7 +138,7 @@ a:3:{s:4:"time";i:1560542066;s:3:"ttl";i:0;s:4:"data";a:4:{s:5:"child";a:1:{s:27
 					
 					
 				
-			";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:10:{s:5:"title";a:1:{i:0;a:5:{s:4:"data";s:39:"5.1 brings Drag, Drop, and Bulk Uploads";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:4:"link";a:1:{i:0;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:3:"rel";s:9:"alternate";s:4:"type";s:9:"text/html";s:4:"href";s:71:"https://expressionengine.com/blog/5.1-brings-drag-drop-and-bulk-uploads";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:2:"id";a:1:{i:0;a:5:{s:4:"data";s:71:"https://expressionengine.com/blog/5.1-brings-drag-drop-and-bulk-uploads";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:9:"published";a:1:{i:0;a:5:{s:4:"data";s:25:"2019-01-22T20:14:00+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:7:"updated";a:1:{i:0;a:5:{s:4:"data";s:25:"2019-01-22T21:03:44+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:6:"author";a:1:{i:0;a:6:{s:4:"data";s:23:"
+			";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:10:{s:5:"title";a:1:{i:0;a:5:{s:4:"data";s:39:"5.1 brings Drag, Drop, and Bulk Uploads";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:4:"link";a:1:{i:0;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:3:"rel";s:9:"alternate";s:4:"type";s:9:"text/html";s:4:"href";s:71:"https://expressionengine.com/blog/5.1-brings-drag-drop-and-bulk-uploads";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:2:"id";a:1:{i:0;a:5:{s:4:"data";s:71:"https://expressionengine.com/blog/5.1-brings-drag-drop-and-bulk-uploads";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:9:"published";a:1:{i:0;a:5:{s:4:"data";s:25:"2019-01-22T20:14:00+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:7:"updated";a:1:{i:0;a:5:{s:4:"data";s:25:"2019-06-15T18:46:02+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:6:"author";a:1:{i:0;a:6:{s:4:"data";s:23:"
 					
 					
 					
@@ -365,7 +365,7 @@ a:3:{s:4:"time";i:1560542066;s:3:"ttl";i:0;s:4:"data";a:4:{s:5:"child";a:1:{s:27
 					
 					
 				
-			";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:10:{s:5:"title";a:1:{i:0;a:5:{s:4:"data";s:38:"EllisLab Acquired by Digital Locations";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:4:"link";a:1:{i:0;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:3:"rel";s:9:"alternate";s:4:"type";s:9:"text/html";s:4:"href";s:72:"https://expressionengine.com/blog/ellislab-acquired-by-digital-locations";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:2:"id";a:1:{i:0;a:5:{s:4:"data";s:72:"https://expressionengine.com/blog/ellislab-acquired-by-digital-locations";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:9:"published";a:1:{i:0;a:5:{s:4:"data";s:25:"2018-12-04T08:01:00+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:7:"updated";a:1:{i:0;a:5:{s:4:"data";s:25:"2018-12-04T03:51:18+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:6:"author";a:1:{i:0;a:6:{s:4:"data";s:23:"
+			";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:10:{s:5:"title";a:1:{i:0;a:5:{s:4:"data";s:38:"EllisLab Acquired by Digital Locations";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:4:"link";a:1:{i:0;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:3:"rel";s:9:"alternate";s:4:"type";s:9:"text/html";s:4:"href";s:72:"https://expressionengine.com/blog/ellislab-acquired-by-digital-locations";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:2:"id";a:1:{i:0;a:5:{s:4:"data";s:72:"https://expressionengine.com/blog/ellislab-acquired-by-digital-locations";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:9:"published";a:1:{i:0;a:5:{s:4:"data";s:25:"2018-12-04T08:01:00+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:7:"updated";a:1:{i:0;a:5:{s:4:"data";s:25:"2019-06-15T18:38:05+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:6:"author";a:1:{i:0;a:6:{s:4:"data";s:23:"
 					
 					
 					
@@ -825,48 +825,122 @@ a:3:{s:4:"time";i:1560542066;s:3:"ttl";i:0;s:4:"data";a:4:{s:5:"child";a:1:{s:27
 					
 					
 				
-			";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:10:{s:5:"title";a:1:{i:0;a:5:{s:4:"data";s:25:"Prime Day Deals are Here!";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:4:"link";a:1:{i:0;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:3:"rel";s:9:"alternate";s:4:"type";s:9:"text/html";s:4:"href";s:58:"https://expressionengine.com/blog/prime-day-deals-are-here";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:2:"id";a:1:{i:0;a:5:{s:4:"data";s:58:"https://expressionengine.com/blog/prime-day-deals-are-here";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:9:"published";a:1:{i:0;a:5:{s:4:"data";s:25:"2018-07-16T18:50:00+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:7:"updated";a:1:{i:0;a:5:{s:4:"data";s:25:"2018-07-16T17:58:42+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:6:"author";a:1:{i:0;a:6:{s:4:"data";s:23:"
+			";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:10:{s:5:"title";a:1:{i:0;a:5:{s:4:"data";s:42:"ExpressionEngine 4.3: The EU Made Me Do It";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:4:"link";a:1:{i:0;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:3:"rel";s:9:"alternate";s:4:"type";s:9:"text/html";s:4:"href";s:75:"https://expressionengine.com/blog/expressionengine-4.3-the-eu-made-me-do-it";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:2:"id";a:1:{i:0;a:5:{s:4:"data";s:75:"https://expressionengine.com/blog/expressionengine-4.3-the-eu-made-me-do-it";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:9:"published";a:1:{i:0;a:5:{s:4:"data";s:25:"2018-05-25T15:39:00+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:7:"updated";a:1:{i:0;a:5:{s:4:"data";s:25:"2018-05-25T15:50:06+00:00";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:6:"author";a:1:{i:0;a:6:{s:4:"data";s:23:"
 					
 					
 					
-				";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:2:{s:4:"name";a:1:{i:0;a:5:{s:4:"data";s:11:"Derek Jones";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:5:"email";a:1:{i:0;a:5:{s:4:"data";s:24:"derek.jones@ellislab.com";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}}}}}s:8:"category";a:3:{i:0;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:4:"term";s:17:"CP Accessory Feed";s:6:"scheme";s:60:"https://expressionengine.com/blog/category/cp-accessory-feed";s:5:"label";s:17:"CP Accessory Feed";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}i:1;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:4:"term";s:16:"ExpressionEngine";s:6:"scheme";s:59:"https://expressionengine.com/blog/category/expressionengine";s:5:"label";s:16:"ExpressionEngine";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}i:2;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:4:"term";s:4:"News";s:6:"scheme";s:47:"https://expressionengine.com/blog/category/news";s:5:"label";s:4:"News";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:7:"content";a:1:{i:0;a:5:{s:4:"data";s:1028:"
-				<figure><img src="https://expressionengine.com/asset/img/blog/prime-sale-blog-news_2x.png" alt="Prime Day Sale"></figure>
+				";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";s:5:"child";a:1:{s:27:"http://www.w3.org/2005/Atom";a:2:{s:4:"name";a:1:{i:0;a:5:{s:4:"data";s:12:"Robin Sowell";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:5:"email";a:1:{i:0;a:5:{s:4:"data";s:25:"robin.sowell@ellislab.com";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}}}}}s:8:"category";a:3:{i:0;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:4:"term";s:17:"CP Accessory Feed";s:6:"scheme";s:60:"https://expressionengine.com/blog/category/cp-accessory-feed";s:5:"label";s:17:"CP Accessory Feed";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}i:1;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:4:"term";s:16:"ExpressionEngine";s:6:"scheme";s:59:"https://expressionengine.com/blog/category/expressionengine";s:5:"label";s:16:"ExpressionEngine";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}i:2;a:5:{s:4:"data";s:0:"";s:7:"attribs";a:1:{s:0:"";a:3:{s:4:"term";s:4:"News";s:6:"scheme";s:47:"https://expressionengine.com/blog/category/news";s:5:"label";s:4:"News";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:7:"content";a:1:{i:0;a:5:{s:4:"data";s:7296:"
+				<figure>
+    <img src="https://expressionengine.com/asset/img/blog/4.3-announce-blog-news@2x_.png" alt="Welcome to 4.2">
+</figure>
 
-<p>So we don&#8217;t really understand why, but there is apparently a holiday going on from Noon PST through midnight tomorrow in honor of prime numbers. We hate feeling left out, so from now until tomorrow night ONLY, we have repriced ExpressionEngine using only prime numbers:</p>
+<p>Tis the season for updated privacy notifications, as websites scramble to comply with the European Union&#8217;s <a href="https://en.wikipedia.org/wiki/General_Data_Protection_Regulation">General Data Protection Regulation</a> (<abbr title="General Data Protection Regulation">GDPR</abbr>), which goes into effect May 25th, 2018. Since the regulation applies to any entity processing the personal data of EU citizens, ignoring it really isn&#8217;t a good option. Upgrading to ExpressionEngine v4.3 is.</p>
 
-<ul>
-<li>ExpressionEngine 4: <del>$299</del> <strong>$271</strong>
+<p>ExpressionEngine v4.3 brings a comprehensive set of tools that make it the go-to CMS for building sites that take user privacy concerns seriously. It handles the heavy lifting, making it easy for designers and third party developers to create <abbr title="General Data Protection Regulation">GDPR</abbr> compliant websites.</p>
 
-<ul>
-<li>Additional Sites: <del>$199</del> <strong>$179/ea</strong></li>
-</ul></li>
-<li>Upgrade from ExpressionEngine 3: <del>$99</del> <strong>$89</strong>
+<h2>Consent Manager</h2>
 
-<ul>
-<li>Upgrade from ExpressionEngine 2 to 3: <del>$149</del> <strong>$131</strong></li>
-<li>That means you save <strong>$79</strong> total if you then leap to v4!</li>
-</ul></li>
-</ul>
+<p>The <abbr title="General Data Protection Regulation">GDPR</abbr> is all about transparency and the need to obtain consent before processing personal data.  The new Consent Manager allows users to create and manage any requests for consent that they may need.  Have a Terms of Service? Create a consent request for it. Offering email sign-ups? Consent request.  Want to use targeted ad tracking? You know what you need to do.</p>
 
-<p>Don&#8217;t delay, our celebration of prime numbers ends in only 36 hours! Wait&#8230; shouldn&#8217;t that be like 37 hours? Really don&#8217;t understand how this holiday works, oh well!</p>
+<p>The consent manager even lets you manage consent requests you didn&#8217;t know you needed. Native consent requests are automatically created and third party add-ons that may require consent can create their own consent requests upon installation or update.</p>
 
-				";s:7:"attribs";a:1:{s:0:"";a:1:{s:4:"type";s:4:"html";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:7:"pubDate";a:1:{i:0;a:5:{s:4:"data";s:31:"Mon, 16 Jul 2018 18:50:00 +0000";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:11:"description";a:1:{i:0;a:5:{s:4:"data";s:1018:"<figure><img src="https://expressionengine.com/asset/img/blog/prime-sale-blog-news_2x.png" alt="Prime Day Sale"></figure>
+<p>On the frontend, users can easily view all existing consent requests, give or deny consent, and modify their consent settings at any time.  <a href="https://docs.expressionengine.com/v4/templates/globals/consent.html">Global consent variables</a> make it simple to alter content based on a user&#8217;s consent to a given request:</p>
 
-<p>So we don&#8217;t really understand why, but there is apparently a holiday going on from Noon PST through midnight tomorrow in honor of prime numbers. We hate feeling left out, so from now until tomorrow night ONLY, we have repriced ExpressionEngine using only prime numbers:</p>
+<div class="codeblock"><pre><code>&#123;if consent:ee_mail:email_collection&#125;
 
-<ul>
-<li>ExpressionEngine 4: <del>$299</del> <strong>$271</strong>
+    &#123;sign_up_button&#125;
 
-<ul>
-<li>Additional Sites: <del>$199</del> <strong>$179/ea</strong></li>
-</ul></li>
-<li>Upgrade from ExpressionEngine 3: <del>$99</del> <strong>$89</strong>
+&#123;/if&#125;
+</code></pre></div>
 
-<ul>
-<li>Upgrade from ExpressionEngine 2 to 3: <del>$149</del> <strong>$131</strong></li>
-<li>That means you save <strong>$79</strong> total if you then leap to v4!</li>
-</ul></li>
-</ul>
+<p>All of those user responses to the consent requests are maintained in an <a href="https://docs.expressionengine.com/v4/cp/logs/consent.html">audit log</a>, making it a simple matter to report a user&#8217;s consent history. Because when dealing with the law, it&#8217;s always best to cover your &#8230; bases.</p>
 
-<p>Don&#8217;t delay, our celebration of prime numbers ends in only 36 hours! Wait&#8230; shouldn&#8217;t that be like 37 hours? Really don&#8217;t understand how this holiday works, oh well!</p>
-";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}}}}}}}}}}}s:4:"type";i:512;s:7:"headers";a:10:{s:4:"date";s:29:"Fri, 14 Jun 2019 19:54:26 GMT";s:6:"server";s:6:"Apache";s:10:"set-cookie";s:677:"exp_last_visit=1245182066; expires=Sat, 13-Jun-2020 19:54:26 GMT; Max-Age=31536000; path=/; domain=.expressionengine.com; secure; HttpOnly, exp_last_activity=1560542066; expires=Sat, 13-Jun-2020 19:54:26 GMT; Max-Age=31536000; path=/; domain=.expressionengine.com; secure; HttpOnly, exp_csrf_token=deleted; expires=Thu, 01-Jan-1970 00:00:01 GMT; Max-Age=0; path=/; domain=.expressionengine.com; secure; HttpOnly, exp_csrf_token=1ea9af9ca43d0120a2328273e70720a0d008270b; expires=Fri, 14-Jun-2019 21:54:26 GMT; Max-Age=7200; path=/; domain=.expressionengine.com; secure; HttpOnly, PHPSESSID=13ab135ef92e9511ad50a3f916924ba8; path=/; domain=.expressionengine.com; secure; HttpOnly";s:15:"x-frame-options";s:10:"SAMEORIGIN";s:7:"expires";s:29:"Fri, 31 May 2019 13:36:08 GMT";s:13:"last-modified";s:29:"Fri, 31 May 2019 12:36:08 GMT";s:13:"cache-control";s:62:"no-store, no-cache, must-revalidate, post-check=0, pre-check=0";s:6:"pragma";s:8:"no-cache";s:25:"strict-transport-security";s:34:"max-age=7776000; includeSubDomains";s:12:"content-type";s:23:"text/xml; charset=utf-8";}s:5:"build";s:14:"20190614195424";}}
+<h2>Cookie Consent</h2>
+
+<p>The <abbr title="General Data Protection Regulation">GDPR</abbr>&#8217;s discussion of cookies is sparse, but we&#8217;ve jumped through hoops before <a href="https://expressionengine.com/blog/the-cookie-consent-module-eu-cookie-legislation">due to EU cookie regulations</a>, so we&#8217;ve built in native cookie consent functionality that will stand up to the strictest interpretations of the <abbr title="General Data Protection Regulation">GDPR</abbr> on cookies.</p>
+
+<p>If you enable the cookie consent requirement in the <a href="https://docs.expressionengine.com/v4/cp/settings/security-privacy.html#require-user-consent-to-set-cookies">cookie settings</a>, only <strong>strictly necessary cookies</strong> will be set natively without first obtaining explicit prior consent.  Native ExpressionEngine cookies are <a href="https://docs.expressionengine.com/v4/general/cookies.html">well documented</a>, and necessary cookies do not contain any Personally Identifiable Information (<abbr title="Personally Identifiable Information">PII</abbr>).</p>
+
+<p>Consent to set non-necessary cookies can be managed via the Consent Manager, just like any other consent request.  Third party add-ons can register cookies they set as well. Any non-necessary cookie that is set via internal ExpressionEngine methods will require user consent prior to being set.</p>
+
+<h2>Member Anonymization</h2>
+
+<p>In addition to making certain users know what data a site is collecting and requiring permission for any <abbr title="Personally Identifiable Information">PII</abbr> data, the <abbr title="General Data Protection Regulation">GDPR</abbr> requires that users be able to remove their personal data at will.  In many cases, this is simply a matter of deleting the member, which is already an option. But there are times when a record needs to be maintained, such as purchase records.</p>
+
+<p>If deleting all traces of a member isn&#8217;t viable, version 4.3 allows you to &#8216;Anonymize&#8217; an existing user, wiping out all <abbr title="Personally Identifiable Information">PII</abbr> data but still maintaining the non-identifiable elements for the record.  To anonymize a member&#8217;s record, visit the Member&#8217;s profile in the control panel, and click &#8220;Anonymize Member Record&#8221;.</p>
+
+<p>Third party developers can sanitize any data they have stored as well via the new extension hooks.</p>
+
+<h2>Extension Hooks You Say?</h2>
+
+<p>Yes, one goal in v4.3 is to make it as easy as possible for third party developers to make their add-ons <abbr title="General Data Protection Regulation">GDPR</abbr> friendly.</p>
+
+<p>The add-on has its own cookies?  Put them in <a href="https://docs.expressionengine.com/v4/development/addon_setup_php_file.html">addon.addon.setup.php file</a>. Need to collect personal data? Add a few more lines to <code>addon.setup.php</code>.  The native <a href="https://docs.expressionengine.com/v4/add-ons/consent/index.html">Consent module</a> will handle users granting and denying consent for all registered consent requests, both first and third party.</p>
+
+<p>If your add-on needs to check those permissions before performing an action, the <a href="https://docs.expressionengine.com/v4/development/services/consent.html">Consent service</a> makes it easy. And the new <a href="https://docs.expressionengine.com/v4/development/extension_hooks/model/member/index.html#member-anonymize">member_anonymization hook</a> lets you know if you need to nuke any <abbr title="Personally Identifiable Information">PII</abbr> your add-on stores!</p>
+
+<h2>Breach Notification</h2>
+
+<p>Continuing the focus on transparency, the <abbr title="General Data Protection Regulation">GDPR</abbr> details specific requirements concerning the notification of the subjects of a data breach. The new <a href="https://docs.expressionengine.com/v4//cp/utilities/mass-notification-export.html">Mass Notification Export</a> utility will output both a full and a validated CSV of member email addresses. That makes it fast and easy to export to a third-party validation and mass notification service to make sure your emails are delivered and your domain doesn&#8217;t get blacklisted for spam. It&#8217;s one less thing to worry about in the unlikely event data is compromised.</p>
+
+<h2>Don&#8217;t care about the <abbr title="General Data Protection Regulation">GDPR</abbr>?</h2>
+
+<p>Totally unaffected by the <abbr title="General Data Protection Regulation">GDPR</abbr>? Celebrate your good fortune by checking out the new filters on the entry manager. Filter by author or set parameters on where to search while laughing at the rest of us as we try to figure out what counts as &#8216;Personally Identifying Information&#8217;.</p>
+
+				";s:7:"attribs";a:1:{s:0:"";a:1:{s:4:"type";s:4:"html";}}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:7:"pubDate";a:1:{i:0;a:5:{s:4:"data";s:31:"Fri, 25 May 2018 15:39:00 +0000";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}s:11:"description";a:1:{i:0;a:5:{s:4:"data";s:7286:"<figure>
+    <img src="https://expressionengine.com/asset/img/blog/4.3-announce-blog-news@2x_.png" alt="Welcome to 4.2">
+</figure>
+
+<p>Tis the season for updated privacy notifications, as websites scramble to comply with the European Union&#8217;s <a href="https://en.wikipedia.org/wiki/General_Data_Protection_Regulation">General Data Protection Regulation</a> (<abbr title="General Data Protection Regulation">GDPR</abbr>), which goes into effect May 25th, 2018. Since the regulation applies to any entity processing the personal data of EU citizens, ignoring it really isn&#8217;t a good option. Upgrading to ExpressionEngine v4.3 is.</p>
+
+<p>ExpressionEngine v4.3 brings a comprehensive set of tools that make it the go-to CMS for building sites that take user privacy concerns seriously. It handles the heavy lifting, making it easy for designers and third party developers to create <abbr title="General Data Protection Regulation">GDPR</abbr> compliant websites.</p>
+
+<h2>Consent Manager</h2>
+
+<p>The <abbr title="General Data Protection Regulation">GDPR</abbr> is all about transparency and the need to obtain consent before processing personal data.  The new Consent Manager allows users to create and manage any requests for consent that they may need.  Have a Terms of Service? Create a consent request for it. Offering email sign-ups? Consent request.  Want to use targeted ad tracking? You know what you need to do.</p>
+
+<p>The consent manager even lets you manage consent requests you didn&#8217;t know you needed. Native consent requests are automatically created and third party add-ons that may require consent can create their own consent requests upon installation or update.</p>
+
+<p>On the frontend, users can easily view all existing consent requests, give or deny consent, and modify their consent settings at any time.  <a href="https://docs.expressionengine.com/v4/templates/globals/consent.html">Global consent variables</a> make it simple to alter content based on a user&#8217;s consent to a given request:</p>
+
+<div class="codeblock"><pre><code>&#123;if consent:ee_mail:email_collection&#125;
+
+    &#123;sign_up_button&#125;
+
+&#123;/if&#125;
+</code></pre></div>
+
+<p>All of those user responses to the consent requests are maintained in an <a href="https://docs.expressionengine.com/v4/cp/logs/consent.html">audit log</a>, making it a simple matter to report a user&#8217;s consent history. Because when dealing with the law, it&#8217;s always best to cover your &#8230; bases.</p>
+
+<h2>Cookie Consent</h2>
+
+<p>The <abbr title="General Data Protection Regulation">GDPR</abbr>&#8217;s discussion of cookies is sparse, but we&#8217;ve jumped through hoops before <a href="https://expressionengine.com/blog/the-cookie-consent-module-eu-cookie-legislation">due to EU cookie regulations</a>, so we&#8217;ve built in native cookie consent functionality that will stand up to the strictest interpretations of the <abbr title="General Data Protection Regulation">GDPR</abbr> on cookies.</p>
+
+<p>If you enable the cookie consent requirement in the <a href="https://docs.expressionengine.com/v4/cp/settings/security-privacy.html#require-user-consent-to-set-cookies">cookie settings</a>, only <strong>strictly necessary cookies</strong> will be set natively without first obtaining explicit prior consent.  Native ExpressionEngine cookies are <a href="https://docs.expressionengine.com/v4/general/cookies.html">well documented</a>, and necessary cookies do not contain any Personally Identifiable Information (<abbr title="Personally Identifiable Information">PII</abbr>).</p>
+
+<p>Consent to set non-necessary cookies can be managed via the Consent Manager, just like any other consent request.  Third party add-ons can register cookies they set as well. Any non-necessary cookie that is set via internal ExpressionEngine methods will require user consent prior to being set.</p>
+
+<h2>Member Anonymization</h2>
+
+<p>In addition to making certain users know what data a site is collecting and requiring permission for any <abbr title="Personally Identifiable Information">PII</abbr> data, the <abbr title="General Data Protection Regulation">GDPR</abbr> requires that users be able to remove their personal data at will.  In many cases, this is simply a matter of deleting the member, which is already an option. But there are times when a record needs to be maintained, such as purchase records.</p>
+
+<p>If deleting all traces of a member isn&#8217;t viable, version 4.3 allows you to &#8216;Anonymize&#8217; an existing user, wiping out all <abbr title="Personally Identifiable Information">PII</abbr> data but still maintaining the non-identifiable elements for the record.  To anonymize a member&#8217;s record, visit the Member&#8217;s profile in the control panel, and click &#8220;Anonymize Member Record&#8221;.</p>
+
+<p>Third party developers can sanitize any data they have stored as well via the new extension hooks.</p>
+
+<h2>Extension Hooks You Say?</h2>
+
+<p>Yes, one goal in v4.3 is to make it as easy as possible for third party developers to make their add-ons <abbr title="General Data Protection Regulation">GDPR</abbr> friendly.</p>
+
+<p>The add-on has its own cookies?  Put them in <a href="https://docs.expressionengine.com/v4/development/addon_setup_php_file.html">addon.addon.setup.php file</a>. Need to collect personal data? Add a few more lines to <code>addon.setup.php</code>.  The native <a href="https://docs.expressionengine.com/v4/add-ons/consent/index.html">Consent module</a> will handle users granting and denying consent for all registered consent requests, both first and third party.</p>
+
+<p>If your add-on needs to check those permissions before performing an action, the <a href="https://docs.expressionengine.com/v4/development/services/consent.html">Consent service</a> makes it easy. And the new <a href="https://docs.expressionengine.com/v4/development/extension_hooks/model/member/index.html#member-anonymize">member_anonymization hook</a> lets you know if you need to nuke any <abbr title="Personally Identifiable Information">PII</abbr> your add-on stores!</p>
+
+<h2>Breach Notification</h2>
+
+<p>Continuing the focus on transparency, the <abbr title="General Data Protection Regulation">GDPR</abbr> details specific requirements concerning the notification of the subjects of a data breach. The new <a href="https://docs.expressionengine.com/v4//cp/utilities/mass-notification-export.html">Mass Notification Export</a> utility will output both a full and a validated CSV of member email addresses. That makes it fast and easy to export to a third-party validation and mass notification service to make sure your emails are delivered and your domain doesn&#8217;t get blacklisted for spam. It&#8217;s one less thing to worry about in the unlikely event data is compromised.</p>
+
+<h2>Don&#8217;t care about the <abbr title="General Data Protection Regulation">GDPR</abbr>?</h2>
+
+<p>Totally unaffected by the <abbr title="General Data Protection Regulation">GDPR</abbr>? Celebrate your good fortune by checking out the new filters on the entry manager. Filter by author or set parameters on where to search while laughing at the rest of us as we try to figure out what counts as &#8216;Personally Identifying Information&#8217;.</p>
+";s:7:"attribs";a:0:{}s:8:"xml_base";s:0:"";s:17:"xml_base_explicit";b:0;s:8:"xml_lang";s:2:"en";}}}}}}}}}}}}s:4:"type";i:512;s:7:"headers";a:10:{s:4:"date";s:29:"Tue, 18 Jun 2019 13:44:45 GMT";s:6:"server";s:6:"Apache";s:10:"set-cookie";s:677:"exp_last_visit=1245505485; expires=Wed, 17-Jun-2020 13:44:45 GMT; Max-Age=31536000; path=/; domain=.expressionengine.com; secure; HttpOnly, exp_last_activity=1560865485; expires=Wed, 17-Jun-2020 13:44:45 GMT; Max-Age=31536000; path=/; domain=.expressionengine.com; secure; HttpOnly, exp_csrf_token=deleted; expires=Thu, 01-Jan-1970 00:00:01 GMT; Max-Age=0; path=/; domain=.expressionengine.com; secure; HttpOnly, exp_csrf_token=f1be4e928e3add916d5ae200452b761430504426; expires=Tue, 18-Jun-2019 15:44:45 GMT; Max-Age=7200; path=/; domain=.expressionengine.com; secure; HttpOnly, PHPSESSID=253c71ab52d1c7be3fb59acd9703a1a1; path=/; domain=.expressionengine.com; secure; HttpOnly";s:15:"x-frame-options";s:10:"SAMEORIGIN";s:7:"expires";s:29:"Sat, 15 Jun 2019 19:46:02 GMT";s:13:"last-modified";s:29:"Sat, 15 Jun 2019 18:46:02 GMT";s:13:"cache-control";s:62:"no-store, no-cache, must-revalidate, post-check=0, pre-check=0";s:6:"pragma";s:8:"no-cache";s:25:"strict-transport-security";s:34:"max-age=7776000; includeSubDomains";s:12:"content-type";s:23:"text/xml; charset=utf-8";}s:5:"build";s:14:"20190614195424";}}

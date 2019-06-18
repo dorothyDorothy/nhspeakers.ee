@@ -5,9 +5,12 @@
 		<title>{layout:title}{site_name}</title>
 		<meta name="viewport" content="initial-scale=1">
 
-		<!-- meta data -->
-		{if layout:meta_author}<meta name="author" content="{layout:meta_author}">{/if}
-		{if layout:meta_description}<meta name="description" content="{layout:meta_description}">{/if}
+		{if "{layout:title}"}
+			{exp:seo_lite default_title="{layout:title}"}
+		{if:else}
+			{exp:seo_lite entry_id="{layout:entry_id}"}
+		{/if}		
+
 
 		<!-- open graph common -->
 		<meta property="og:site_name" content="{site_name}">

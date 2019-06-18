@@ -11,32 +11,43 @@
     </div>
 
 
-    <div class="mrgn-50-top-btm text-center">
+    <!-- <div class="mrgn-50-top-btm text-center">
         <img src="/assets/divider.svg" alt="*">
-    </div>
+    </div> -->
 
     <div class="row"> 
       <div class="col-md-8 col-md-offset-2 wow fadeInLeft">
-{exp:channel:entries channel="about"} 
         <div class="row text-center"> 
+{exp:channel:entries channel="about" limit="3" orderby="entry_id" sort="asc"} 
+    {if count < 3}
+    {count}
           <div class="col-md-4 wow fadeIn mrgn-40-btm">
           {about_image}
             <img src="{about_image:source}" class="img-responsive location" alt="{about_image:alt_text}">
           {/about_image}
             <h3>{title}</h3>
-            <p class="lead-sm mrgn-30-top">{p_intro}</p>
+            <p class="lead-sm mrgn-30-top">{summary}</p>
               <p class="mrgn-20-top"><a href="/about/{url_title}" 
-                class="btn btn-sm btn-main">More info</a></p>
+                class="btn btn-sm btn-main">More info</a>
+            </p>
           </div>
-
-{/exp:channel:entries} 
+    {if:else}
+            <div class="col-md-4 wow fadeInRight">
+    
+            <p class="lead-sm mrgn-30-top-btm">
+                {about_image}
+                <img src="{about_image:source}" class="img-responsive location" alt="{about_image:alt_text}">
+              {/about_image}
+                <h3>{title}</h3>
+                <p class="lead-sm mrgn-30-top">{summary} vvv</p>
+                  <p class="mrgn-20-top"><a href="/about/{url_title}" 
+                    class="btn btn-sm btn-main">More info</a></p>              
+            </p>
+            {/if}
+            {/exp:channel:entries} 
+            
+          </div>
       </div>
-
-{!--       <div class="col-lg-6 wow fadeInRight">
-
-      <p class="lead-sm mrgn-30-top-btm">
-      </p>
-      </div> --}
       </div>
     </div>
                

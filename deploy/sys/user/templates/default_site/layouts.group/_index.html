@@ -4,9 +4,12 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="favico.ico">
+    {if "{layout:title}"}
+        {exp:seo_lite default_title="{layout:title}"}
+    {if:else}
+        {exp:seo_lite entry_id="{layout:entry_id}"}
+    {/if}	
+    <link rel="icon" href="/favicon.ico">
     <title>{site_name}</title>
     <link href="/css/vendor/bootstrap.min.css" rel="stylesheet">
     <link href="/css/vendor/ie10-viewport-bug-workaround.css" rel="stylesheet">

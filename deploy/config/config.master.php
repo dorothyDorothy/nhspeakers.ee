@@ -114,7 +114,7 @@ if (isset($config))
 	        'url'         => $resources_url  . 'images/dividers/'
 	    ),	
 	    9 => array(
-	        'name'        => 'About Us',
+	        'name'        => 'About',
 	        'server_path' => $resources_path . 'images/about/',
 	        'url'         => $resources_url  . 'images/about/'
 	    ),
